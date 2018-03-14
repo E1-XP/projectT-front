@@ -13,7 +13,8 @@ order:-1;
 display:flex;
 flex-direction:column;
 align-items:center;
-
+position:fixed;
+height:100%;
 @media only screen and (min-width:1200px){
 max-width:250px;
 }
@@ -40,6 +41,19 @@ margin:.5rem;
 const Navigation_link = styled(Link) `
 display:flex;
 align-items: center;
+&:last-of-type{
+    border-radius:50%;
+}
+`;
+
+const IconProfile = styled.span`
+    display:flex;
+    background-color:red;
+    width:2rem;
+    height:2rem;
+    border-radius:50%;
+    justify-content:center; 
+    align-items:center;
 `;
 
 const Link_label = styled.span`
@@ -76,7 +90,7 @@ export default class SideBar extends React.Component {
                 </Sidebar_navigation>
                 <Sidebar_profile>
                     <Navigation_link to="/profile">
-                        P
+                        <IconProfile>P</IconProfile>
                     </Navigation_link>
                 </Sidebar_profile>
             </Sidebar>

@@ -16,6 +16,22 @@ class Form extends React.Component {
     handleSubmit(e) {
         e.preventDefault();
 
+        const route = this.props.location.pathname.toLowerCase().slice(1);
+        const url = `http://localhost:3001/auth/${route}`;
+        const headers = {
+            'Content-Type': "application/x-www-form-urlencoded"
+        }
+
+        const formData = new URLSearchParams();
+        for (const prop in this.state) {
+            if (this.state[prop]) formData.append(prop, this.state[prop]);
+        }
+
+        axios.defaults.withCredentials = true;
+        axios.post(url, formData, headers).then(data => {
+            console.log(data);
+            if (data.status === 200) this.props.handleAuth(data.data);
+        }).catch(err => console.log(err));
 
     }
 
