@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Redirect } from 'react-router-dom';
 
 class Protected_container extends React.Component {
     componentDidMount() {
@@ -10,8 +10,8 @@ class Protected_container extends React.Component {
 
     render() {
         const { isAuthenticated, children } = this.props;
-
-        return (isAuthenticated) ? children : null;///<Redirect to="/login" />;
+        const path = this.props.location.pathname.toLowerCase();
+        return (isAuthenticated) ? children : ((path === '/login') ? null : <Redirect to="/login" />);
     }
 }
 

@@ -13,6 +13,7 @@ align-items:center;
 class Preloader extends React.Component {
     render() {
         const { isLoading } = this.props;
+
         if (isLoading) return (<Main_preloader><p>Loading...</p></Main_preloader>);
         else return (this.props.children);
     }

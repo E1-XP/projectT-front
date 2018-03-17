@@ -38,7 +38,7 @@ export default class TopBar extends React.Component {
     }
 
     render() {
-        const { isRunning, timer } = this.props.state;
+        const { isRunning, timer } = this.props;
 
         return (
             <Task_controller>
