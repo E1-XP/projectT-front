@@ -49,14 +49,23 @@ class Timer extends React.Component {
         super(props);
 
         this.state = {
-            mappedItems: {}
+            filteredItems: {}
         }
     }
-
+    // componentDidUpdate() {
+    //     if (Object.keys(this.state.mappedItems).length) this.setMappedItems();
+    // }
     componentDidMount() {
-        this.setMappedItems();
+        if (this.props.userData) {
+            const filteredItems = Object.keys(this.setMappedItems()).map(item => false);
+        }
     }
-
+    // componentWillUpdate() {
+    //    
+    // }
+    // componentWillReceiveProps() {
+    //     if (Object.keys(this.state.mappedItems).length) this.setMappedItems();
+    // }
     setMappedItems() {
         const { userData } = this.props;
 
@@ -79,14 +88,18 @@ class Timer extends React.Component {
                 visible: false
             })).reduce(reduceItems, {});
 
-        this.setState({ mappedItems });
-        // console.log(Object.keys(this.state.mappedItems));
+        //this.setState({ mappedItems });
+        return mappedItems;
     }
 
     toggleEntries(item) {
-        const mappedItems = Object.assign({}, this.state.mappedItems);
-        mappedItems[item].map(item => item.visible = !item.visible);
-        this.setState({ mappedItems });
+        const { filteredItems } = this.state;
+
+        filteredItems[item] = !filteredItems[item];
+        this.setState({ filteredItems });
+        // const mappedItems = Object.assign({}, this.state.mappedItems);
+        // mappedItems[item].map(item => item.visible = !item.visible);
+        // this.setState({ mappedItems });
     }
 
     handleClick() {
@@ -107,16 +120,21 @@ class Timer extends React.Component {
 
     stopTimer() {
         const { userData, runningEntry, setTimer, setIsRunning, updateEntryStopField } = this.props;
+        const now = moment().valueOf();
 
         clearInterval(window.interval);
         setIsRunning(false);
         setTimer('0:00:00');
 
-        updateEntryStopField(userData._id, runningEntry, moment().valueOf());
+        updateEntryStopField(userData._id, runningEntry, now);
+
+        //REFRESH HERE      
     }
 
     handleRemove(id) {
-        const { userData, removeEntry } = this.props;
+        const { removeEntry } = this.props;
+        const { userData } = this.props;
+
         removeEntry(userData._id, id);
     }
 
@@ -137,11 +155,13 @@ class Timer extends React.Component {
         }
     }
 
-    getEntries(item) {
-        const { mappedItems } = this.state;
+    getEntries(item, mappedItems) {
 
         return mappedItems[item].map((item2, i) =>
-            (<tr key={i}><Item_row key={i}>{item2.duration}
+            (<tr key={i}><Item_row key={item2.id}>
+                <input type="text" placeholder="add description" />
+                <span>no project</span>
+                <span>{item2.duration}</span>
                 <Item_link onClick={() => this.handleRemove(item2.id)} >
                     <Icon name="delete" style={{ color: '#ccc' }} />
                 </Item_link>
@@ -151,9 +171,11 @@ class Timer extends React.Component {
 
     render() {
         const { stopTimer, timer, isRunning, userData } = this.props;
-        const { mappedItems } = this.state;
+        const { filteredItems } = this.state;
 
         if (!userData.entries) return (<p>Loading...</p>);
+
+        const mappedItems = this.setMappedItems();
 
         const getTotalDayCount = item => {
             const toSeconds = mappedItems[item].reduce((acc, item) => acc += moment.duration(item.duration).asSeconds(), 0);
@@ -166,12 +188,14 @@ class Timer extends React.Component {
                     <tbody>
                         <tr>
                             <Item_header>
-                                <span onClick={() => this.toggleEntries(item)}>entries: {mappedItems[item].length}</span>
+                                <span onClick={() => this.toggleEntries(item)}> {mappedItems[item].length}</span>
+                                <input type="text" placeholder="add description" />
+                                <span>no project</span>
                                 <span style={{ fontWeight: '700' }}>{item}</span>
-                                <span>total: {getTotalDayCount(item)}</span>
+                                <span>{getTotalDayCount(item)}</span>
                             </Item_header>
                         </tr>
-                        {mappedItems[item][0].visible ? this.getEntries(item) : null}
+                        {filteredItems[item] ? this.getEntries(item, mappedItems) : null}
                     </tbody>
                 </Item_table>
             </Navigation_item >);
@@ -180,8 +204,8 @@ class Timer extends React.Component {
             <div>
                 <Topbar timer={timer} isRunning={isRunning} handleClick={this.handleClick.bind(this)} stopTimer={stopTimer} />
                 <Navigation_list>
-                    {userData.entries ? (userData.entries.length ? DOMItems() :
-                        <Navigation_item >Add you first task to begin</Navigation_item>) : <p>Loading...</p>}
+                    {(userData.entries && userData.entries.length) ? DOMItems() :
+                        <Navigation_item >Add you first task to begin</Navigation_item>}
                 </Navigation_list>
             </div>
         );

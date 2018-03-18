@@ -22,6 +22,11 @@ export const setUserData = data => ({
     payload: data
 });
 
+export const setEntries = data => ({
+    type: consts.SET_ENTRIES,
+    payload: data
+});
+
 export const setTimer = time => ({
     type: consts.SET_TIMER,
     payload: time
@@ -34,9 +39,8 @@ export const setRunningEntry = id => ({
 
 export const createNewEntry = userid => dispatch => {
     const url = `http://localhost:3001/users/${userid}/entries/new`;
-    console.log(userid);
-    axios.post(url).then(res => {
 
+    axios.post(url).then(res => {
         dispatch(setRunningEntry(res.data._id));
     }).catch(err => {
         dispatch(loadingError(err));
@@ -46,17 +50,18 @@ export const createNewEntry = userid => dispatch => {
 export const updateEntryStopField = (userid, runningEntry, stopTime) => dispatch => {
     const url = `http://localhost:3001/users/${userid}/entries/${runningEntry}/update?stop=${stopTime}`;
 
-    axios.post(url)
-        .catch(err => {
-            dispatch(loadingError(err));
-        });
+    axios.post(url).then(res => {
+        dispatch(setEntries(res.data));
+    }).catch(err => {
+        dispatch(loadingError(err));
+    });
 }
 
 export const removeEntry = (userid, entryid) => dispatch => {
     const url = `http://localhost:3001/users/${userid}/entries/${entryid}/delete`;
 
     axios.post(url).then(res => {
-        //refresh state
+        dispatch(setEntries(res.data));
     }).catch(err => {
         dispatch(loadingError(err));
     });
@@ -80,13 +85,23 @@ export const fetchData = url => dispatch => {
     });
 }
 
+export const fetchEntries = url => dispatch => {
+    const url = `http://localhost:3001/users/${userid}/entries`;
+
+    axios.get(url).then(res => {
+        dispatch(setUserData(res.data));
+
+    }).catch(err => {
+        dispatch(loadingError(err));
+    });
+}
+
 export const fetchAuthentication = (url, authFlag) => dispatch => {
     dispatch(setIsLoading(true));
 
     axios.post(url).then(res => {
 
-        if (authFlag) dispatch(setUserData(res.data));
-        //(authFlag) ? dispatch(setUserData(res.data)) : dispatch(setUserData(null));
+        (authFlag) ? dispatch(setUserData(res.data)) : dispatch(setUserData(null));
         dispatch(setIsLoading(false));
         dispatch(setIsAuthenticated(authFlag));
 
@@ -94,5 +109,3 @@ export const fetchAuthentication = (url, authFlag) => dispatch => {
         dispatch(loadingError(err));
     });
 }
-
-
