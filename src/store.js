@@ -4,11 +4,12 @@ import rootReducer from './reducers';
 
 const initialState = {
     isLoading: true,
-    isUserLoggedIn: false,
     isRunning: false,
+    isUserLoggedIn: false,
     userData: {},
-    timer: '0:00:00',
-    runningEntry: null
+    runningEntry: null,
+    runningEntryDescription: '',
+    timer: '0:00:00'
 }
 
 const store = createStore(rootReducer, initialState, applyMiddleware(thunk));

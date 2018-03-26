@@ -1,6 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import axios from 'axios';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
 
 class Form extends React.Component {
     constructor(props) {
@@ -16,23 +17,15 @@ class Form extends React.Component {
     handleSubmit(e) {
         e.preventDefault();
 
-        const route = this.props.location.pathname.toLowerCase().slice(1);
-        const url = `http://localhost:3001/auth/${route}`;
-        const headers = {
-            'Content-Type': "application/x-www-form-urlencoded"
-        }
+        const { location, handleAuth } = this.props;
+        const route = location.pathname.toLowerCase().slice(1);
 
         const formData = new URLSearchParams();
         for (const prop in this.state) {
             if (this.state[prop]) formData.append(prop, this.state[prop]);
         }
 
-        axios.defaults.withCredentials = true;
-        axios.post(url, formData, headers).then(data => {
-            console.log(data);
-            if (data.status === 200) this.props.handleAuth(data.data);
-        }).catch(err => console.log(err));
-
+        handleAuth(route, formData);
     }
 
     render() {
@@ -53,4 +46,8 @@ class Form extends React.Component {
     }
 }
 
-export default withRouter(Form);
+const mapDispatchToProps = dispatch => ({
+    handleAuth: (type, data) => dispatch(actions.handleAuth(type, data))
+});
+
+export default withRouter(connect(null, mapDispatchToProps)(Form));

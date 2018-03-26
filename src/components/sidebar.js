@@ -86,6 +86,12 @@ export default class SideBar extends React.Component {
                                 <Link_label>Dashboard</Link_label>
                             </Navigation_link>
                         </Navigation_item>
+                        <Navigation_item>
+                            <Navigation_link to="/projects">
+                                <Icon name="folder" />
+                                <Link_label>Projects</Link_label>
+                            </Navigation_link>
+                        </Navigation_item>
                     </Navigation_list>
                 </Sidebar_navigation>
                 <Sidebar_profile>
