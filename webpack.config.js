@@ -1,20 +1,29 @@
 const path = require('path');
+const webpack = require('webpack');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: ["./src/index.js"],
+    entry: ["react-hot-loader/patch", "babel-polyfill", "./src/index.js"],
     output: {
-        path: path.resolve(__dirname, "public"),
-        filename: "js/[name].js"
+        path: path.resolve(__dirname, "/public"),
+        filename: "bundle.js"
     },
     module: {
         rules: [
             {
+                loader: 'babel-loader',
                 test: /\.js$/,
+                include: [path.resolve(__dirname, "src")],
                 exclude: /node_modules/,
-                use: {
-                    loader: "babel-loader"
+                query: {
+                    presets: ['env', 'react'],
+                    plugins: ["transform-runtime", "transform-class-properties",
+                        "react-hot-loader/babel"]
                 }
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader']
             },
             {
                 test: /\.html$/,
@@ -30,6 +39,11 @@ module.exports = {
         new htmlWebpackPlugin({
             template: "./public/index.html",
             filename: "./index.html"
-        })
-    ]
+        }),
+        new webpack.HotModuleReplacementPlugin()
+    ],
+    devServer: {
+        contentBase: './public',
+        hot: true
+    }
 }

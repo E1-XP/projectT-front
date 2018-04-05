@@ -57,8 +57,10 @@ class TopBar extends React.Component {
     }
 
     componentDidMount() {
-        this.setPreviouslyRunningTimer(this.props.userData);
         this.props.onRef(this);
+
+        this.setPreviouslyRunningTimer(this.props.userData);
+        console.log('TOPBAR JUST MOUNTED');
     }
 
     componentWillUnmount() {
@@ -68,6 +70,9 @@ class TopBar extends React.Component {
 
     setPreviouslyRunningTimer(userData) {
         const { setRunningEntry, isRunning, setIsRunning, setTimer, setRunningEntryDescription } = this.props;
+
+        //await this.props.fetchEntries(this.props.userData._id);
+
         console.log('mounted', userData.entries.filter(item => item.stop === undefined).length);
 
         if (userData.entries.filter(item => item.stop === undefined).length) {
@@ -161,6 +166,7 @@ const mapDispatchToProps = dispatch => ({
     setIsRunning: bool => dispatch(actions.setIsRunning(bool)),
     setTimer: str => dispatch(actions.setTimer(str)),
     toggleTimer: bool => dispatch(actions.toggleTimer(bool)),
+    fetchEntries: id => dispatch(actions.fetchEntries(id)),
     setRunningEntry: v => dispatch(actions.setRunningEntry(v)),
     setRunningEntryDescription: v => dispatch(actions.setRunningEntryDescription(v)),
     createNewEntry: (userid, param, pval) => dispatch(actions.createNewEntry(userid, param, pval)),

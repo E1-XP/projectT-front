@@ -46,6 +46,11 @@ export const setRunningEntryDescription = desc => ({
     payload: desc
 });
 
+export const loadingError = err => ({
+    type: consts.LOADING_ERROR,
+    payload: err
+});
+
 export const toggleTimer = bool => dispatch => {
     if (bool) {
         const start = moment().format();
@@ -92,16 +97,10 @@ export const removeEntry = (userid, entryid) => dispatch => {
 
     const url = `http://localhost:3001/users/${userid}/entries/${entryid}/delete`;
 
-
     axios.post(url).then(res => {
         dispatch(setEntries(res.data));
     }).catch(err => dispatch(loadingError(err)));
 }
-
-export const loadingError = err => ({
-    type: consts.LOADING_ERROR,
-    payload: err
-});
 
 export const fetchData = url => dispatch => {
     dispatch(setIsLoading(true));
@@ -114,21 +113,22 @@ export const fetchData = url => dispatch => {
     }).catch(err => dispatch(loadingError(err)));
 }
 
-export const fetchEntries = url => dispatch => {
+export const fetchEntries = userid => dispatch => {
     const url = `http://localhost:3001/users/${userid}/entries`;
 
     axios.get(url).then(res => {
-        dispatch(setUserData(res.data));
-
+        dispatch(setEntries(res.data));
     }).catch(err => {
         dispatch(loadingError(err));
     });
+
+    return new Promise((res, rej) => res(true));
 }
 
 export const fetchAuthentication = () => dispatch => {
     const url = `http://localhost:3001/auth/refresh`;
 
-    dispatch(setIsLoading(true));
+    //dispatch(setIsLoading(true));
 
     axios.post(url).then(res => {
         if (res.status === 200) {
@@ -163,6 +163,7 @@ export const handleAuth = (type, formData) => dispatch => {
 
 export const handleLogout = () => dispatch => {
     const url = `http://localhost:3001/auth/logout`;
+
     dispatch(setIsLoading(true));
 
     axios.post(url).then(res => {
@@ -175,4 +176,27 @@ export const handleLogout = () => dispatch => {
     }).catch(err => {
         dispatch(loadingError(err));
     });
+}
+
+export const createProject = (userid, name, color, client) => dispatch => {
+    console.log(userid, name, color);
+    color = color.split('').splice(1).join('');
+
+    const url = `http://localhost:3001/users/${userid}/projects/new?name=${name}&color=${color}&client=${client}`;
+    console.log(url);
+
+    axios.post(url).then(res => {
+        dispatch(setUserData(res.data));
+    }).catch(err => dispatch(loadingError(err)));
+}
+
+export const removeProject = (userid, name) => dispatch => {
+    name = JSON.stringify(name);
+
+    const url = `http://localhost:3001/users/${userid}/projects/delete?name=${name}`;
+    console.log(url);
+
+    axios.post(url).then(res => {
+        dispatch(setUserData(res.data));
+    }).catch(err => dispatch(loadingError(err)));
 }
