@@ -157,7 +157,7 @@ class Projects extends React.Component {
         if (names.length) removeProject(userData._id, names);
     }
 
-    getSeletectorColors = () => {
+    getSelectorColors = () => {
         const { colors, selectedColor } = this.state;
         const setActive = (itm) => this.setState({ selectedColor: itm });
 
@@ -224,7 +224,7 @@ class Projects extends React.Component {
                         <Modal isOpen={this.state.isColorSelectorOpen} shouldCloseOnEsc={true} style={colorSelectorStyle}
                             shouldCloseOnOverlayClick={true} onRequestClose={this.closeColorSelector}>
                             <Color_Container>
-                                {this.getSeletectorColors()}
+                                {this.getSelectorColors()}
                             </Color_Container></Modal>
                     </Modal_Section>
                     <Modal_Footer>

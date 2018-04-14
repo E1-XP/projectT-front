@@ -42,6 +42,14 @@ export default class TimeEntry extends React.Component {
         return `${startFormat} - ${stopFormat}`;
     }
 
+    getProjectColor = projectName => {
+        const { userData } = this.props;
+        let color;
+
+        userData.projects.map(itm => itm.name === projectName ? color = itm.color : null);
+        return `#${color}`;
+    }
+
     render() {
         const { i, item, handleRemove, startNewEntry } = this.props;
         const { description } = this.props.item;
@@ -51,7 +59,10 @@ export default class TimeEntry extends React.Component {
                 <input type="text" defaultValue={description ? description : null}
                     // onChange={e => this.setState({ description: e.target.value })}
                     onBlur={e => this.setDescription(e)} placeholder='add description' />
-                <span>no project</span>
+                <span style={{ color: this.getProjectColor(item.project) }}>{item.project}</span>
+                <Item_link onClick={() => alert('ok')}>
+                    <Icon name="attach_money" fill={item.billable ? 'green' : '#bbb'} />
+                </Item_link>
                 <span>{item.duration}</span>
                 <span>{this.getStopStartTime(item.start, item.stop)}</span>
                 <Item_link onClick={() => handleRemove(item.id)} >

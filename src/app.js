@@ -5,13 +5,15 @@ import { Provider } from 'react-redux';
 import styledNormalize from 'styled-normalize';
 import { injectGlobal } from 'styled-components';
 import reset from './styles/reset';
+import style from './styles/style';
 
 import store from './store';
 import routes from './routes';
 
-const resetCSS = () => injectGlobal`
+const baseCSS = () => injectGlobal`
     ${styledNormalize}
     ${reset}
+    ${style}
 `;
 
 class App extends React.Component {
@@ -20,7 +22,7 @@ class App extends React.Component {
     }
 
     render() {
-        resetCSS();
+        baseCSS();
         return (
             <Provider store={store}>
                 <Router>{routes}</Router>

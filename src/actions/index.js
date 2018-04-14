@@ -6,6 +6,8 @@ import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
+const baseUrl = `https://project--t.herokuapp.com`;
+
 export const setIsLoading = bool => ({
     type: consts.IS_LOADING,
     payload: bool
@@ -36,6 +38,11 @@ export const setTimer = string => ({
     payload: string
 });
 
+export const setWeekTimer = string => ({
+    type: consts.SET_WEEK_TIMER,
+    payload: string
+});
+
 export const setRunningEntry = id => ({
     type: consts.SET_RUNNING_ENTRY,
     payload: id
@@ -51,14 +58,17 @@ export const loadingError = err => ({
     payload: err
 });
 
-export const toggleTimer = bool => dispatch => {
+export const toggleTimer = bool => (dispatch, getState) => {
     if (bool) {
         const start = moment().format();
         dispatch(setIsRunning(true));
 
         window.interval = setInterval(() => {
             const time = moment.duration(moment().diff(start)).format('h:mm:ss', { stopTrim: "hh mm ss" });
+            //const weekTime = moment.duration(getState().weekTimer).add(1, 's').format('h:mm:ss', { stopTrim: "hh mm ss" });
+
             dispatch(setTimer(time));
+            //dispatch(setWeekTimer('0:00'));
             document.title = `${time} - ProjectT`;
         }, 500);
     }
@@ -71,7 +81,7 @@ export const toggleTimer = bool => dispatch => {
 }
 
 export const createNewEntry = (userid, param, pval) => dispatch => {
-    const url = `http://localhost:3001/users/${userid}/entries/new?${param}=${pval}`;
+    const url = `${baseUrl}/users/${userid}/entries/new?${param}=${pval}`;
     console.log(url);
 
     axios.post(url).then(res => {
@@ -83,7 +93,7 @@ export const updateEntry = (userid, runningEntryId, queryParams) => dispatch => 
     let queryStr = ``;
     Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
 
-    const url = `http://localhost:3001/users/${userid}/entries/${runningEntryId}/update?${queryStr}`;
+    const url = `${baseUrl}/users/${userid}/entries/${runningEntryId}/update?${queryStr}`;
     console.log(url);
 
     axios.post(url).then(res => {
@@ -95,7 +105,7 @@ export const updateEntry = (userid, runningEntryId, queryParams) => dispatch => 
 export const removeEntry = (userid, entryid) => dispatch => {
     if (entryid.length !== 24) entryid = JSON.stringify(entryid);
 
-    const url = `http://localhost:3001/users/${userid}/entries/${entryid}/delete`;
+    const url = `${baseUrl}/users/${userid}/entries/${entryid}/delete`;
 
     axios.post(url).then(res => {
         dispatch(setEntries(res.data));
@@ -114,7 +124,7 @@ export const fetchData = url => dispatch => {
 }
 
 export const fetchEntries = userid => dispatch => {
-    const url = `http://localhost:3001/users/${userid}/entries`;
+    const url = `${baseUrl}/users/${userid}/entries`;
 
     axios.get(url).then(res => {
         dispatch(setEntries(res.data));
@@ -126,7 +136,7 @@ export const fetchEntries = userid => dispatch => {
 }
 
 export const fetchAuthentication = () => dispatch => {
-    const url = `http://localhost:3001/auth/refresh`;
+    const url = `${baseUrl}/auth/refresh`;
 
     //dispatch(setIsLoading(true));
 
@@ -142,7 +152,7 @@ export const fetchAuthentication = () => dispatch => {
 }
 
 export const handleAuth = (type, formData) => dispatch => {
-    const url = `http://localhost:3001/auth/${type}`;
+    const url = `${baseUrl}/auth/${type}`;
     const headers = { 'Content-Type': "application/x-www-form-urlencoded" }
 
     setTimeout(() => dispatch(setIsLoading(true)), 500);
@@ -162,7 +172,7 @@ export const handleAuth = (type, formData) => dispatch => {
 }
 
 export const handleLogout = () => dispatch => {
-    const url = `http://localhost:3001/auth/logout`;
+    const url = `${baseUrl}/auth/logout`;
 
     dispatch(setIsLoading(true));
 
@@ -182,7 +192,7 @@ export const createProject = (userid, name, color, client) => dispatch => {
     console.log(userid, name, color);
     color = color.split('').splice(1).join('');
 
-    const url = `http://localhost:3001/users/${userid}/projects/new?name=${name}&color=${color}&client=${client}`;
+    const url = `${baseUrl}/users/${userid}/projects/new?name=${name}&color=${color}&client=${client}`;
     console.log(url);
 
     axios.post(url).then(res => {
@@ -193,7 +203,7 @@ export const createProject = (userid, name, color, client) => dispatch => {
 export const removeProject = (userid, name) => dispatch => {
     name = JSON.stringify(name);
 
-    const url = `http://localhost:3001/users/${userid}/projects/delete?name=${name}`;
+    const url = `${baseUrl}/users/${userid}/projects/delete?name=${name}`;
     console.log(url);
 
     axios.post(url).then(res => {

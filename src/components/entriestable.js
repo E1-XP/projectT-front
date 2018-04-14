@@ -103,7 +103,7 @@ class EntriesTable extends React.Component {
         const { handleRemove, changeDescription } = this.props;
         const { filteredItems } = this.state;
 
-        //   console.log('TASKS', mappedTasks[idx]);
+        //console.log('TASKS single', mappedTasks[idx]);
         return Object.keys(mappedTasks[idx]).map((item, i) =>
             (<section key={item}>
                 <Itembody_header key={item}>
@@ -116,7 +116,7 @@ class EntriesTable extends React.Component {
                         onBlur={e => mappedTasks[idx][item].length === 1 ?
                             changeDescription(e.target.value, mappedTasks[idx][item][0].id) :
                             this.changeDescriptionMultiple(e.target.value, mappedTasks[idx][item], idx)} />
-                    <span>no project</span>
+                    <Item_link>no project</Item_link>
                     <span>{this.getStopStartTime(mappedTasks[idx][item])}</span>
                     <span><Icon name="attach_money" /></span>
                     <span onClick={() => this.toggleEntries(idx, item)} >{this.getTotalDayCount(mappedTasks[idx][item])}</span>
@@ -129,8 +129,8 @@ class EntriesTable extends React.Component {
                     </Item_link>
                 </Itembody_header>
                 <Itembody_body>
-                    {(filteredItems[idx][item] && mappedTasks[idx][item].length > 1) ?
-                        this.getSingleEntries(mappedTasks[idx][item]) : null}
+                    {(filteredItems[idx][item] && mappedTasks[idx][item].length > 1) &&
+                        this.getSingleEntries(mappedTasks[idx][item])}
                 </Itembody_body>
             </section>));
     }
@@ -171,7 +171,7 @@ class EntriesTable extends React.Component {
         if (!Object.keys(filteredItems).length) return (<p>Loading...</p>);
 
         const { mappedTasks } = this.buildUIState();
-        console.log('MTASKS', mappedTasks);
+        //console.log('MTASKS', mappedTasks);
         return Object.keys(mappedItems).map((item, i) =>
             <List_item key={item}>
                 <Item_header>

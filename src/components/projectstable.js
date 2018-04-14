@@ -146,8 +146,21 @@ class ProjectsTable extends React.Component {
         this.setState({ checkedProjects });
     }
 
-    getProjectTime = () => {
+    projectsLengthSum = (projectStr) => {
+        const { entries } = this.props.data;
+        const now = moment();
+        const total = entries
+            .filter(item => item.stop !== undefined)
+            .filter(itm => itm.project === projectStr)
+            .reduce((acc, item) =>
+                acc + moment.duration(moment(Number(item.stop)).diff(item.start)).valueOf(), 0);
 
+        return total;
+    }
+
+    getProjectTime = projectStr => {
+        const total = this.projectsLengthSum(projectStr);
+        return moment.duration(total).format('h:mm:ss', { stopTrim: "hh mm ss" });
     }
 
     setSortState = (sortOrder, sortBy) => {
@@ -170,7 +183,7 @@ class ProjectsTable extends React.Component {
     }
 
     render() {
-        const { projects } = this.props.data;
+        const { projects, entries } = this.props.data;
         const { sortBy, checkedProjects } = this.state;
 
         if (!projects.length || !Object.keys(checkedProjects).length) return (<p>Loading...</p>);
@@ -196,7 +209,8 @@ class ProjectsTable extends React.Component {
                                 <Color_Indicator color={`#${itm.color}`} />
                             </TD>
                             <TD>{itm.client ? itm.client : '(No Client)'}</TD>
-                            <TD>(Not Started)</TD>
+                            <TD>{this.projectsLengthSum(itm.name) ?
+                                this.getProjectTime(itm.name) : '(Not Started)'}</TD>
                         </Table_Row>)) :
                         <tr><No_Entries>Press the 'Create Project' button to get started.</No_Entries></tr>}
                 </tbody>

@@ -1,5 +1,4 @@
-export default `
-* {
+export default ` * {
     box-sizing: border-box;
 }
 
@@ -26,8 +25,8 @@ p {
 }
 
 @import url('https://fonts.googleapis.com/css?family=Open+Sans');
-
-body{
+body {
     font-family: 'Open Sans', sans-serif;
 }
-`; 
+
+`;

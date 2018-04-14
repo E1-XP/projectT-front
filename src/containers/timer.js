@@ -37,7 +37,39 @@ const Week_counter = styled.div`
 `;
 
 class Timer extends React.Component {
-    setMappedItems() {
+    constructor() {
+        super();
+
+        // this.state = {
+        //     weekTime: 0,
+        //     weekTimeNum: 0
+        // }
+    }
+
+    componentDidMount() {
+        const { userData, setWeekTimer } = this.props;
+        if (userData.entries.length) {
+            setWeekTimer(this.getWeekTimeComposed(userData.entries));
+        }
+    }
+    // const { userData, isRunning } = this.props;
+    // if (userData.entries.length) {
+    //     const weekTime = this.getWeekTimeFormatted(this.getWeekTime(userData.entries));
+    //     this.setState({ weekTime });
+    // }
+    // if (isRunning) this.
+
+    componentWillReceiveProps(nextProps) {
+        const { userData, setWeekTimer, isRunning } = this.props;
+        const condition = nextProps.userData.entries.length !== userData.entries.length;
+
+        if (!isRunning) setWeekTimer(this.getWeekTimeComposed(userData.entries));//this.setState({ weekTime: this.getWeekTime(nextProps.userData.entries) });
+        // if (nextProps.isRunning) {
+        //     window.weekInterval = setInterval(this.runWeekTimer, 400);}
+        // if (nextProps.isRunning === false && window.weekInterval) clearInterval(window.weekInterval);
+    }
+
+    setMappedItems = () => {
         const { userData } = this.props;
 
         const getReadable = item => moment(item.start).format('ddd, DD MMM');
@@ -54,6 +86,8 @@ class Timer extends React.Component {
                 start: item.start,
                 stop: item.stop,
                 description: item.description ? item.description : '',
+                project: item.project ? item.project : '',
+                billable: item.billable,
                 userId: item.userId,
                 id: item._id,
                 readable: getReadable(item),
@@ -62,14 +96,14 @@ class Timer extends React.Component {
             })).reduce(reduceItems, {});
     }
 
-    handleRemove(id) {
+    handleRemove = id => {
         const { removeEntry } = this.props;
         const { userData } = this.props;
         console.log(id);
         removeEntry(userData._id, id);
     }
 
-    changeDescription(description, runningEntry, previousDescription, enabLeEmptyInput = false) {
+    changeDescription = (description, runningEntry, previousDescription, enabLeEmptyInput = false) => {
         const { userData, updateEntry } = this.props;
         if (!runningEntry) runningEntry = this.props.runningEntry;
         console.log('change desc', description);
@@ -79,16 +113,35 @@ class Timer extends React.Component {
         }
     }
 
-    getTotalWeekTime(entries) {
-        const now = moment();
+    getWeekTime = entries => {
+        const thisWeekStart = moment().startOf('isoWeek');
+
         const total = entries.filter(item => item.stop !== undefined)
-            .filter(item => now.diff(item.start, 'days') < 7)
+            .filter(item => item.start > thisWeekStart.valueOf())
             .reduce((acc, item) => acc + moment.duration(moment(Number(item.stop)).diff(item.start)).valueOf(), 0);
 
-        return moment(total).format('h:mm:ss', { stopTrim: "hh mm ss" });
+        return total;
     }
 
-    handleClick(param, pval) {
+    getWeekTimeFormatted = time => {
+        return moment.duration(time).format('h:mm:ss', { stopTrim: "hh mm ss" });
+    }
+
+    getWeekTimeComposed = entries => {
+        return this.getWeekTimeFormatted(this.getWeekTime(entries));
+    }
+
+    // getWeekTimeIfIsRunning = () => {
+    //     //return moment.duration(this.state.WeekTime;
+    //     //const timeCalculation = () =>;
+    //     // window.weekInterval = setInterval(timeCalculation, 500);
+    // }
+
+    runWeekTimer = () => {
+        this.setState(prevState => ({ weekTime: this.getWeekTimeFormatted(moment.duration(prevState.weekTime).add(1, 's')) }));
+    }
+
+    handleClick = (param, pval) => {
         const { userData, createNewEntry, toggleTimer, setRunningEntryDescription } = this.props;
 
         createNewEntry(userData._id, param, pval);
@@ -96,38 +149,43 @@ class Timer extends React.Component {
         toggleTimer(true);
     }
 
-    passRefToChild(str) {
+    passRefToChild = str => {
         this.topBarRef.setStateWithRef(str);
     }
 
     render() {
-        const { userData } = this.props;
+        const { userData, isRunning, weekTimer } = this.props;
 
         if (!userData.entries) return (<p>Loading...</p>);
+
         const mappedItems = this.setMappedItems();
+
         return (
             <div>
-                <Topbar onRef={ref => this.topBarRef = ref} />
-                <Week_counter>This week:<span>{this.getTotalWeekTime(userData.entries)}</span></Week_counter>
+                <Topbar onRef={ref => this.topBarRef = ref} getWeekTime={this.getWeekTimeComposed} />
+                <Week_counter>
+                    This week:<span>{weekTimer}</span>
+                </Week_counter>
                 <Navigation_list>
                     {(userData.entries && userData.entries.length) ?
-                        <EntriesTable mappedItems={mappedItems}
-                            setTopbarDescription={this.passRefToChild.bind(this)}
-                            handleClick={this.handleClick.bind(this)}
-                            handleRemove={this.handleRemove.bind(this)}
-                            changeDescription={this.changeDescription.bind(this)}
-                        /> :
-                        <List_item >Add you first task to begin</List_item>}
+                        <EntriesTable mappedItems={mappedItems} userData={userData}
+                            setTopbarDescription={this.passRefToChild}
+                            handleClick={this.handleClick}
+                            handleRemove={this.handleRemove}
+                            changeDescription={this.changeDescription} /> :
+                        <List_item>Add you first task to begin</List_item>}
                 </Navigation_list>
             </div>
         );
     };
 }
 
-const mapStateToProps = ({ userData, runningEntry, runningEntryDescription }) => ({
+const mapStateToProps = ({ userData, runningEntry, runningEntryDescription, isRunning, weekTimer }) => ({
     userData,
     runningEntry,
-    runningEntryDescription
+    runningEntryDescription,
+    isRunning,
+    weekTimer
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -136,7 +194,8 @@ const mapDispatchToProps = dispatch => ({
     createNewEntry: (userid, param, pval) => dispatch(actions.createNewEntry(userid, param, pval)),
     removeEntry: (v, v2) => dispatch(actions.removeEntry(v, v2)),
     updateEntry: (userid, runningEntry, obj) => dispatch(actions.updateEntry(userid, runningEntry, obj)),
-    toggleTimer: bool => dispatch(actions.toggleTimer(bool))
+    toggleTimer: bool => dispatch(actions.toggleTimer(bool)),
+    setWeekTimer: str => dispatch(actions.setWeekTimer(str))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Timer); 
