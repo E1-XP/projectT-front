@@ -2,11 +2,13 @@ import consts from './constants';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
+import { push } from 'react-router-redux'
+
 import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
-
-const baseUrl = `https://project--t.herokuapp.com`;
+const baseUrl = `http://localhost:3001`;
+//const baseUrl = `https://project--t.herokuapp.com`;
 
 export const setIsLoading = bool => ({
     type: consts.IS_LOADING,
@@ -43,6 +45,11 @@ export const setWeekTimer = string => ({
     payload: string
 });
 
+export const setProject = object => ({
+    type: consts.SET_PROJECT,
+    payload: object
+});
+
 export const setRunningEntry = id => ({
     type: consts.SET_RUNNING_ENTRY,
     payload: id
@@ -58,8 +65,8 @@ export const loadingError = err => ({
     payload: err
 });
 
-export const toggleTimer = bool => (dispatch, getState) => {
-    if (bool) {
+export const toggleTimer = isTrue => (dispatch, getState) => {
+    if (isTrue) {
         const start = moment().format();
         dispatch(setIsRunning(true));
 
@@ -80,8 +87,11 @@ export const toggleTimer = bool => (dispatch, getState) => {
     }
 }
 
-export const createNewEntry = (userid, param, pval) => dispatch => {
-    const url = `${baseUrl}/users/${userid}/entries/new?${param}=${pval}`;
+export const createNewEntry = (userid, queryParams) => dispatch => {
+    let queryStr = ``;
+    Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
+
+    const url = `${baseUrl}/users/${userid}/entries/new?${queryStr}`;
     console.log(url);
 
     axios.post(url).then(res => {
@@ -146,6 +156,10 @@ export const fetchAuthentication = () => dispatch => {
             dispatch(setIsAuthenticated(true));
             dispatch(setIsLoading(false));
         }
+        else {
+            dispatch(push('/login'));
+            dispatch(setIsLoading(false));
+        }
     }).catch(err => {
         dispatch(loadingError(err));
     });
@@ -153,13 +167,16 @@ export const fetchAuthentication = () => dispatch => {
 
 export const handleAuth = (type, formData) => dispatch => {
     const url = `${baseUrl}/auth/${type}`;
-    const headers = { 'Content-Type': "application/x-www-form-urlencoded" }
+    const config = {
+        headers: { 'Content-Type': "application/x-www-form-urlencoded" }
+    };
 
     setTimeout(() => dispatch(setIsLoading(true)), 500);
 
-    axios.post(url, formData, headers).then(res => {
+    axios.post(url, formData).then(res => {
+        console.log(res);
         if (res.status === 200) {
-            sessionStorage.setItem('session', JSON.stringify(res.data));
+            //sessionStorage.setItem('session', JSON.stringify(res.data));
             localStorage.setItem('isAuth', true);
 
             dispatch(setUserData(res.data));
@@ -177,7 +194,7 @@ export const handleLogout = () => dispatch => {
     dispatch(setIsLoading(true));
 
     axios.post(url).then(res => {
-        sessionStorage.removeItem('session');
+        //sessionStorage.removeItem('session');
         localStorage.removeItem('isAuth');
 
         dispatch(setIsAuthenticated(false));

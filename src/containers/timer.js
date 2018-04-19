@@ -11,7 +11,7 @@ import Topbar from '../containers/topbar';
 import EntriesTable from '../components/entriestable';
 import Icon from '../components/icon';
 
-const Navigation_list = styled.ul`
+const List = styled.ul`
 `;
 
 const List_item = styled.li`
@@ -37,15 +37,6 @@ const Week_counter = styled.div`
 `;
 
 class Timer extends React.Component {
-    constructor() {
-        super();
-
-        // this.state = {
-        //     weekTime: 0,
-        //     weekTimeNum: 0
-        // }
-    }
-
     componentDidMount() {
         const { userData, setWeekTimer } = this.props;
         if (userData.entries.length) {
@@ -166,7 +157,7 @@ class Timer extends React.Component {
                 <Week_counter>
                     This week:<span>{weekTimer}</span>
                 </Week_counter>
-                <Navigation_list>
+                <List>
                     {(userData.entries && userData.entries.length) ?
                         <EntriesTable mappedItems={mappedItems} userData={userData}
                             setTopbarDescription={this.passRefToChild}
@@ -174,7 +165,7 @@ class Timer extends React.Component {
                             handleRemove={this.handleRemove}
                             changeDescription={this.changeDescription} /> :
                         <List_item>Add you first task to begin</List_item>}
-                </Navigation_list>
+                </List>
             </div>
         );
     };

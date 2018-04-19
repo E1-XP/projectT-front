@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { ConnectedRouter } from 'react-router-redux';
 import { Provider } from 'react-redux';
 
 import styledNormalize from 'styled-normalize';
@@ -8,6 +8,7 @@ import reset from './styles/reset';
 import style from './styles/style';
 
 import store from './store';
+import history from './history';
 import routes from './routes';
 
 const baseCSS = () => injectGlobal`
@@ -25,7 +26,9 @@ class App extends React.Component {
         baseCSS();
         return (
             <Provider store={store}>
-                <Router>{routes}</Router>
+                <ConnectedRouter history={history}>
+                    {routes}
+                </ConnectedRouter>
             </Provider>
         );
     }

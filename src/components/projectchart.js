@@ -80,7 +80,7 @@ class ProjectsChart extends React.Component {
                     <span>
                         {this.getProjectTime(undefined)}
                     </span>
-                </List_item>) : <p>No data available for this period</p>}
+                </List_item>) : null}
         </ul>);
     }
 

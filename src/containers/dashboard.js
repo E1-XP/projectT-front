@@ -28,8 +28,7 @@ const Header = styled.header`
 `;
 
 const Heading = styled.h2`
-    
-;`
+`;
 
 const Chart_Section = styled.section`
     flex:1 1 65%;
@@ -56,6 +55,7 @@ class Dashboard extends React.Component {
             periodStop: moment().startOf('isoWeek').add(6, 'days'),
             periodReadable: 'This Week',
             periodType: 'weeks',
+            customPeriodLength: 0,
             isModalOpen: false
         }
 
@@ -95,17 +95,21 @@ class Dashboard extends React.Component {
         const getUnix = itm => moment.duration(moment(itm.stop).diff(itm.start)).valueOf();
 
         const generateDayLabels = () => Array(periodStop.diff(periodStart, 'days') + 1).fill(null)
-            .map((itm, i) => moment(periodStart).add(i, 'd').format('ddd, Do MMM'));
+            .map((itm, i) => ({
+                unix: moment(periodStart).add(i, 'd').valueOf(),
+                readable: moment(periodStart).add(i, 'd').format('ddd, Do MMM')
+            }));
 
         const getDayTimeSum = itm => mappedItems[itm].reduce((acc, itm) => acc += (itm.stop - itm.start), 0);
 
-        const getDayObj = (itm, dataFlag) => ({
-            readable: itm,
-            duration: dataFlag ? this.getTotalDayCount(mappedItems[itm]) : `0:00`,
-            time: dataFlag ? getDayTimeSum(itm) : 0
+        const getDayObj = (itm, dataFlag = false) => ({
+            readable: itm.readable,
+            duration: dataFlag ? this.getTotalDayCount(mappedItems[itm.readable]) : `0:00`,
+            time: dataFlag ? getDayTimeSum(itm.readable) : 0,
+            week: moment(itm.unix).isoWeek()
         });
 
-        return generateDayLabels().map(itm => mappedItems[itm] ? getDayObj(itm, true) : getDayObj(itm));
+        return generateDayLabels().map(itm => mappedItems[itm.readable] ? getDayObj(itm, true) : getDayObj(itm));
     }
 
     getYearMonthsArr = () => {
@@ -177,11 +181,15 @@ class Dashboard extends React.Component {
     }
 
     addPeriodState = () => {
-        const { periodStart, periodStop, periodType } = this.state;
+        const { periodStart, periodStop, periodType, customPeriodLength } = this.state;
 
         const periodTypeNew = periodType === 'weeks' ? 'isoWeek' : periodType.slice(0, periodType.length - 1);
-        const periodStartNew = periodStart.clone().add(1, periodType);
-        const periodStopNew = periodStartNew.clone().endOf(periodTypeNew);
+
+        const periodStartNew = periodType !== 'custom' ? periodStart.clone().add(1, periodType) :
+            periodStop.clone().add(1, 'days');
+
+        const periodStopNew = periodType !== 'custom' ? periodStartNew.clone().endOf(periodTypeNew) :
+            periodStartNew.clone().add(customPeriodLength, 'days');
 
         const periodReadable = this.setReadableHeading(periodType, periodStartNew, periodStopNew);
 
@@ -189,11 +197,15 @@ class Dashboard extends React.Component {
     }
 
     subtractPeriodState = () => {
-        const { periodStart, periodStop, periodType } = this.state;
+        const { periodStart, periodStop, periodType, customPeriodLength } = this.state;
 
         const periodTypeNew = periodType === 'weeks' ? 'isoWeek' : periodType.slice(0, periodType.length - 1);
-        const periodStartNew = periodStart.clone().subtract(1, periodType);
-        const periodStopNew = periodStartNew.clone().endOf(periodTypeNew);
+
+        const periodStartNew = periodType !== 'custom' ? periodStart.clone().subtract(1, periodType) :
+            periodStart.clone().subtract(customPeriodLength + 1, 'days');
+
+        const periodStopNew = periodType !== 'custom' ? periodStartNew.clone().endOf(periodTypeNew) :
+            periodStart.clone().subtract(1, 'days');
 
         const periodReadable = this.setReadableHeading(periodType, periodStartNew, periodStopNew);
 
@@ -225,12 +237,14 @@ class Dashboard extends React.Component {
 
                 Object.keys(days).map(itm => days[itm] === periodReadable ? periodReadable = itm : null);
             } break;
+
             case 'weeks': {
                 periodReadable = `${periodStartNew.format('Do MMM')} - ${periodStopNew.format('Do MMM')}`;
 
                 if (periodReadable === this.thisWeekReadable) periodReadable = 'This Week';
                 else if (periodReadable === this.lastWeekReadable) periodReadable = 'Last Week';
             } break;
+
             case 'months': {
                 periodReadable = periodStartNew.format('MMMM YYYY');
 
@@ -240,96 +254,22 @@ class Dashboard extends React.Component {
                 if (periodReadable.split(' ')[1] === moment().format('YYYY')) periodReadable = periodReadable.split(' ')[0];
 
             } break;
+
             case 'years': {
                 periodReadable = `${periodStartNew.format('YYYY')}`;
 
                 if (periodReadable === this.thisYearReadable) periodReadable = 'This Year';
                 else if (periodReadable === this.lastYearReadable) periodReadable = 'Last Year';
             } break;
+
+            case 'custom': {
+                periodReadable = `${periodStartNew.format('Do MMM')} - ${periodStopNew.format('Do MMM')}`;
+            } break;
         }
 
         return periodReadable;
     }
 
-    setToday = () => {
-        this.setState({
-            periodStart: moment().startOf('day'),
-            periodStop: moment().endOf('day'),
-            periodReadable: 'Today',
-            periodType: 'days'
-        });
-        this.closeModal();
-    }
-
-    setYesterday = () => {
-        this.setState({
-            periodStart: moment().startOf('day').subtract(1, 'd'),
-            periodStop: moment().endOf('day').subtract(1, 'd'),
-            periodReadable: 'Yesterday',
-            periodType: 'days'
-        });
-        this.closeModal();
-    }
-
-    setThisWeek = () => {
-        this.setState({
-            periodStart: moment().startOf('isoWeek'),
-            periodStop: moment().startOf('isoWeek').add(6, 'd'),
-            periodReadable: 'This Week',
-            periodType: 'weeks'
-        });
-        this.closeModal();
-    }
-
-    setLastWeek = () => {
-        this.setState({
-            periodStart: moment().startOf('isoWeek').subtract(7, 'd'),
-            periodStop: moment().startOf('isoWeek').subtract(1, 'd'),
-            periodReadable: 'Last Week',
-            periodType: 'weeks'
-        });
-        this.closeModal();
-    }
-
-    setThisMonth = () => {
-        this.setState({
-            periodStart: moment().startOf('month'),
-            periodStop: moment().endOf('month'),
-            periodReadable: 'This Month',
-            periodType: 'months'
-        });
-        this.closeModal();
-    }
-
-    setLastMonth = () => {
-        this.setState({
-            periodStart: moment().startOf('month').subtract(1, 'M'),
-            periodStop: moment().endOf('month').subtract(1, 'M'),
-            periodReadable: 'Last Month',
-            periodType: 'months'
-        });
-        this.closeModal();
-    }
-
-    setThisYear = () => {
-        this.setState({
-            periodStart: moment().startOf('year'),
-            periodStop: moment().endOf('year'),
-            periodReadable: 'This Year',
-            periodType: 'years'
-        });
-        this.closeModal();
-    }
-
-    setLastYear = () => {
-        this.setState({
-            periodStart: moment().startOf('year').subtract(1, 'y'),
-            periodStop: moment().endOf('year').subtract(1, 'y'),
-            periodReadable: 'Last Year',
-            periodType: 'years'
-        });
-        this.closeModal();
-    }
 
     openModal = () => {
         this.setState({ isModalOpen: true });
@@ -339,42 +279,10 @@ class Dashboard extends React.Component {
         this.setState({ isModalOpen: false });
     }
 
-    getPeriodType = (periodStart, periodStop) => {
-        const length = periodStop.diff(periodStart, 'days');
-        //calculate length of period -day
-        const getMonthArg = () => periodStart.clone().format('D') === '1' &&
-            periodStop.clone().format('D') === periodStart.clone().endOf('month').format('D');
-
-        console.log(length);
-        if (!length) return 'days';
-        else if (length === 6) return 'weeks';
-        else if (length < 7) return 'weeks';
-        else if (getMonthArg()) return 'months';
-        else if (length > 7) return 'months';
-
-        //console.log(periodStart.clone().format('D'),
-        // periodStop.clone().format('D'), periodStart.clone().startOf('month').format('D'), 'BIGTEST');
-        //1 30 1
-    }
-
-    handleSelect = (range) => {
-        console.log(range);
-        const periodStart = moment(range.startDate).startOf('day');
-        const periodStop = moment(range.endDate).endOf('day');
-        const periodType = this.getPeriodType(periodStart, periodStop);
-        const periodReadable = this.setReadableHeading(periodType, periodStart, periodStop);
-
-        this.setState({
-            periodStart,
-            periodStop,
-            periodReadable,
-            periodType
-        });
-    }
-
     render() {
         const { userData } = this.props;
-        const { periodReadable, periodStart, periodStop, periodType, isModalOpen } = this.state;
+        const { mappedItems, periodReadable, periodStart, periodStop, periodType, isModalOpen, customPeriodLength }
+            = this.state;
 
         const modalStyle = {
             overlay: { backgroundColor: 'transparent' },
@@ -383,6 +291,8 @@ class Dashboard extends React.Component {
                 top: '50px', left: 'initial', right: '185px'
             }
         };
+
+        if (!Object.keys(userData).length && !Object.keys(mappedItems).length) return (<p>Loading...</p>);
 
         return (
             <Wrapper>
@@ -405,17 +315,16 @@ class Dashboard extends React.Component {
                             </Period_selection>
                         </h3>
                     </Header>
-                    <PeriodTimeChart data={this.getPeriodTimeArr()} yearData={this.getYearMonthsArr} periodType={periodType} />
+                    <PeriodTimeChart data={this.getPeriodTimeArr()} getYearData={this.getYearMonthsArr}
+                        customPeriodLength={customPeriodLength} periodType={periodType} />
                     <ProjectChart userData={userData} totalWeekTime={this.getTotalWeekTime}
                         periodStart={periodStart} periodStop={periodStop} />
 
                     {/* <--modal--> */}
                     <Modal isOpen={isModalOpen} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true}
                         onRequestClose={this.closeModal} style={modalStyle}>
-                        <ModalCalendar periodStart={periodStart} periodStop={periodStop} handleSelect={this.handleSelect}
-                            setToday={this.setToday} setYesterday={this.setYesterday} setThisMonth={this.setThisMonth}
-                            setThisWeek={this.setThisWeek} setThisYear={this.setThisYear} setLastMonth={this.setLastMonth}
-                            setLastWeek={this.setLastWeek} setLastYear={this.setLastYear} />
+                        <ModalCalendar periodStart={periodStart} periodStop={periodStop} closeModal={this.closeModal}
+                            setReadableHeading={this.setReadableHeading} setState={this.setState.bind(this)} />
                     </Modal>
                 </Chart_Section>
                 <ProjectsCounter userData={userData} />

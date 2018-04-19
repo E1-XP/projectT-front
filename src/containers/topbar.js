@@ -8,7 +8,7 @@ import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
 import Modal from 'react-modal';
-// Modal.setAppElement('.sc-gZMcBi llCEqF');
+import TopBarDropdown from '../components/topbardropdown';
 import Icon from '../components/icon';
 
 const Task_controller = styled.section`
@@ -77,7 +77,6 @@ class TopBar extends React.Component {
 
         this.state = {
             description: '',
-            project: null,
             billable: false,
             isModalOpen: false,
             isTimerModeManual: false
@@ -92,20 +91,20 @@ class TopBar extends React.Component {
     }
 
     componentWillUnmount() {
-        //if (window.interval) clearInterval(window.interval);
         this.props.onRef(null);
     }
 
     setPreviouslyRunningTimer(userData) {
-        const { setRunningEntry, isRunning, setIsRunning, setTimer, setRunningEntryDescription } = this.props;
-
-        //await this.props.fetchEntries(this.props.userData._id);
+        const { setRunningEntry, isRunning, setIsRunning, setTimer, timer,
+            setRunningEntryDescription, setProject } = this.props;
 
         console.log('mounted', userData.entries.filter(item => item.stop === undefined).length);
 
         if (userData.entries.filter(item => item.stop === undefined).length) {
             const runEntry = userData.entries.filter(item => item.stop === undefined)[0];
+            console.log(runEntry, 'RUNENTRy');
             setRunningEntry(runEntry._id);
+            setProject(userData.projects.filter(itm => itm.name === runEntry.project)[0]);
             console.log('mounted2');
 
             const start = moment(runEntry.start).format();
@@ -114,8 +113,8 @@ class TopBar extends React.Component {
             clearInterval(window.interval);
             window.interval = setInterval(() => {
                 const time = moment.duration(moment().diff(start)).format('h:mm:ss', { stopTrim: "hh mm ss" });
-                setTimer(time);
-            }, 500);
+                if (time !== timer) setTimer(time);
+            }, 400);
 
             setRunningEntryDescription(runEntry.description || '');
             this.setState({ description: runEntry.description || '' });
@@ -127,25 +126,31 @@ class TopBar extends React.Component {
     }
 
     handleClick() {
-        const { isRunning, createNewEntry, userData, toggleTimer, runningEntryDescription } = this.props;
+        const { isRunning, createNewEntry, userData, toggleTimer, runningEntryDescription,
+            currentProject } = this.props;
 
         if (!isRunning) {
             toggleTimer(true);
-            createNewEntry(userData._id, 'description', runningEntryDescription);
+
+            const params = { description: runningEntryDescription };
+            if (currentProject) params.project = currentProject.name;
+
+            createNewEntry(userData._id, params);
         }
         else this.stopTimer();
     }
 
     stopTimer() {
         const { userData, toggleTimer, runningEntry, updateEntry, runningEntryDescription,
-            setRunningEntryDescription, getWeekTime, setWeekTimer } = this.props;
-        const { project, billable } = this.state;
+            setRunningEntryDescription, getWeekTime, setWeekTimer, currentProject,
+            setProject } = this.props;
+        const { billable } = this.state;
 
         const now = moment().valueOf();
         const payload = {
             stop: now,
             description: runningEntryDescription,
-            project: (project && project.name) ? project.name : '',
+            project: (currentProject && currentProject.name) ? currentProject.name : '',
             billable
         };
 
@@ -153,11 +158,13 @@ class TopBar extends React.Component {
         updateEntry(userData._id, runningEntry, payload);
         setWeekTimer(getWeekTime(userData.entries));
         setRunningEntryDescription('');
+        setProject(null);
         this.setState({ description: '' });
     }
 
     changeDescription(description, runningEntry, previousDescription, enableEmptyInput = false) {
         const { userData, updateEntry } = this.props;
+
         if (!runningEntry) runningEntry = this.props.runningEntry;
         console.log('change desc', description);
 
@@ -167,7 +174,11 @@ class TopBar extends React.Component {
     }
 
     setProjectState = obj => {
-        this.setState({ project: obj, isModalOpen: false });
+        const { updateEntry, setProject, userData, runningEntry } = this.props;
+
+        if (runningEntry) updateEntry(userData._id, runningEntry, { project: obj.name });
+        setProject(obj);
+        this.setState({ isModalOpen: false });
     }
 
     setBillable = () => {
@@ -183,8 +194,8 @@ class TopBar extends React.Component {
     }
 
     render() {
-        const { isRunning, timer, setRunningEntryDescription, userData } = this.props;
-        const { project, description, billable, isTimerModeManual } = this.state;
+        const { isRunning, timer, setRunningEntryDescription, userData, currentProject } = this.props;
+        const { description, billable, isTimerModeManual } = this.state;
 
         const modalStyle = {
             overlay: { backgroundColor: 'transparent' },
@@ -196,10 +207,10 @@ class TopBar extends React.Component {
 
         const timerModeCondition = isTimerModeManual ? '#bbb' : 'green';
 
-        const CurrentProjectJSX = () => project ?
+        const CurrentProjectJSX = () => currentProject ?
             (<Item_link>
-                <Color_indicator color={project.color} />
-                <span>{project.name}</span>
+                <Color_indicator color={currentProject.color} />
+                <span>{currentProject.name}</span>
             </Item_link>) :
             (<Item_link>
                 <Icon name="folder" fill="#bbb" />
@@ -238,36 +249,25 @@ class TopBar extends React.Component {
                 </Task_timing>
 
                 {/* <-- modal --> */}
-                <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true}
-                    overlayRef={node => this.overlayRef = node} onRequestClose={this.closeModal}
-                    style={modalStyle}>
-                    <ul>
-                        <li key={'no project'} onClick={() => this.setProjectState(null)}>
-                            <Item_link> <Color_indicator color={'bbb'} />no project</Item_link>
-                        </li>
-                        {userData.projects.map(itm =>
-                            (<li key={itm.name} onClick={() => this.setProjectState(itm)}>
-                                <Item_link>
-                                    <Color_indicator color={itm.color} />{itm.name}
-                                </Item_link>
-                            </li>))}
-                        <li key={'add project'} onClick={() => 'ok'}>
-                            <Item_link><Icon name="add" fill="green" />add Project</Item_link>
-                        </li>
-                    </ul>
+                <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true}
+                    shouldCloseOnOverlayClick={true} overlayRef={node => this.overlayRef = node}
+                    onRequestClose={this.closeModal} style={modalStyle}>
+                    <TopBarDropdown setProjectState={this.setProjectState} userData={userData} />
                 </Modal>
             </Task_controller >
         );
     }
 }
 
-const mapStateToProps = ({ isRunning, timer, userData, runningEntry, runningEntryDescription }) => ({
-    isRunning,
-    userData,
-    runningEntry,
-    timer,
-    runningEntryDescription
-});
+const mapStateToProps = ({ isRunning, timer, userData, runningEntry,
+    runningEntryDescription, currentProject }) => ({
+        isRunning,
+        userData,
+        runningEntry,
+        timer,
+        currentProject,
+        runningEntryDescription
+    });
 
 const mapDispatchToProps = dispatch => ({
     setIsRunning: bool => dispatch(actions.setIsRunning(bool)),
@@ -275,9 +275,10 @@ const mapDispatchToProps = dispatch => ({
     toggleTimer: bool => dispatch(actions.toggleTimer(bool)),
     setWeekTimer: str => dispatch(actions.setWeekTimer(str)),
     fetchEntries: id => dispatch(actions.fetchEntries(id)),
+    setProject: obj => dispatch(actions.setProject(obj)),
     setRunningEntry: v => dispatch(actions.setRunningEntry(v)),
     setRunningEntryDescription: v => dispatch(actions.setRunningEntryDescription(v)),
-    createNewEntry: (userid, param, pval) => dispatch(actions.createNewEntry(userid, param, pval)),
+    createNewEntry: (userid, obj) => dispatch(actions.createNewEntry(userid, obj)),
     updateEntry: (userid, runningEntry, obj) => dispatch(actions.updateEntry(userid, runningEntry, obj))
 });
 

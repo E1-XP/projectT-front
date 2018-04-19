@@ -7,6 +7,7 @@ import styled from 'styled-components';
 
 const Container = styled.section`
     width:50%;
+    max-width:450px;
     margin:5rem auto;
 `;
 
@@ -25,7 +26,7 @@ const Heading = styled.h2`
 
 const Button = styled.button`
     padding:.5rem;
-    background-color:green;
+    background-color:red;
     border:none;
     margin:none;
     color:white;
@@ -35,7 +36,13 @@ const Button = styled.button`
 `;
 
 const Form_validation_hints = styled.p`
-    
+    color:red;
+`;
+
+const StaySigned_section = styled.section`
+    display:flex;
+    align-items:center;
+    padding:.7rem;
 `;
 
 class Form extends React.Component {
@@ -45,7 +52,8 @@ class Form extends React.Component {
         this.state = {
             email: "",
             username: "",
-            password: ""
+            password: "",
+            persistentSession: false
         }
     }
 
@@ -55,17 +63,18 @@ class Form extends React.Component {
         const { location, handleAuth } = this.props;
         const route = location.pathname.toLowerCase().slice(1);
 
-        const formData = new URLSearchParams();
-        for (const prop in this.state) {
-            if (this.state[prop]) formData.append(prop, this.state[prop]);
-        }
+        handleAuth(route, this.state);
+    }
 
-        handleAuth(route, formData);
+    toggleChecked = () => {
+        this.setState(prevState =>
+            ({ persistentSession: !prevState.persistentSession }));
     }
 
     render() {
         const { location } = this.props;
-        const { email, username, password } = this.state;
+        const { email, username, password, checked } = this.state;
+
         const isSignUp = location.pathname.toLowerCase().slice(1) === 'signup';
         const formHeading = isSignUp ? 'Sign Up to enter our App.' : 'Log in to get access to your account.';
 
@@ -76,6 +85,11 @@ class Form extends React.Component {
                     <Form_item value={email} onChange={(e) => this.setState({ email: e.target.value })} placeholder="email" />
                     {isSignUp ? (<Form_item value={username} onChange={(e) => this.setState({ username: e.target.value })} placeholder="username" />) : null}
                     <Form_item value={password} onChange={(e) => this.setState({ password: e.target.value })} type="password" placeholder="password" />
+                    {!isSignUp && <StaySigned_section>
+                        <input type="checkbox" checked={checked} onChange={this.toggleChecked}
+                            style={{ marginRight: '.5rem' }} />
+                        <p>Stay logged in</p>
+                    </StaySigned_section>}
                     <Button>Submit</Button>
                 </Form_section>
                 <Form_validation_hints />
