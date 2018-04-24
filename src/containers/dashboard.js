@@ -6,6 +6,8 @@ import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
+import getMappedItems from '../selectors/getmappeditems';
+
 import Modal from 'react-modal';
 import Icon from '../components/icon';
 import ModalCalendar from '../components/modalcalendar';
@@ -50,7 +52,6 @@ class Dashboard extends React.Component {
         super();
 
         this.state = {
-            mappedItems: {},
             periodStart: moment().startOf('isoWeek'),
             periodStop: moment().startOf('isoWeek').add(6, 'days'),
             periodReadable: 'This Week',
@@ -74,9 +75,9 @@ class Dashboard extends React.Component {
         this.lastYearReadable = `${moment().subtract(1, 'years').format('YYYY')}`;
     }
 
-    componentDidMount() {
-        if (this.props.userData) this.setState({ mappedItems: this.getMappedItems() });
-    }
+    // componentDidMount() {
+    //     if (this.props.userData) this.setState({ mappedItems: this.getMappedItems() });
+    // }
 
     getTotalDayCount = array => {
         const toSeconds = array.reduce((acc, item) =>
@@ -87,7 +88,8 @@ class Dashboard extends React.Component {
 
     getPeriodTimeArr = () => {
         const { entries } = this.props.userData;
-        const { mappedItems, periodStart, periodStop } = this.state;
+        const { mappedItems } = this.props;
+        const { periodStart, periodStop } = this.state;
 
         const getReadable = itm => moment(itm.start).format('ddd, Do MMM');
         const getDuration = itm => moment(itm).format('h:mm:ss', { stopTrim: "hh mm ss" });
@@ -149,25 +151,6 @@ class Dashboard extends React.Component {
         }));
     }
 
-    getMappedItems = () => {
-        const { userData } = this.props;
-
-        const getReadable = itm => moment(itm.start).format('ddd, Do MMM');
-
-        const reduceItems = (acc, itm) => {
-            acc[itm.readable] ? acc[itm.readable].push(itm) : acc[itm.readable] = [itm];
-            return acc;
-        }
-
-        return userData.entries
-            .filter(itm => itm.stop !== undefined)
-            .sort((a, b) => b.start - a.start)
-            .map((itm, i) => ({
-                start: itm.start,
-                stop: itm.stop,
-                readable: getReadable(itm)
-            })).reduce(reduceItems, {});
-    }
 
     getTotalWeekTime = entries => {
         const { periodStart, periodStop } = this.state;
@@ -333,6 +316,9 @@ class Dashboard extends React.Component {
     }
 }
 
-const mapStateToProps = ({ userData }) => ({ userData });
+const mapStateToProps = ({ userData }) => ({
+    userData,
+    mappedItems: getMappedItems(userData)
+});
 
 export default connect(mapStateToProps, null)(Dashboard);

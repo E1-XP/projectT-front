@@ -8,7 +8,7 @@ import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
 import Modal from 'react-modal';
-import TopBarDropdown from '../components/topbardropdown';
+import ProjectDropdown from '../components/projectdropdown';
 import Icon from '../components/icon';
 
 const Task_controller = styled.section`
@@ -19,6 +19,7 @@ const Task_controller = styled.section`
     justify-content:space-between;
     align-items:center;
     position:fixed;
+    z-index:50;
     background-color:#fff;
     width:95%;
     height:75px;
@@ -35,6 +36,11 @@ const Task_timing = styled.div`
 `;
 
 const Task_description = styled.input`
+    outline-color:transparent;
+    width:100%;
+    padding:.3rem;
+    border:none;
+    font-size:18px;
 `;
 
 const Task_timer = styled.span`
@@ -85,9 +91,7 @@ class TopBar extends React.Component {
 
     componentDidMount() {
         this.props.onRef(this);
-
         this.setPreviouslyRunningTimer(this.props.userData);
-        console.log('TOPBAR JUST MOUNTED');
     }
 
     componentWillUnmount() {
@@ -95,26 +99,17 @@ class TopBar extends React.Component {
     }
 
     setPreviouslyRunningTimer(userData) {
-        const { setRunningEntry, isRunning, setIsRunning, setTimer, timer,
-            setRunningEntryDescription, setProject } = this.props;
+        const { setRunningEntry, setIsRunning, setTimer, setRunningEntryDescription,
+            setProject, toggleTimer } = this.props;
 
-        console.log('mounted', userData.entries.filter(item => item.stop === undefined).length);
-
-        if (userData.entries.filter(item => item.stop === undefined).length) {
-            const runEntry = userData.entries.filter(item => item.stop === undefined)[0];
-            console.log(runEntry, 'RUNENTRy');
-            setRunningEntry(runEntry._id);
-            setProject(userData.projects.filter(itm => itm.name === runEntry.project)[0]);
-            console.log('mounted2');
-
+        let runEntry = userData.entries.filter(item => item.stop === undefined);
+        if (runEntry.length) {
+            runEntry = runEntry[0];
             const start = moment(runEntry.start).format();
 
-            setIsRunning(true);
-            clearInterval(window.interval);
-            window.interval = setInterval(() => {
-                const time = moment.duration(moment().diff(start)).format('h:mm:ss', { stopTrim: "hh mm ss" });
-                if (time !== timer) setTimer(time);
-            }, 400);
+            setRunningEntry(runEntry._id);
+            setProject(userData.projects.filter(itm => itm.name === runEntry.project)[0]);
+            toggleTimer(true, start);
 
             setRunningEntryDescription(runEntry.description || '');
             this.setState({ description: runEntry.description || '' });
@@ -198,7 +193,7 @@ class TopBar extends React.Component {
         const { description, billable, isTimerModeManual } = this.state;
 
         const modalStyle = {
-            overlay: { backgroundColor: 'transparent' },
+            overlay: { backgroundColor: 'transparent', zIndex: 55 },
             content: {
                 width: '200px', margin: '0 auto', height: '120px', padding: '1rem', position: 'absolute',
                 top: '50px', left: 'initial', right: '80px'
@@ -252,19 +247,20 @@ class TopBar extends React.Component {
                 <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true}
                     shouldCloseOnOverlayClick={true} overlayRef={node => this.overlayRef = node}
                     onRequestClose={this.closeModal} style={modalStyle}>
-                    <TopBarDropdown setProjectState={this.setProjectState} userData={userData} />
+                    <ProjectDropdown setProjectState={this.setProjectState} userData={userData} />
                 </Modal>
             </Task_controller >
         );
     }
 }
 
-const mapStateToProps = ({ isRunning, timer, userData, runningEntry,
+const mapStateToProps = ({ isRunning, timer, weekTimer, userData, runningEntry,
     runningEntryDescription, currentProject }) => ({
         isRunning,
         userData,
         runningEntry,
         timer,
+        weekTimer,
         currentProject,
         runningEntryDescription
     });
@@ -272,7 +268,7 @@ const mapStateToProps = ({ isRunning, timer, userData, runningEntry,
 const mapDispatchToProps = dispatch => ({
     setIsRunning: bool => dispatch(actions.setIsRunning(bool)),
     setTimer: str => dispatch(actions.setTimer(str)),
-    toggleTimer: bool => dispatch(actions.toggleTimer(bool)),
+    toggleTimer: (bool, val) => dispatch(actions.toggleTimer(bool, val)),
     setWeekTimer: str => dispatch(actions.setWeekTimer(str)),
     fetchEntries: id => dispatch(actions.fetchEntries(id)),
     setProject: obj => dispatch(actions.setProject(obj)),

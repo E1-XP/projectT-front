@@ -12,11 +12,10 @@ class Protected_container extends React.Component {
     render() {
         const { isUserLoggedIn, children } = this.props;
         const path = this.props.location.pathname.toLowerCase();
+
         return (isUserLoggedIn) ? children : ((path === '/login') ? null : <Redirect to="/login" />);
     }
 }
-const mapStateToProps = ({ isUserLoggedIn }) => ({
-    isUserLoggedIn
-});
+const mapStateToProps = ({ isUserLoggedIn }) => ({ isUserLoggedIn });
 
 export default withRouter(connect(mapStateToProps, null)(Protected_container));

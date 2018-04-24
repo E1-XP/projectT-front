@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Icon from './icon';
@@ -32,21 +32,34 @@ const Sidebar_profile = styled.section`
 `;
 
 const Navigation_list = styled.ul`
+
 `;
 
 const Navigation_item = styled.li`
-    margin:.5rem;
+    margin:.1rem;
 `;
 
-const Navigation_link = styled(Link) `
-color:#ddd;
+const Navigation_link = styled(NavLink) `
+    color:#ddd;
     display:flex;
     align-items: center;
-&:last-of-type{
-    border-radius:50%;
+    justify-content: center;
+    padding: 0.3rem;
+    border-radius: 7px;
+    @media only screen and (min-width:1200px){
+         justify-content:initial;
 }
 &:hover{
     color:white;
+}
+`;
+
+const Header_link = styled(Link) `
+    color:#ddd;
+    display:flex;
+    align-items: center;
+    &:hover {
+        color:white;
 }
 `;
 
@@ -72,9 +85,9 @@ export default class SideBar extends React.Component {
         return (
             <Sidebar>
                 <Sidebar_header>
-                    <Navigation_link to="/timer">
+                    <Header_link to="/timer">
                         <h1>T</h1>
-                    </Navigation_link>
+                    </Header_link>
                 </Sidebar_header>
                 <Sidebar_navigation>
                     <Navigation_list>
@@ -85,13 +98,13 @@ export default class SideBar extends React.Component {
                             </Navigation_link>
                         </Navigation_item>
                         <Navigation_item>
-                            <Navigation_link to="/dashboard">
+                            <Navigation_link to="/dashboard" activeClassName="active" >
                                 <Icon name="insert_chart" />
                                 <Link_label>Dashboard</Link_label>
                             </Navigation_link>
                         </Navigation_item>
                         <Navigation_item>
-                            <Navigation_link to="/projects">
+                            <Navigation_link to="/projects" activeClassName="active">
                                 <Icon name="folder" />
                                 <Link_label>Projects</Link_label>
                             </Navigation_link>
@@ -99,7 +112,7 @@ export default class SideBar extends React.Component {
                     </Navigation_list>
                 </Sidebar_navigation>
                 <Sidebar_profile>
-                    <Navigation_link to="/profile">
+                    <Navigation_link to="/profile" activeClassName="active">
                         <IconProfile>P</IconProfile>
                     </Navigation_link>
                 </Sidebar_profile>

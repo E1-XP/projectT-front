@@ -7,9 +7,16 @@ import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
+import getMappedItems from '../selectors/getmappeditems';
+
 import Topbar from '../containers/topbar';
-import EntriesTable from '../components/entriestable';
+import WeekCounter from '../containers/weekcounter';
+import EntriesTable from '../containers/entriestable';
 import Icon from '../components/icon';
+
+const Container = styled.div`
+    background-color:rgb(250,250,250);
+`;
 
 const List = styled.ul`
 `;
@@ -30,12 +37,6 @@ const Item_link = styled.a`
     cursor:pointer;
 `;
 
-const Week_counter = styled.div`
-    border:1px solid blue;
-    margin-top:61px;
-    padding:1rem;
-`;
-
 class Timer extends React.Component {
     componentDidMount() {
         const { userData, setWeekTimer } = this.props;
@@ -52,39 +53,12 @@ class Timer extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         const { userData, setWeekTimer, isRunning } = this.props;
-        const condition = nextProps.userData.entries.length !== userData.entries.length;
-
+        //const condition = nextProps.userData.entries.length !== userData.entries.length;
         if (!isRunning) setWeekTimer(this.getWeekTimeComposed(userData.entries));//this.setState({ weekTime: this.getWeekTime(nextProps.userData.entries) });
         // if (nextProps.isRunning) {
+        //else console.log('running');
         //     window.weekInterval = setInterval(this.runWeekTimer, 400);}
         // if (nextProps.isRunning === false && window.weekInterval) clearInterval(window.weekInterval);
-    }
-
-    setMappedItems = () => {
-        const { userData } = this.props;
-
-        const getReadable = item => moment(item.start).format('ddd, DD MMM');
-        const getDuration = item => moment.duration(moment(Number(item.stop)).diff(item.start)).format('h:mm:ss', { stopTrim: "hh mm ss" });
-        const reduceItems = (acc, item) => {
-            acc[item.readable] ? acc[item.readable].push(item) : acc[item.readable] = [item];
-            return acc;
-        }
-
-        return userData.entries
-            .filter(item => item.stop !== undefined)
-            .sort((a, b) => b.start - a.start)
-            .map((item, i) => ({
-                start: item.start,
-                stop: item.stop,
-                description: item.description ? item.description : '',
-                project: item.project ? item.project : '',
-                billable: item.billable,
-                userId: item.userId,
-                id: item._id,
-                readable: getReadable(item),
-                duration: getDuration(item),
-                visible: false
-            })).reduce(reduceItems, {});
     }
 
     handleRemove = id => {
@@ -107,9 +81,12 @@ class Timer extends React.Component {
     getWeekTime = entries => {
         const thisWeekStart = moment().startOf('isoWeek');
 
-        const total = entries.filter(item => item.stop !== undefined)
-            .filter(item => item.start > thisWeekStart.valueOf())
-            .reduce((acc, item) => acc + moment.duration(moment(Number(item.stop)).diff(item.start)).valueOf(), 0);
+        const total = entries
+            .reduce((acc, itm) => {
+                return (itm.stop !== undefined && itm.start > thisWeekStart.valueOf()) ?
+                    acc + moment.duration(moment(itm.stop).diff(itm.start)).valueOf() :
+                    acc;
+            }, 0);
 
         return total;
     }
@@ -145,38 +122,35 @@ class Timer extends React.Component {
     }
 
     render() {
-        const { userData, isRunning, weekTimer } = this.props;
-
+        const { userData, isRunning, mappedItems } = this.props;
+        console.log('RENDERING TIMER PAGE');
         if (!userData.entries) return (<p>Loading...</p>);
 
-        const mappedItems = this.setMappedItems();
-
         return (
-            <div>
+            <Container>
                 <Topbar onRef={ref => this.topBarRef = ref} getWeekTime={this.getWeekTimeComposed} />
-                <Week_counter>
-                    This week:<span>{weekTimer}</span>
-                </Week_counter>
+                <WeekCounter />
                 <List>
-                    {(userData.entries && userData.entries.length) ?
-                        <EntriesTable mappedItems={mappedItems} userData={userData}
+                    {userData.entries.length ?
+                        <EntriesTable
                             setTopbarDescription={this.passRefToChild}
                             handleClick={this.handleClick}
                             handleRemove={this.handleRemove}
                             changeDescription={this.changeDescription} /> :
                         <List_item>Add you first task to begin</List_item>}
                 </List>
-            </div>
+                {userData.entries.length > 9 ? <button>Load more entries</button> : null}
+            </Container>
         );
     };
 }
 
-const mapStateToProps = ({ userData, runningEntry, runningEntryDescription, isRunning, weekTimer }) => ({
+const mapStateToProps = ({ userData, runningEntry, runningEntryDescription, isRunning }) => ({
     userData,
+    mappedItems: getMappedItems(userData),
     runningEntry,
     runningEntryDescription,
-    isRunning,
-    weekTimer
+    isRunning
 });
 
 const mapDispatchToProps = dispatch => ({

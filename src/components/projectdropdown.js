@@ -17,11 +17,14 @@ const Item_link = styled.a`
     align-items:center;
 `;
 
+const List = styled.ul`
+`;
+
 const TopBarDropdown = props => {
     const { setProjectState, userData } = props;
 
     return (
-        <ul>
+        <List>
             <li key={'no project'} onClick={() => setProjectState(null)}>
                 <Item_link> <Color_indicator color={'bbb'} />no project</Item_link>
             </li>
@@ -34,7 +37,7 @@ const TopBarDropdown = props => {
             <li key={'add project'} onClick={() => 'ok'}>
                 <Item_link><Icon name="add" fill="green" />add Project</Item_link>
             </li>
-        </ul>
+        </List>
     );
 }
 

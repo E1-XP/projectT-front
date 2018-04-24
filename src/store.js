@@ -11,6 +11,7 @@ const initialState = {
     isUserLoggedIn: false,
     userData: {},
     settings: {},
+    mappedItems: {},
     runningEntry: null,
     currentProject: '',
     runningEntryDescription: '',

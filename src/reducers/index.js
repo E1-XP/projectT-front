@@ -15,6 +15,7 @@ const reducer = (state = {}, action) => {
             const userData = Object.assign({}, state.userData, { entries: action.payload });
             return Object.assign({}, state, { userData });
         };
+        case consts.SET_MAPPED_ITEMS: return Object.assign({}, state, { mappedItems: action.payload });
         case consts.SET_PROJECT: return Object.assign({}, state, { currentProject: action.payload });
         case consts.SET_RUNNING_ENTRY: return Object.assign({}, state, { runningEntry: action.payload });
         case consts.SET_RUNNING_ENTRY_DESCRIPTION: return Object.assign({}, state, { runningEntryDescription: action.payload });

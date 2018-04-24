@@ -52,12 +52,12 @@ class Preloader extends React.Component {
     render() {
         const { isLoading } = this.props;
 
-        if (isLoading) return (
+        return isLoading ? (
             <Main_preloader>
                 <h1>ProjectT</h1>
                 <Spinner />
-            </Main_preloader>);
-        else return (this.props.children);
+            </Main_preloader>)
+            : (this.props.children);
     }
 }
 

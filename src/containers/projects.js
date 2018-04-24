@@ -241,7 +241,6 @@ const mapStateToProps = ({ userData }) => ({ userData });
 const mapDispatchToProps = dispatch => ({
     createProject: (userid, name, color, client) => dispatch(actions.createProject(userid, name, color, client)),
     removeProject: (userid, name) => dispatch(actions.removeProject(userid, name))
-
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Projects);

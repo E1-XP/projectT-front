@@ -7,8 +7,8 @@ import { push } from 'react-router-redux'
 import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
-const baseUrl = `http://localhost:3001`;
-//const baseUrl = `https://project--t.herokuapp.com`;
+//const baseUrl = `http://localhost:3001`;
+const baseUrl = `https://project--t.herokuapp.com`;
 
 export const setIsLoading = bool => ({
     type: consts.IS_LOADING,
@@ -32,6 +32,11 @@ export const setUserData = data => ({
 
 export const setEntries = data => ({
     type: consts.SET_ENTRIES,
+    payload: data
+});
+
+export const setMappedItems = data => ({
+    type: consts.SET_MAPPED_ITEMS,
     payload: data
 });
 
@@ -65,19 +70,25 @@ export const loadingError = err => ({
     payload: err
 });
 
-export const toggleTimer = isTrue => (dispatch, getState) => {
+export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState) => {
     if (isTrue) {
-        const start = moment().format();
+        let start = moment().format();
+        let initialWeekTime = getState().weekTimer;
+
+        if (previousTime) start = previousTime;
         dispatch(setIsRunning(true));
 
         window.interval = setInterval(() => {
+            if (previousTime && initialWeekTime === '0:00:00') initialWeekTime = getState().weekTimer;
+            const state = getState();
             const time = moment.duration(moment().diff(start)).format('h:mm:ss', { stopTrim: "hh mm ss" });
-            //const weekTime = moment.duration(getState().weekTimer).add(1, 's').format('h:mm:ss', { stopTrim: "hh mm ss" });
+            const weekTime = moment.duration(initialWeekTime).add(moment().diff(moment(start)))
+                .format('h:mm:ss', { stopTrim: "hh mm ss" });
 
-            dispatch(setTimer(time));
-            //dispatch(setWeekTimer('0:00'));
+            state.timer !== time && dispatch(setTimer(time));
+            state.weekTimer !== weekTime && dispatch(setWeekTimer(weekTime));
             document.title = `${time} - ProjectT`;
-        }, 500);
+        }, 450);
     }
     else {
         clearInterval(window.interval);
@@ -148,11 +159,9 @@ export const fetchEntries = userid => dispatch => {
 export const fetchAuthentication = () => dispatch => {
     const url = `${baseUrl}/auth/refresh`;
 
-    //dispatch(setIsLoading(true));
-
     axios.post(url).then(res => {
         if (res.status === 200) {
-            dispatch(setUserData(res.data));// setTimeout(dispatch(setUserData(null)), 5000);
+            dispatch(setUserData(res.data));
             dispatch(setIsAuthenticated(true));
             dispatch(setIsLoading(false));
         }
@@ -199,6 +208,7 @@ export const handleLogout = () => dispatch => {
 
         dispatch(setIsAuthenticated(false));
         setTimeout(() => dispatch(setIsLoading(false)), 1000);
+        dispatch(setUserData(null));
 
     }).catch(err => {
         dispatch(loadingError(err));
