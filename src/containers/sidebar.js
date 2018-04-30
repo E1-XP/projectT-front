@@ -1,8 +1,12 @@
 import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { withRouter, NavLink, Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import Icon from './icon';
+import * as actions from '../actions';
+
+import ProfileDropdown from '../components/profiledropdown';
+import Icon from '../components//icon';
 
 const Sidebar = styled.section`
     color:white;
@@ -15,6 +19,7 @@ const Sidebar = styled.section`
     align-items:center;
     position:fixed;
     height:100%;
+    z-index:90;
     @media only screen and (min-width:1200px){
          max-width:250px;
 }
@@ -32,7 +37,6 @@ const Sidebar_profile = styled.section`
 `;
 
 const Navigation_list = styled.ul`
-
 `;
 
 const Navigation_item = styled.li`
@@ -63,16 +67,6 @@ const Header_link = styled(Link) `
 }
 `;
 
-const IconProfile = styled.span`
-    display:flex;
-    background-color:red;
-    width:2rem;
-    height:2rem;
-    border-radius:50%;
-    justify-content:center; 
-    align-items:center;
-`;
-
 const Link_label = styled.span`
     display:none;
     @media only screen and (min-width:1200px){
@@ -80,8 +74,10 @@ const Link_label = styled.span`
         margin-left:1rem;
 }`;
 
-export default class SideBar extends React.Component {
+class SideBar extends React.Component {
     render() {
+        const { handleLogout, userData } = this.props;
+
         return (
             <Sidebar>
                 <Sidebar_header>
@@ -112,11 +108,19 @@ export default class SideBar extends React.Component {
                     </Navigation_list>
                 </Sidebar_navigation>
                 <Sidebar_profile>
-                    <Navigation_link to="/profile" activeClassName="active">
-                        <IconProfile>P</IconProfile>
-                    </Navigation_link>
+                    <ProfileDropdown username={userData.username} handleLogout={handleLogout} />
                 </Sidebar_profile>
             </Sidebar>
         );
     }
 }
+
+const mapStateToProps = ({ user }) => ({
+    userData: user.userData
+});
+
+const mapDispatchToProps = dispatch => ({
+    handleLogout: () => dispatch(actions.global.handleLogout)
+});
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SideBar));

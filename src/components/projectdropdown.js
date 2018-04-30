@@ -17,28 +17,137 @@ const Item_link = styled.a`
     align-items:center;
 `;
 
+const Item = styled.li`
+    padding:.5rem;
+    width:15rem;
+    background-color:${props => props.project ? '#eee' : 'white'};
+    color:${props => props.project ? 'green' : 'black'};    
+    border-radius:5px;    
+    &:hover{
+        background-color:#eee;
+    }
+`;
+
 const List = styled.ul`
 `;
 
-const TopBarDropdown = props => {
-    const { setProjectState, userData } = props;
+const Input = styled.input`
+    border:none;
+    outline-color:transparent;
+`;
 
-    return (
-        <List>
-            <li key={'no project'} onClick={() => setProjectState(null)}>
-                <Item_link> <Color_indicator color={'bbb'} />no project</Item_link>
-            </li>
-            {userData.projects.map(itm =>
-                (<li key={itm.name} onClick={() => setProjectState(itm)}>
+const Searchbar = styled.div`
+    display:flex;
+    justify-content:center;
+    border-radius:5px;
+    border:1px solid #ddd;    
+`;
+
+const Wrapper = {
+    borderRadius: '5px',
+    position: 'absolute',
+    zIndex: 50,
+    backgroundColor: 'white',
+    boxShadow: '0 2px 6px 0 rgba(0,0,0,.1)',
+    padding: '.7rem',
+    maxHeight: '15rem'
+}
+
+const Screen_blocker = styled.div`
+     display: block;
+        position:fixed;
+        top:0;
+        left:0;
+        background-color:transparent;
+        width:100%;
+        height:100%;
+`;
+
+class ProjectDropdown extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isMenuOpen: false,
+            inputValue: '',
+        }
+
+        this.wrapperStyle = { ...Wrapper, ...this.props.style };
+    }
+
+    componentWillReceiveProps(nxtProps) {
+        console.log('called update');
+        if (nxtProps.isOpen && this.state.isMenuOpen !== nxtProps.isOpen) this.openMenu();
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('click', this.closeMenu);
+    }
+
+    openMenu = e => {
+        this.setState({ isMenuOpen: true }, e => document.addEventListener('click', this.closeMenu));
+    }
+
+    closeMenu = e => {
+        if (!this.dropdown.contains(e.target)) this.setState({ isMenuOpen: false },
+            e => document.removeEventListener('click', this.closeMenu));
+    }
+
+    shouldShowItem = itm => {
+        const { inputValue } = this.state;
+        return inputValue ? itm.includes(inputValue) : true;
+    }
+
+    setInputState = e => {
+        this.setState({ inputValue: e.target.value });
+    }
+
+    generateItemArray = () => {
+        const { project, setProjectState } = this.props;
+        let counter = 0;
+        let shouldShowEmptyItem;
+
+        const listItems = this.props.userData.projects.map((itm, i, arr) => {
+            if ((i === arr.length - 1) && !counter) shouldShowEmptyItem = true;
+
+            if (this.shouldShowItem(itm.name)) {
+                counter += 1;
+
+                return (<Item key={itm.name} project={project === itm.name}
+                    onClick={(e) => setProjectState(itm)}>
                     <Item_link>
                         <Color_indicator color={itm.color} />{itm.name}
                     </Item_link>
-                </li>))}
-            <li key={'add project'} onClick={() => 'ok'}>
-                <Item_link><Icon name="add" fill="green" />add Project</Item_link>
-            </li>
-        </List>
-    );
+                </Item>);
+            }
+        });
+
+        return (<List>{this.shouldShowItem('no project') &&
+            <Item key='no project' onClick={(e) => setProjectState(null)}>
+                <Item_link> <Color_indicator color={'bbb'} />no project</Item_link>
+            </Item>}
+            {listItems} {shouldShowEmptyItem && <Item key='nothing to show'>
+                <Item_link>No projects found</Item_link></Item>}</List>);
+    }
+
+    render() {
+        const { setProjectState, style } = this.props;
+        const { isMenuOpen, itemFilter, inputValue, shouldShowEmptyItem } = this.state;
+
+        return (
+            <React.Fragment>
+                {isMenuOpen && <Screen_blocker />}
+                {isMenuOpen && <div ref={node => this.dropdown = node} style={this.wrapperStyle}>
+                    <Searchbar >
+                        <Icon name="search" />
+                        <Input placeholder="Find project..." className="input-standard"
+                            value={inputValue} onChange={this.setInputState} />
+                    </Searchbar>
+                    {this.generateItemArray()}
+                </div>}
+            </React.Fragment >
+        );
+    }
 }
 
-export default TopBarDropdown;
+export default ProjectDropdown;

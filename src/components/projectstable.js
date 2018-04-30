@@ -6,7 +6,6 @@ import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
 import Dropdown, { DropdownContent, DropdownTrigger } from 'react-simple-dropdown';
-import 'react-simple-dropdown/styles/Dropdown.css';
 import Icon from './icon';
 
 const Table = styled.table`
@@ -77,7 +76,6 @@ const Dropdown_CheckBox = styled.div`
 `;
 
 const CheckBox = ({ name, state, handleChecks }) => {
-    // const overlay =
     return (
         <Dropdown >
             <DropdownTrigger >
@@ -89,8 +87,7 @@ const CheckBox = ({ name, state, handleChecks }) => {
             </DropdownTrigger>
             <DropdownContent>
                 OK
-</DropdownContent>
-
+            </DropdownContent>
         </Dropdown>
     );
 }

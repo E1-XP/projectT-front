@@ -236,11 +236,11 @@ class Projects extends React.Component {
     }
 }
 
-const mapStateToProps = ({ userData }) => ({ userData });
+const mapStateToProps = ({ user }) => ({ userData: user.userData });
 
 const mapDispatchToProps = dispatch => ({
-    createProject: (userid, name, color, client) => dispatch(actions.createProject(userid, name, color, client)),
-    removeProject: (userid, name) => dispatch(actions.removeProject(userid, name))
+    createProject: (userid, name, color, client) => dispatch(actions.entry.createProject(userid, name, color, client)),
+    removeProject: (userid, name) => dispatch(actions.entry.removeProject(userid, name))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Projects);

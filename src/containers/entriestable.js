@@ -5,8 +5,11 @@ import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
+import * as actions from '../actions/entry';
 import getMappedItems from '../selectors/getmappeditems';
 
+import EntryHeader from '../components/entryheader';
+import EntryTimer from '../components/entrytimer';
 import TimeEntry from '../components/timentry';
 import ProjectDropdown from '../components/projectdropdown';
 import EntryDropdown from '../components/entrydropdown';
@@ -114,6 +117,10 @@ const Input_task = styled.input`
     outline-color: transparent;
 `;
 
+const Item_day=styled.span`
+    font-weight:700;
+`;
+
 class EntriesTable extends React.Component {
     constructor(props) {
         super(props);
@@ -152,11 +159,17 @@ class EntriesTable extends React.Component {
         this.setState({ filteredItems });
     }
 
-    startNewEntry = description => {
-        const { handleClick, setTopbarDescription } = this.props;
+    startNewEntry = item => {
+        const { setTopbarDescription, userData, createNewEntry } = this.props;
+        console.log(item, 'ITEM');
 
-        handleClick('description', description);
-        setTopbarDescription(description);
+        const paramsObj = {};
+        paramsObj.billable = item.billable;
+        if (item.description) paramsObj.description = item.description;
+        if (item.project) paramsObj.project = item.project;
+
+        createNewEntry(userData._id, paramsObj);
+        setTopbarDescription(item.description);
     }
 
     getTotalDayCount = array => {
@@ -171,22 +184,49 @@ class EntriesTable extends React.Component {
             ((item === this.yesterday) ? 'Yesterday' : item.slice(0, 7) + item.slice(9));
     }
 
-    changeDescriptionMultiple = (desc, array, idx) => {
-        const { mappedItems, changeDescription } = this.props;
-        const arrId = array.map(itm => itm.id);
+    changeDescription = (description, runningEntry, previousDescription) => {
+        const { userData, updateEntry } = this.props;
+        if (!runningEntry) runningEntry = this.props.runningEntry;
+        console.log('change desc', description);
 
-        changeDescription(desc, JSON.stringify(arrId), null, true);
-
-        const filteredItems = this.state.filteredItems.slice();
-        filteredItems[idx][desc] = filteredItems[idx][array[0].description];
-        this.setState({ filteredItems });
+        const descrCandidate = description.trim();
+        descrCandidate !== previousDescription
+            && updateEntry(userData._id, runningEntry, { description: descrCandidate });
     }
 
-    getStopStartTime = items => {
-        const startFormat = moment(items[items.length - 1].start).format('hh:mm A');
-        const stopFormat = moment(items[0].stop).format('hh:mm A');
+    changeDescriptionMultiple = (desc, array, idx) => {
+        const { mappedItems } = this.props;
+        const arrId = array.map(itm => itm.id);
 
-        return `${startFormat} - ${stopFormat} `;
+        this.changeDescription(desc, JSON.stringify(arrId), null);
+    }
+
+    changeProject = (project, entryid) => {
+        const { userData, updateEntry } = this.props;
+
+        updateEntry(userData._id, entryid, { project });
+    }
+
+    changeProjectMultiple = (project, array) => {
+        const { userData, updateEntry } = this.props;
+
+        const arrId = array.map(itm => itm.id);
+
+        updateEntry(userData._id, JSON.stringify(arrId), { project });
+    }
+
+    isEveryItemBillable = (array) => {
+        if (array[0].billable && array.every(itm => itm.billable === array[0].billable)) return true;
+        else return false;
+    }
+
+    setBillableMulti = (array) => {
+        const { userData, updateEntry } = this.props;
+
+        const arrId = array.map(itm => itm.id);
+        const bool = this.isEveryItemBillable(array);
+
+        updateEntry(userData._id, JSON.stringify(arrId), { billable: !bool });
     }
 
     getProjectColor = name => {
@@ -198,62 +238,36 @@ class EntriesTable extends React.Component {
             'white';
     }
 
-    getTaskEntries = (idx) => {
-        const { handleRemove, changeDescription } = this.props;
+    onBlurDescriptionSave = (e, currentItem,idx) => {
+        currentItem.length === 1 ?
+    this.changeDescription(e.target.value, currentItem[0].id) :
+    this.changeDescriptionMultiple(e.target.value, currentItem, idx);
+    }
+
+    getTaskEntries = idx => {
+        const { handleRemove, userData } = this.props;
         const { filteredItems, mappedTasks } = this.state;
-
-        const startNewEntryProxy = currentItem => this.startNewEntry(currentItem[0].description);
-
-        const removeCondition = currentItem => currentItem.length === 1 ?
-            currentItem[0].id : currentItem.map(itm => itm.id);
-
-        const onBlurCondition = (e, currentItem) => currentItem.length === 1 ?
-            changeDescription(e.target.value, currentItem[0].id) :
-            this.changeDescriptionMultiple(e.target.value, currentItem, idx);
 
         return Object.keys(mappedTasks[idx]).map((item, i) => {
             const projectName = item.split('\n')[0].trim();
             const projectDescription = item.split('\n')[1].trim();
             const currentItem = mappedTasks[idx][item];
-
+    
             return (<section key={item}>
                 <Itembody_header key={item}>
-                    <div>
-                        {currentItem.length > 1 &&
-                            <GroupEntries_length color={filteredItems[idx][item] ? 'green' : 'black'}
-                                onClick={() => this.toggleEntries(idx, item)} >
-                                {currentItem.length}
-                            </GroupEntries_length>}
-                        <Input_task type="text" placeholder="Add description"
-                            defaultValue={projectDescription === '$empty#' ? '' : projectDescription}
-                            onBlur={e => onBlurCondition(e, currentItem)} />
-                        {projectName &&
-                            <Item_link onClick={() => alert('ok')}>
-                                <Color_indicator color={this.getProjectColor(projectName)} />
-                                <Item_project color={this.getProjectColor(projectName)}>
-                                    {projectName}
-                                </Item_project>
-                            </Item_link>}
-                        {!projectName && <Item_link_toggle onClick={() => alert('ok')}>
-                            <Icon name="folder" />
-                        </Item_link_toggle>}
-                    </div>
-                    <Time_container_outer>
-                        <Item_toggle><Icon name="attach_money" /></Item_toggle>
-                        <Time_container_inner onClick={() => this.toggleEntries(idx, item)}>
-                            <span> {this.getTotalDayCount(currentItem)}</span>
-                            <Item_toggle>{this.getStopStartTime(currentItem)}</Item_toggle>
-                        </Time_container_inner>
-                        <Item_link_toggle onClick={() => startNewEntryProxy(currentItem)} >
-                            <Icon name="play_arrow" fill="#ccc" />
-                        </Item_link_toggle>
-                        <EntryDropdown Item_link_relative={Item_link_relative}
-                            handleRemove={() => handleRemove(removeCondition(currentItem))} />
-                    </Time_container_outer>
+                    <EntryHeader currentItem={currentItem} projectDescription={projectDescription}
+                        filteredItem={filteredItems[idx][item]} item={item} projectName={projectName}
+                        toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
+                        getProjectColor={this.getProjectColor} Item_link_toggle={Item_link_toggle}
+                        userData={userData} changeProject={this.changeProjectMultiple} />
+                    <EntryTimer currentItem={currentItem} setBillableMulti={this.setBillableMulti}
+                        toggleEntries={this.toggleEntries} idx={idx} item={item} handleRemove={handleRemove}
+                        getTotalDayCount={this.getTotalDayCount} isEveryItemBillable={this.isEveryItemBillable}
+                        Item_toggle={Item_toggle} Item_link_toggle={Item_link_toggle}
+                        Item_link_relative={Item_link_relative} startNewEntry={this.startNewEntry} />
                 </Itembody_header>
                 <Itembody_body>
-                    {(filteredItems[idx][item] && currentItem.length > 1) &&
-                        this.getSingleEntries(currentItem)}
+                    {(filteredItems[idx][item] && currentItem.length > 1) && this.getSingleEntries(currentItem)}
                 </Itembody_body>
             </section>)
         });
@@ -261,10 +275,13 @@ class EntriesTable extends React.Component {
 
     getSingleEntries = entries => {
         return Object.keys(entries).map((item, i) =>
-            <TimeEntry key={item} item={entries[i]} projects={this.props.userData.projects}
+            <TimeEntry key={item} item={entries[i]}
+                userData={this.props.userData}
                 setTopbarDescription={this.props.setTopbarDescription}
                 startNewEntry={this.startNewEntry}
-                changeDescription={this.props.changeDescription}
+                changeDescription={this.changeDescription}
+                changeProject={this.changeProject}
+                updateEntry={this.props.updateEntry}
                 handleRemove={this.props.handleRemove}
             />);
     }
@@ -298,13 +315,14 @@ class EntriesTable extends React.Component {
         const { mappedItems, toggleEntries, changeDescription } = this.props;
         const { filteredItems } = this.state;
         console.log('RENDERING ENTRIES TABLE');
-
+        console.log(mappedItems, filteredItems, this.state.mappedTasks, 'MFT');
+        
         if (!Object.keys(filteredItems).length) return (<p>Loading...</p>);
 
         return Object.keys(mappedItems).map((itm, idx) =>
             <List_item key={itm}>
                 <Item_header>
-                    <span style={{ fontWeight: '700' }}>{this.getDayField(itm)}</span>
+                    <Item_day>{this.getDayField(itm)}</Item_day>
                     <span>{this.getTotalDayCount(mappedItems[itm])}</span>
                 </Item_header>
                 {this.getTaskEntries(idx)}
@@ -312,9 +330,13 @@ class EntriesTable extends React.Component {
     }
 }
 
-const mapStateToProps = ({ userData }) => ({
-    userData,
-    mappedItems: getMappedItems(userData)
+const mapStateToProps = ({ user }) => ({
+    userData: user.userData,
+    mappedItems: getMappedItems(user.userData)
 });
 
-export default connect(mapStateToProps, null)(EntriesTable);
+const mapDispatchToProps = dispatch => ({
+    createNewEntry: (uid, obj) => dispatch(actions.createNewEntry(uid, obj))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(EntriesTable);

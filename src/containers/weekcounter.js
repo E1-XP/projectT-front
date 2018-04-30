@@ -10,6 +10,11 @@ const Week_counter = styled.div`
 `;
 
 class WeekTimer extends React.Component {
+    shouldComponentUpdate(nextProps) {
+        if (this.props.isRunning && !nextProps.isRunning) return false;
+        return true;
+    }
+
     render() {
         const { weekTimer } = this.props;
 
@@ -21,8 +26,8 @@ class WeekTimer extends React.Component {
     }
 }
 
-const mapStateToProps = ({ weekTimer }) => ({
-    weekTimer
+const mapStateToProps = ({ timer }) => ({
+    weekTimer: timer.weekTimer
 });
 
 export default connect(mapStateToProps, null)(WeekTimer);

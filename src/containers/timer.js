@@ -18,10 +18,18 @@ const Container = styled.div`
     background-color:rgb(250,250,250);
 `;
 
+const Container_center = styled.div`
+    display:flex;
+    justify-content:center;
+    padding:1rem;
+`;
+
 const List = styled.ul`
 `;
 
 const List_item = styled.li`
+    padding:1rem;
+    text-align:center;
 `;
 
 const Item_row = styled.td`
@@ -37,6 +45,14 @@ const Item_link = styled.a`
     cursor:pointer;
 `;
 
+const Button_load = styled.button`
+    background-color:red;
+    border:none;
+    color:white;        
+    padding:1rem;
+    cursor:pointer;
+`;
+
 class Timer extends React.Component {
     componentDidMount() {
         const { userData, setWeekTimer } = this.props;
@@ -44,21 +60,10 @@ class Timer extends React.Component {
             setWeekTimer(this.getWeekTimeComposed(userData.entries));
         }
     }
-    // const { userData, isRunning } = this.props;
-    // if (userData.entries.length) {
-    //     const weekTime = this.getWeekTimeFormatted(this.getWeekTime(userData.entries));
-    //     this.setState({ weekTime });
-    // }
-    // if (isRunning) this.
 
     componentWillReceiveProps(nextProps) {
         const { userData, setWeekTimer, isRunning } = this.props;
-        //const condition = nextProps.userData.entries.length !== userData.entries.length;
-        if (!isRunning) setWeekTimer(this.getWeekTimeComposed(userData.entries));//this.setState({ weekTime: this.getWeekTime(nextProps.userData.entries) });
-        // if (nextProps.isRunning) {
-        //else console.log('running');
-        //     window.weekInterval = setInterval(this.runWeekTimer, 400);}
-        // if (nextProps.isRunning === false && window.weekInterval) clearInterval(window.weekInterval);
+        if (!isRunning) setWeekTimer(this.getWeekTimeComposed(userData.entries));
     }
 
     handleRemove = id => {
@@ -66,16 +71,6 @@ class Timer extends React.Component {
         const { userData } = this.props;
         console.log(id);
         removeEntry(userData._id, id);
-    }
-
-    changeDescription = (description, runningEntry, previousDescription, enabLeEmptyInput = false) => {
-        const { userData, updateEntry } = this.props;
-        if (!runningEntry) runningEntry = this.props.runningEntry;
-        console.log('change desc', description);
-
-        if (((description.trim() !== previousDescription) && runningEntry) || (enabLeEmptyInput && runningEntry)) {
-            updateEntry(userData._id, runningEntry, { description: description.trim() });
-        }
     }
 
     getWeekTime = entries => {
@@ -99,23 +94,6 @@ class Timer extends React.Component {
         return this.getWeekTimeFormatted(this.getWeekTime(entries));
     }
 
-    // getWeekTimeIfIsRunning = () => {
-    //     //return moment.duration(this.state.WeekTime;
-    //     //const timeCalculation = () =>;
-    //     // window.weekInterval = setInterval(timeCalculation, 500);
-    // }
-
-    runWeekTimer = () => {
-        this.setState(prevState => ({ weekTime: this.getWeekTimeFormatted(moment.duration(prevState.weekTime).add(1, 's')) }));
-    }
-
-    handleClick = (param, pval) => {
-        const { userData, createNewEntry, toggleTimer, setRunningEntryDescription } = this.props;
-
-        createNewEntry(userData._id, param, pval);
-        setRunningEntryDescription(pval);
-        toggleTimer(true);
-    }
 
     passRefToChild = str => {
         this.topBarRef.setStateWithRef(str);
@@ -126,41 +104,36 @@ class Timer extends React.Component {
         console.log('RENDERING TIMER PAGE');
         if (!userData.entries) return (<p>Loading...</p>);
 
-        return (
-            <Container>
-                <Topbar onRef={ref => this.topBarRef = ref} getWeekTime={this.getWeekTimeComposed} />
-                <WeekCounter />
-                <List>
-                    {userData.entries.length ?
-                        <EntriesTable
-                            setTopbarDescription={this.passRefToChild}
-                            handleClick={this.handleClick}
-                            handleRemove={this.handleRemove}
-                            changeDescription={this.changeDescription} /> :
-                        <List_item>Add you first task to begin</List_item>}
-                </List>
-                {userData.entries.length > 9 ? <button>Load more entries</button> : null}
-            </Container>
-        );
+        return (<Container>
+            <Topbar onRef={ref => this.topBarRef = ref} getWeekTime={this.getWeekTimeComposed} />
+            <WeekCounter isRunning={isRunning} />
+            <List>
+                {userData.entries.length ?
+                    <EntriesTable
+                        setTopbarDescription={this.passRefToChild}
+                        handleRemove={this.handleRemove}
+                        updateEntry={this.props.updateEntry} /> :
+                    <List_item>Add you first task to begin</List_item>}
+            </List>
+            {userData.entries.length > 9 && <Container_center>
+                <Button_load>Load more entries</Button_load>
+            </Container_center>}
+        </Container>);
     };
 }
 
-const mapStateToProps = ({ userData, runningEntry, runningEntryDescription, isRunning }) => ({
-    userData,
-    mappedItems: getMappedItems(userData),
-    runningEntry,
-    runningEntryDescription,
-    isRunning
+const mapStateToProps = ({ user, entry, global }) => ({
+    userData: user.userData,
+    mappedItems: getMappedItems(user.userData),
+    runningEntry: entry.runningEntry,
+    runningEntryDescription: entry.runningEntryDescription,
+    isRunning: global.isRunning
 });
 
 const mapDispatchToProps = dispatch => ({
-    setUserData: v => dispatch(actions.setUserData(v)),
-    setRunningEntryDescription: v => dispatch(actions.setRunningEntryDescription(v)),
-    createNewEntry: (userid, param, pval) => dispatch(actions.createNewEntry(userid, param, pval)),
-    removeEntry: (v, v2) => dispatch(actions.removeEntry(v, v2)),
-    updateEntry: (userid, runningEntry, obj) => dispatch(actions.updateEntry(userid, runningEntry, obj)),
-    toggleTimer: bool => dispatch(actions.toggleTimer(bool)),
-    setWeekTimer: str => dispatch(actions.setWeekTimer(str))
+    removeEntry: (v, v2) => dispatch(actions.entry.removeEntry(v, v2)),
+    updateEntry: (userid, runningEntry, obj) => dispatch(actions.entry.updateEntry(userid, runningEntry, obj)),
+    setWeekTimer: str => dispatch(actions.timer.setWeekTimer(str))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Timer); 

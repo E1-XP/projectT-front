@@ -128,7 +128,7 @@ class Form extends React.Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-    handleAuth: (type, data) => dispatch(actions.handleAuth(type, data))
+    handleAuth: (type, data) => dispatch(actions.global.handleAuth(type, data))
 });
 
 export default withRouter(connect(null, mapDispatchToProps)(Form));

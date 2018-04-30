@@ -16,6 +16,6 @@ class Protected_container extends React.Component {
         return (isUserLoggedIn) ? children : ((path === '/login') ? null : <Redirect to="/login" />);
     }
 }
-const mapStateToProps = ({ isUserLoggedIn }) => ({ isUserLoggedIn });
+const mapStateToProps = ({ global }) => ({ isUserLoggedIn:global.isUserLoggedIn });
 
 export default withRouter(connect(mapStateToProps, null)(Protected_container));

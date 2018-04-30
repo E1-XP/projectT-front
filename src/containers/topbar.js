@@ -7,7 +7,6 @@ import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
-import Modal from 'react-modal';
 import ProjectDropdown from '../components/projectdropdown';
 import Icon from '../components/icon';
 
@@ -33,6 +32,7 @@ const Task_timing = styled.div`
     display:flex;
     justify-content:space-between;
     align-items:center;
+    margin-right:1rem;
 `;
 
 const Task_description = styled.input`
@@ -54,7 +54,7 @@ const Settings_section = styled.nav`
 const Task_button = styled.a`
     cursor:pointer;
     color:white;
-    background-color:${props => props.isRunning ? 'red' : 'green'};
+    background-color:${props => props.isRunning ? 'red' : '#4bc800;'};
     border-radius:50%;
     padding:.3rem;
     display:flex;
@@ -83,9 +83,8 @@ class TopBar extends React.Component {
 
         this.state = {
             description: '',
-            billable: false,
-            isModalOpen: false,
-            isTimerModeManual: false
+            isTimerModeManual: false,
+            isMenuOpen: false
         }
     }
 
@@ -98,9 +97,9 @@ class TopBar extends React.Component {
         this.props.onRef(null);
     }
 
-    setPreviouslyRunningTimer(userData) {
+    setPreviouslyRunningTimer = userData => {
         const { setRunningEntry, setIsRunning, setTimer, setRunningEntryDescription,
-            setProject, toggleTimer } = this.props;
+            setProject, toggleTimer, setBillable } = this.props;
 
         let runEntry = userData.entries.filter(item => item.stop === undefined);
         if (runEntry.length) {
@@ -110,9 +109,12 @@ class TopBar extends React.Component {
             setRunningEntry(runEntry._id);
             setProject(userData.projects.filter(itm => itm.name === runEntry.project)[0]);
             toggleTimer(true, start);
-
             setRunningEntryDescription(runEntry.description || '');
-            this.setState({ description: runEntry.description || '' });
+
+            const stateObj = { description: runEntry.description || '' };
+            if (runEntry.billable) setBillable(true);
+            console.log(runEntry);
+            this.setState(stateObj);
         }
     }
 
@@ -120,14 +122,12 @@ class TopBar extends React.Component {
         this.setState({ description: val });
     }
 
-    handleClick() {
-        const { isRunning, createNewEntry, userData, toggleTimer, runningEntryDescription,
-            currentProject } = this.props;
+    handleClick = () => {
+        const { isRunning, createNewEntry, userData, runningEntryDescription,
+            currentProject, billable } = this.props;
 
         if (!isRunning) {
-            toggleTimer(true);
-
-            const params = { description: runningEntryDescription };
+            const params = { description: runningEntryDescription, billable };
             if (currentProject) params.project = currentProject.name;
 
             createNewEntry(userData._id, params);
@@ -135,11 +135,11 @@ class TopBar extends React.Component {
         else this.stopTimer();
     }
 
-    stopTimer() {
+    stopTimer = () => {
         const { userData, toggleTimer, runningEntry, updateEntry, runningEntryDescription,
             setRunningEntryDescription, getWeekTime, setWeekTimer, currentProject,
-            setProject } = this.props;
-        const { billable } = this.state;
+            setProject, billable } = this.props;
+
 
         const now = moment().valueOf();
         const payload = {
@@ -157,14 +157,15 @@ class TopBar extends React.Component {
         this.setState({ description: '' });
     }
 
-    changeDescription(description, runningEntry, previousDescription, enableEmptyInput = false) {
+    changeDescription = (description, runningEntry, previousDescription, enableEmptyInput = false) => {
         const { userData, updateEntry } = this.props;
 
         if (!runningEntry) runningEntry = this.props.runningEntry;
         console.log('change desc', description);
 
-        if (((description.trim() !== previousDescription) && runningEntry) || (enableEmptyInput && runningEntry)) {
-            updateEntry(userData._id, runningEntry, { description: description.trim() });
+        const descrCandidate = description.trim();
+        if (((descrCandidate !== previousDescription) && runningEntry) || (enableEmptyInput && runningEntry)) {
+            updateEntry(userData._id, runningEntry, { description: descrCandidate });
         }
     }
 
@@ -177,105 +178,88 @@ class TopBar extends React.Component {
     }
 
     setBillable = () => {
-        this.setState(prevState => ({ billable: !prevState.billable }))
+        const { runningEntry, updateEntry, userData, billable, setBillable } = this.props;
+
+        setBillable(!billable);
+        runningEntry && updateEntry(userData._id, runningEntry, { billable: !billable });
     }
 
-    openModal = () => {
-        this.setState({ isModalOpen: true });
+    setRunningDescription = e => {
+        const { updateEntry, setRunningEntryDescription, userData, runningEntry } = this.props;
+
+        updateEntry(userData._id, runningEntry, { description: e.target.value });
+        setRunningEntryDescription(e.target.value);
     }
 
-    closeModal = () => {
-        this.setState({ isModalOpen: false });
+    setDescriptionState = e => {
+        this.setState({ description: e.target.value });
+    }
+
+    openMenu = () => {
+        this.setState({ isMenuOpen: true });
     }
 
     render() {
-        const { isRunning, timer, setRunningEntryDescription, userData, currentProject } = this.props;
-        const { description, billable, isTimerModeManual } = this.state;
-
-        const modalStyle = {
-            overlay: { backgroundColor: 'transparent', zIndex: 55 },
-            content: {
-                width: '200px', margin: '0 auto', height: '120px', padding: '1rem', position: 'absolute',
-                top: '50px', left: 'initial', right: '80px'
-            }
-        };
-
-        const timerModeCondition = isTimerModeManual ? '#bbb' : 'green';
-
-        const CurrentProjectJSX = () => currentProject ?
-            (<Item_link>
-                <Color_indicator color={currentProject.color} />
-                <span>{currentProject.name}</span>
-            </Item_link>) :
-            (<Item_link>
-                <Icon name="folder" fill="#bbb" />
-            </Item_link>);
+        const { isRunning, timer, setRunningEntryDescription, userData, currentProject, billable } = this.props;
+        const { description, isTimerModeManual } = this.state;
 
         return (
             <Task_controller>
                 <Task_description
                     type="text"
                     placeholder={isRunning ? '(no description)' : 'What are you working on?'}
-                    // defaultValue={runningEntryDescription}
-                    value={description}
-                    onChange={e => this.setState({ description: e.target.value })}
-                    onBlur={e => setRunningEntryDescription(e.target.value)} />
+                    value={description} onChange={this.setDescriptionState}
+                    onBlur={this.setRunningDescription} />
                 <Task_timing>
-                    <span onClick={this.openModal}>{<CurrentProjectJSX />}</span>
+                    <span style={{ position: 'relative' }} onClick={this.openMenu}>
+                        {currentProject &&
+                            <Item_link>
+                                <Color_indicator color={currentProject.color} />
+                                <span>{currentProject.name}</span>
+                            </Item_link>}
+                        {!currentProject &&
+                            <Item_link>
+                                <Icon name="folder" fill="#bbb" />
+                            </Item_link>}
+                        <ProjectDropdown setProjectState={this.setProjectState} userData={userData}
+                            style={{ top: 25, left: '-4rem' }} isOpen={this.state.isMenuOpen} />
+                    </span>
                     <Item_link onClick={this.setBillable}>
                         <Icon name="attach_money" size={'24px'} fill={billable ? 'green' : '#bbb'} />
                     </Item_link>
                     <Task_timer>{timer}</Task_timer>
-                    <Task_button isRunning={isRunning} onClick={() => this.handleClick()}>
+                    <Task_button isRunning={isRunning} onClick={this.handleClick}>
                         <Icon name={isRunning ? "stop" : "play_arrow"} />
                     </Task_button>
-                    {isRunning ?
-                        <Item_link>
-                            <Icon name="delete" fill="#bbb" />
-                        </Item_link> :
-                        <Settings_section>
-                            <Item_link>
-                                <Icon name="access_time" fill={timerModeCondition} size="20px" />
-                            </Item_link>
-                            <Item_link>
-                                <Icon name="menu" fill={!timerModeCondition} size="20px" />
-                            </Item_link>
-                        </Settings_section>}
                 </Task_timing>
-
-                {/* <-- modal --> */}
-                <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true}
-                    shouldCloseOnOverlayClick={true} overlayRef={node => this.overlayRef = node}
-                    onRequestClose={this.closeModal} style={modalStyle}>
-                    <ProjectDropdown setProjectState={this.setProjectState} userData={userData} />
-                </Modal>
             </Task_controller >
         );
     }
 }
 
-const mapStateToProps = ({ isRunning, timer, weekTimer, userData, runningEntry,
-    runningEntryDescription, currentProject }) => ({
-        isRunning,
-        userData,
-        runningEntry,
-        timer,
-        weekTimer,
-        currentProject,
-        runningEntryDescription
-    });
+const mapStateToProps = ({ global, entry, timer, user }) => ({
+    isRunning: global.isRunning,
+    userData: user.userData,
+    runningEntry: entry.runningEntry,
+    timer: timer.timer,
+    billable: entry.billable,
+    weekTimer: timer.weekTimer,
+    currentProject: entry.currentProject,
+    runningEntryDescription: entry.runningEntryDescription
+});
 
 const mapDispatchToProps = dispatch => ({
-    setIsRunning: bool => dispatch(actions.setIsRunning(bool)),
-    setTimer: str => dispatch(actions.setTimer(str)),
-    toggleTimer: (bool, val) => dispatch(actions.toggleTimer(bool, val)),
-    setWeekTimer: str => dispatch(actions.setWeekTimer(str)),
-    fetchEntries: id => dispatch(actions.fetchEntries(id)),
-    setProject: obj => dispatch(actions.setProject(obj)),
-    setRunningEntry: v => dispatch(actions.setRunningEntry(v)),
-    setRunningEntryDescription: v => dispatch(actions.setRunningEntryDescription(v)),
-    createNewEntry: (userid, obj) => dispatch(actions.createNewEntry(userid, obj)),
-    updateEntry: (userid, runningEntry, obj) => dispatch(actions.updateEntry(userid, runningEntry, obj))
+    setIsRunning: bool => dispatch(actions.global.setIsRunning(bool)),
+    setTimer: str => dispatch(actions.timer.setTimer(str)),
+    toggleTimer: (bool, val) => dispatch(actions.timer.toggleTimer(bool, val)),
+    setWeekTimer: str => dispatch(actions.timer.setWeekTimer(str)),
+    fetchEntries: id => dispatch(actions.user.fetchEntries(id)),
+    setProject: obj => dispatch(actions.entry.setProject(obj)),
+    setBillable: v => dispatch(actions.entry.setBillable(v)),
+    setRunningEntry: v => dispatch(actions.entry.setRunningEntry(v)),
+    setRunningEntryDescription: v => dispatch(actions.entry.setRunningEntryDescription(v)),
+    createNewEntry: (userid, obj) => dispatch(actions.entry.createNewEntry(userid, obj)),
+    updateEntry: (userid, runningEntry, obj) => dispatch(actions.entry.updateEntry(userid, runningEntry, obj))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopBar);

@@ -2,21 +2,28 @@ import { applyMiddleware, createStore } from 'redux';
 import { routerMiddleware } from 'react-router-redux'
 import thunk from 'redux-thunk';
 import rootReducer from './reducers';
-
 import history from './history';
 
 const initialState = {
-    isLoading: true,
-    isRunning: false,
-    isUserLoggedIn: false,
-    userData: {},
-    settings: {},
-    mappedItems: {},
-    runningEntry: null,
-    currentProject: '',
-    runningEntryDescription: '',
-    timer: '0:00:00',
-    weekTimer: '0:00:00'
+    global: {
+        isLoading: true,
+        isRunning: false,
+        isUserLoggedIn: false
+    },
+    entry: {
+        runningEntry: null,
+        currentProject: '',
+        billable: false,
+        runningEntryDescription: ''
+    },
+    user: {
+        userData: {},
+        settings: {}
+    },
+    timer: {
+        timer: '0:00:00',
+        weekTimer: '0:00:00'
+    }
 }
 
 const store = createStore(rootReducer, initialState,

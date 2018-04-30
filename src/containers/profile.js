@@ -20,7 +20,7 @@ class Profile extends React.Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-    logout: () => dispatch(actions.handleLogout())
+    logout: () => dispatch(actions.global.handleLogout())
 });
 
 export default connect(null, mapDispatchToProps)(Profile);

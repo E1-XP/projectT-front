@@ -29,6 +29,7 @@ const Dropdown = styled.ul`
 
 const Dropdown_item = styled.li`
     padding:.3rem;
+    text-align:left;
     &:hover{
         background-color:#ddd;
     }
@@ -47,7 +48,7 @@ class EntryDropdown extends React.Component {
         this.setState({ isOpen: true }, () => document.addEventListener('click', this.closeMenu));
     }
 
-    closeMenu = () => {
+    closeMenu = e => {
         this.setState({ isOpen: false }, () => document.removeEventListener('click', this.closeMenu));
     }
 

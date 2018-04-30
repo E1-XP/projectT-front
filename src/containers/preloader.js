@@ -61,14 +61,14 @@ class Preloader extends React.Component {
     }
 }
 
-const mapStateToProps = ({ isLoading, isUserLoggedIn }) => ({
-    isLoading,
-    isUserLoggedIn
+const mapStateToProps = ({ global }) => ({
+    isLoading: global.isLoading,
+    isUserLoggedIn: global.isUserLoggedIn
 });
 
 const mapDispatchToProps = dispatch => ({
-    setIsLoading: v => dispatch(actions.setIsLoading(v)),
-    fetchAuthentication: () => dispatch(actions.fetchAuthentication()),
+    setIsLoading: v => dispatch(actions.global.setIsLoading(v)),
+    fetchAuthentication: () => dispatch(actions.global.fetchAuthentication()),
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Preloader));

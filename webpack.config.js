@@ -18,20 +18,14 @@ module.exports = {
                 query: {
                     presets: ['env', 'react'],
                     plugins: ["transform-runtime", "transform-class-properties",
+                        "transform-object-rest-spread",
                         "react-hot-loader/babel"]
                 }
-            },
-            {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader']
-            },
-            {
+            }, {
                 test: /\.html$/,
-                use: [
-                    {
-                        loader: "html-loader"
-                    }
-                ]
+                use: [{
+                    loader: "html-loader"
+                }]
             }
         ]
     },
