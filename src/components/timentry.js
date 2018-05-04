@@ -90,15 +90,7 @@ const Info_container = styled.div`
     position:relative;
 `;
 
-const Screen_blocker = styled.div`
-     display: block;
-        position:fixed;
-        top:0;
-        left:0;
-        background-color:transparent;
-        width:100%;
-        height:100%;
-`;
+const dropdownStyle = { top: 25, left: '50%' };
 
 export default class TimeEntry extends React.Component {
     constructor(props) {
@@ -152,18 +144,37 @@ export default class TimeEntry extends React.Component {
         changeProject(name, item.id);
     }
 
-    render() {
-        const { i, item, handleRemove, startNewEntry, userData } = this.props;
+    setDescriptionProxy = e => {
+        this.setDescription(e);
+    }
+
+    handleRemoveProxy = () => {
+        this.props.handleRemove(this.props.item.id);
+    }
+
+    startNewEntryProxy = () => {
+        this.props.startNewEntry(this.props.item);
+    }
+
+    setBillableProxy = () => {
+        const { item } = this.props;
+        this.setBillable(item.id, !item.billable)
+    }
+
+    getDescription = () => {
         const { description } = this.props.item;
+        return description ? (description === '$empty#' ? '' : description) : null;
+    }
+
+    render() {
+        const { item, userData } = this.props;
         const { isMenuOpen } = this.state;
 
         return (
             <Item_row key={item.id}>
                 <Info_container>
-                    <Input_task type="text" defaultValue={description ?
-                        (description === '$empty#' ? '' : description) : null}
-                        // onChange={e => this.setState({ description: e.target.value })}
-                        onBlur={e => this.setDescription(e)} placeholder='Add description' />
+                    <Input_task type="text" defaultValue={this.getDescription()}
+                        onBlur={this.setDescriptionProxy} placeholder='Add description' />
                     {item.project && <Item_link onClick={this.openMenu}>
                         <Color_indicator color={this.getProjectColor(item.project)} />
                         <Item_project color={this.getProjectColor(item.project)}>
@@ -173,23 +184,22 @@ export default class TimeEntry extends React.Component {
                     {!item.project && <Item_link_toggle onClick={this.openMenu}>
                         <Icon name="folder" />
                     </Item_link_toggle>}
-                    {isMenuOpen && <Screen_blocker />}
-                    {isMenuOpen && <ProjectDropdown project={item.project} userData={userData}
-                        setProjectState={this.onProjectClick} style={{ top: 25, left: '50%' }} />}
+                    <ProjectDropdown project={item.project} userData={userData} isOpen={isMenuOpen}
+                        setProjectState={this.onProjectClick} style={dropdownStyle} />
                 </Info_container>
                 <Time_container_outer>
-                    <Item_link_toggle onClick={() => this.setBillable(item.id, !item.billable)}>
+                    <Item_link_toggle onClick={this.setBillableProxy}>
                         <Icon name="attach_money" fill={item.billable ? 'green' : '#bbb'} />
                     </Item_link_toggle>
                     <Time_container_inner>
                         <span>{item.duration}</span>
                         <Item_toggle>{this.getStopStartTime(item.start, item.stop)}</Item_toggle>
                     </Time_container_inner>
-                    <Item_link_toggle onClick={() => startNewEntry(item)} >
-                        <Icon name="play_arrow" style={{ color: '#ccc' }} />
+                    <Item_link_toggle onClick={this.startNewEntryProxy}>
+                        <Icon name="play_arrow" fill='#ccc' />
                     </Item_link_toggle>
                     <EntryDropdown Item_link_relative={Item_link_relative}
-                        handleRemove={() => handleRemove(item.id)} />
+                        handleRemove={this.handleRemoveProxy} />
                 </Time_container_outer>
             </Item_row>);
     }

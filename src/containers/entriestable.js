@@ -8,19 +8,13 @@ momentDFPlugin(moment);
 import * as actions from '../actions/entry';
 import getMappedItems from '../selectors/getmappeditems';
 
+import EntryGroup from '../components/entrygroup';
 import EntryHeader from '../components/entryheader';
 import EntryTimer from '../components/entrytimer';
 import TimeEntry from '../components/timentry';
 import ProjectDropdown from '../components/projectdropdown';
 import EntryDropdown from '../components/entrydropdown';
 import Icon from '../components/icon';
-
-const Item_table = styled.table`
-    width:100%;
-`;
-
-const Itembody_body = styled.ul`
-`;
 
 const List_item = styled.li`
     background-color:white;
@@ -34,26 +28,6 @@ const Item_link = styled.a`
     cursor:pointer;
 `;
 
-const Item_link_relative = styled.span`
-    cursor:pointer;
-    position:relative;
-    opacity:0;
-    pointer-events:none;
-`;
-
-const Item_link_toggle = styled(Item_link) `
-    opacity:0;
-    pointer-events:none;
-`;
-
-const Item_toggle = styled.span`
-    display:none;
-`;
-
-const Item_project = styled.span`
-    color:${({ color }) => color === 'white' ? 'black' : color};
-`;
-
 const Item_header = styled.header`
     display:flex;
     justify-content:space-between;
@@ -63,63 +37,10 @@ const Item_header = styled.header`
     margin-right:2.2rem;
 `;
 
-const Itembody_header = styled.header`
-    display:flex;
-    justify-content:space-between;
-    padding:1rem 0;
-    margin:auto .3rem;
-    margin-left:1.5rem;
-    height:4rem;
-    align-items:center;
-    &:hover ${Item_link_toggle} {
-        opacity:1;
-        pointer-events:all;
-    }
-    &:hover ${Item_link_relative} {
-        opacity:1;
-        pointer-events:all;    
-    }
-    &:hover ${Item_toggle} {
-        display:block;
-    }
-`;
-
-const Time_container_inner = styled.div`
-    display:flex;
-    flex-direction:column;
-    align-items:flex-end;
-    justify-content:center;
-    width:12rem;
-`;
-
-const Time_container_outer = styled.div`
-    display:flex;
-    align-items:center;
-`;
-
-const Color_indicator = styled.span`
-    display: inline-block;
-    width:.6rem;
-    height:.6rem;
-    background-color: ${props => props.color};
-    border-radius: 50%;
-    margin-right: .5rem;
-`;
-
-const GroupEntries_length = styled.span`
-    cursor:pointer;
-    margin-right: .5rem;
-    color: ${({ color }) => color};
-`;
-
-const Input_task = styled.input`
-    border: none;
-    outline-color: transparent;
-`;
-
-const Item_day=styled.span`
+const Item_day = styled.span`
     font-weight:700;
 `;
+
 
 class EntriesTable extends React.Component {
     constructor(props) {
@@ -180,8 +101,10 @@ class EntriesTable extends React.Component {
     }
 
     getDayField = item => {
+        const cut2nd = (itm, i) => i === 1 ? (itm.length === 3 ? itm.slice(0, 1) : itm.slice(0, 2)) : itm;
+
         return (this.today === item) ? 'Today' :
-            ((item === this.yesterday) ? 'Yesterday' : item.slice(0, 7) + item.slice(9));
+            ((item === this.yesterday) ? 'Yesterday' : item.split(' ').map(cut2nd).join(' '));
     }
 
     changeDescription = (description, runningEntry, previousDescription) => {
@@ -238,39 +161,10 @@ class EntriesTable extends React.Component {
             'white';
     }
 
-    onBlurDescriptionSave = (e, currentItem,idx) => {
+    onBlurDescriptionSave = (e, currentItem, idx) => {
         currentItem.length === 1 ?
-    this.changeDescription(e.target.value, currentItem[0].id) :
-    this.changeDescriptionMultiple(e.target.value, currentItem, idx);
-    }
-
-    getTaskEntries = idx => {
-        const { handleRemove, userData } = this.props;
-        const { filteredItems, mappedTasks } = this.state;
-
-        return Object.keys(mappedTasks[idx]).map((item, i) => {
-            const projectName = item.split('\n')[0].trim();
-            const projectDescription = item.split('\n')[1].trim();
-            const currentItem = mappedTasks[idx][item];
-    
-            return (<section key={item}>
-                <Itembody_header key={item}>
-                    <EntryHeader currentItem={currentItem} projectDescription={projectDescription}
-                        filteredItem={filteredItems[idx][item]} item={item} projectName={projectName}
-                        toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
-                        getProjectColor={this.getProjectColor} Item_link_toggle={Item_link_toggle}
-                        userData={userData} changeProject={this.changeProjectMultiple} />
-                    <EntryTimer currentItem={currentItem} setBillableMulti={this.setBillableMulti}
-                        toggleEntries={this.toggleEntries} idx={idx} item={item} handleRemove={handleRemove}
-                        getTotalDayCount={this.getTotalDayCount} isEveryItemBillable={this.isEveryItemBillable}
-                        Item_toggle={Item_toggle} Item_link_toggle={Item_link_toggle}
-                        Item_link_relative={Item_link_relative} startNewEntry={this.startNewEntry} />
-                </Itembody_header>
-                <Itembody_body>
-                    {(filteredItems[idx][item] && currentItem.length > 1) && this.getSingleEntries(currentItem)}
-                </Itembody_body>
-            </section>)
-        });
+            this.changeDescription(e.target.value, currentItem[0].id) :
+            this.changeDescriptionMultiple(e.target.value, currentItem, idx);
     }
 
     getSingleEntries = entries => {
@@ -295,9 +189,7 @@ class EntriesTable extends React.Component {
             return acc;
         }
         return Object.keys(mappedItems)
-            .map(itm =>
-                mappedItems[itm].reduce(reduceFn, {})
-            );
+            .map(itm => mappedItems[itm].reduce(reduceFn, {}));
     }
 
     getFilteredItems = mappedItems => {
@@ -311,29 +203,51 @@ class EntriesTable extends React.Component {
                 }, {}));
     }
 
+    getTaskEntries = idx => {
+        const { handleRemove, userData } = this.props;
+        const { filteredItems, mappedTasks } = this.state;
+
+        return Object.keys(mappedTasks[idx]).map((item, i) => {
+            const projectName = item.split('\n')[0].trim();
+            const projectDescription = item.split('\n')[1].trim();
+            const currentItem = mappedTasks[idx][item];
+
+            return <EntryGroup key={currentItem[0].id} currentItem={currentItem} projectDescription={projectDescription}
+                filteredItem={filteredItems[idx][item]} item={item} projectName={projectName}
+                toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
+                getProjectColor={this.getProjectColor} userData={userData}
+                changeProject={this.changeProjectMultiple}
+                currentItem={currentItem} setBillableMulti={this.setBillableMulti}
+                toggleEntries={this.toggleEntries} idx={idx} item={item} handleRemove={handleRemove}
+                getTotalDayCount={this.getTotalDayCount} isEveryItemBillable={this.isEveryItemBillable}
+                startNewEntry={this.startNewEntry} getSingleEntries={this.getSingleEntries} />
+        });
+    }
+
     render() {
         const { mappedItems, toggleEntries, changeDescription } = this.props;
         const { filteredItems } = this.state;
-        console.log('RENDERING ENTRIES TABLE');
-        console.log(mappedItems, filteredItems, this.state.mappedTasks, 'MFT');
-        
+
         if (!Object.keys(filteredItems).length) return (<p>Loading...</p>);
 
-        return Object.keys(mappedItems).map((itm, idx) =>
-            <List_item key={itm}>
-                <Item_header>
-                    <Item_day>{this.getDayField(itm)}</Item_day>
-                    <span>{this.getTotalDayCount(mappedItems[itm])}</span>
-                </Item_header>
-                {this.getTaskEntries(idx)}
-            </List_item >);
+        return Object.keys(mappedItems)
+            .map((itm, idx) =>
+                <List_item key={itm}>
+                    <Item_header>
+                        <Item_day>{this.getDayField(itm)}</Item_day>
+                        <span>{this.getTotalDayCount(mappedItems[itm])}</span>
+                    </Item_header>
+                    {this.getTaskEntries(idx)}
+                </List_item >);
     }
 }
 
-const mapStateToProps = ({ user }) => ({
-    userData: user.userData,
-    mappedItems: getMappedItems(user.userData)
-});
+const mapStateToProps = ({ user }) => {
+    return {
+        userData: user.userData,
+        mappedItems: getMappedItems(user.userData)
+    }
+};
 
 const mapDispatchToProps = dispatch => ({
     createNewEntry: (uid, obj) => dispatch(actions.createNewEntry(uid, obj))

@@ -89,8 +89,12 @@ class ProjectDropdown extends React.Component {
     }
 
     closeMenu = e => {
-        if (!this.dropdown.contains(e.target)) this.setState({ isMenuOpen: false },
-            e => document.removeEventListener('click', this.closeMenu));
+        const liElems = Array.from(document.querySelectorAll('.js-click-close'));
+        console.log(e.target.nodeName)
+
+        if (!this.dropdown.contains(e.target) || liElems.some(itm => itm.contains(e.target))) {
+            this.setState({ isMenuOpen: false }, e => document.removeEventListener('click', this.closeMenu));
+        }
     }
 
     shouldShowItem = itm => {
@@ -103,18 +107,18 @@ class ProjectDropdown extends React.Component {
     }
 
     generateItemArray = () => {
-        const { project, setProjectState } = this.props;
+        const { project, setProjectState, userData } = this.props;
         let counter = 0;
         let shouldShowEmptyItem;
 
-        const listItems = this.props.userData.projects.map((itm, i, arr) => {
+        const listItems = userData.projects.map((itm, i, arr) => {
             if ((i === arr.length - 1) && !counter) shouldShowEmptyItem = true;
 
             if (this.shouldShowItem(itm.name)) {
                 counter += 1;
 
                 return (<Item key={itm.name} project={project === itm.name}
-                    onClick={(e) => setProjectState(itm)}>
+                    onClick={(e) => setProjectState(itm)} className="js-click-close">
                     <Item_link>
                         <Color_indicator color={itm.color} />{itm.name}
                     </Item_link>
@@ -123,10 +127,11 @@ class ProjectDropdown extends React.Component {
         });
 
         return (<List>{this.shouldShowItem('no project') &&
-            <Item key='no project' onClick={(e) => setProjectState(null)}>
+            <Item key='no project' onClick={(e) => setProjectState(null)} className="js-click-close">
                 <Item_link> <Color_indicator color={'bbb'} />no project</Item_link>
             </Item>}
-            {listItems} {shouldShowEmptyItem && <Item key='nothing to show'>
+            {listItems}
+            {shouldShowEmptyItem && <Item key='nothing to show' >
                 <Item_link>No projects found</Item_link></Item>}</List>);
     }
 
@@ -145,8 +150,7 @@ class ProjectDropdown extends React.Component {
                     </Searchbar>
                     {this.generateItemArray()}
                 </div>}
-            </React.Fragment >
-        );
+            </React.Fragment>);
     }
 }
 

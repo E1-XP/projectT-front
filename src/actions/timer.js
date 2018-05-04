@@ -1,12 +1,8 @@
 import consts from './types';
-import axios from 'axios';
-axios.defaults.withCredentials = true;
 
 import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
-//const baseUrl = `http://localhost:3001`;
-const baseUrl = `https://project--t.herokuapp.com`;
 
 import { setIsRunning } from './global';
 import { setBillable } from './entry';

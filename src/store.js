@@ -8,7 +8,8 @@ const initialState = {
     global: {
         isLoading: true,
         isRunning: false,
-        isUserLoggedIn: false
+        isUserLoggedIn: false,
+        allEntriesFetched: false
     },
     entry: {
         runningEntry: null,

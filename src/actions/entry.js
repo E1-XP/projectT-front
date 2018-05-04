@@ -2,11 +2,11 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-//const baseUrl = `http://localhost:3001`;
-const baseUrl = `https://project--t.herokuapp.com`;
+const baseUrl = `http://localhost:3001`;
+//const baseUrl = `https://project--t.herokuapp.com`;
 
 import { toggleTimer } from './timer';
-import { setEntries, setUserData } from './user';
+import { setEntries, editEntries, removeEntries, setUserData } from './user';
 import { loadingError } from './global';
 
 export const setBillable = bool => ({
@@ -58,8 +58,9 @@ export const updateEntry = (userid, runningEntryId, queryParams) => dispatch => 
     console.log(url);
 
     axios.post(url).then(res => {
-        dispatch(setEntries(res.data));
+        dispatch(editEntries(res.data));
         if (queryParams.stop) dispatch(setRunningEntry(null));
+
     }).catch(err => dispatch(loadingError(err)));
 }
 
@@ -69,7 +70,11 @@ export const removeEntry = (userid, entryid) => dispatch => {
     const url = `${baseUrl}/users/${userid}/entries/${entryid}/delete`;
 
     axios.post(url).then(res => {
-        dispatch(setEntries(res.data));
+        let response;
+        if (!Array.isArray(res.data)) response = [res.data];
+        else response = res.data;
+
+        dispatch(removeEntries(response));
     }).catch(err => dispatch(loadingError(err)));
 }
 

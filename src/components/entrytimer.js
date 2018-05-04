@@ -62,7 +62,7 @@ export default class EntryTimer extends React.Component {
     }
 
     handleRemoveProxy = () => {
-        const { currentItem } = this.props;
+        const { currentItem, handleRemove } = this.props;
         handleRemove(this.shouldRemoveOneOrMultiple(currentItem));
     }
 
@@ -75,7 +75,7 @@ export default class EntryTimer extends React.Component {
         const { setBillableMulti, currentItem, idx, item, handleRemove, getTotalDayCount,
             isEveryItemBillable, Item_toggle, Item_link_toggle, Item_link_relative } = this.props;
 
-        console.log('rendering entimer');
+        // console.log('rendering entimer');
 
         return (
             <Time_container_outer>

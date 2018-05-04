@@ -44,7 +44,7 @@ const Wrapper = styled.div`
     position: relative;
 `;
 
-export default class EntryHead extends React.PureComponent {
+export default class EntryHead extends React.Component {
     constructor(props) {
         super(props);
 
@@ -91,7 +91,7 @@ export default class EntryHead extends React.PureComponent {
         const { filteredItem, idx, item, projectDescription, userData, currentItem, getProjectColor,
             projectName, Item_link_toggle } = this.props;
 
-        console.log('rendering entryheader');
+        //console.log('rendering entryheader');
         return (
             <Wrapper>
                 {currentItem.length > 1 &&

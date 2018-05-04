@@ -10,7 +10,7 @@ import Icon from '../components//icon';
 
 const Sidebar = styled.section`
     color:white;
-    background-color:#333;
+    background-color:rgb(50, 50, 50);
     max-width:52px;
     padding:1rem;
     order:-1;

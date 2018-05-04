@@ -11,7 +11,7 @@ import ProjectDropdown from '../components/projectdropdown';
 import Icon from '../components/icon';
 
 const Task_controller = styled.section`
-    border:2px solid #ccc;
+    border:1px solid #eee;
     border-width:0 0 2px 0;
     display:flex;
     padding:1rem;
@@ -76,6 +76,12 @@ const Item_link = styled.a`
     display:flex;
     align-items:center;
 `;
+
+const Span_relative = styled.span`
+    position: relative;
+`;
+
+const dropdownStyle = { top: 25, left: '-4rem' };
 
 class TopBar extends React.Component {
     constructor(props) {
@@ -174,7 +180,7 @@ class TopBar extends React.Component {
 
         if (runningEntry) updateEntry(userData._id, runningEntry, { project: obj.name });
         setProject(obj);
-        this.setState({ isModalOpen: false });
+        this.setState({ isMenuOpen: false });
     }
 
     setBillable = () => {
@@ -211,7 +217,7 @@ class TopBar extends React.Component {
                     value={description} onChange={this.setDescriptionState}
                     onBlur={this.setRunningDescription} />
                 <Task_timing>
-                    <span style={{ position: 'relative' }} onClick={this.openMenu}>
+                    <Span_relative onClick={this.openMenu}>
                         {currentProject &&
                             <Item_link>
                                 <Color_indicator color={currentProject.color} />
@@ -222,8 +228,8 @@ class TopBar extends React.Component {
                                 <Icon name="folder" fill="#bbb" />
                             </Item_link>}
                         <ProjectDropdown setProjectState={this.setProjectState} userData={userData}
-                            style={{ top: 25, left: '-4rem' }} isOpen={this.state.isMenuOpen} />
-                    </span>
+                            style={dropdownStyle} isOpen={this.state.isMenuOpen} />
+                    </Span_relative>
                     <Item_link onClick={this.setBillable}>
                         <Icon name="attach_money" size={'24px'} fill={billable ? 'green' : '#bbb'} />
                     </Item_link>
@@ -253,7 +259,6 @@ const mapDispatchToProps = dispatch => ({
     setTimer: str => dispatch(actions.timer.setTimer(str)),
     toggleTimer: (bool, val) => dispatch(actions.timer.toggleTimer(bool, val)),
     setWeekTimer: str => dispatch(actions.timer.setWeekTimer(str)),
-    fetchEntries: id => dispatch(actions.user.fetchEntries(id)),
     setProject: obj => dispatch(actions.entry.setProject(obj)),
     setBillable: v => dispatch(actions.entry.setBillable(v)),
     setRunningEntry: v => dispatch(actions.entry.setRunningEntry(v)),

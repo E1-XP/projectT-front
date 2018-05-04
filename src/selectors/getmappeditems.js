@@ -15,8 +15,8 @@ const getMappedItemsFn = entries => {
             const mapped = {
                 start: item.start,
                 stop: item.stop,
-                description: item.description ? item.description : '',
-                project: item.project ? item.project : '',
+                description: item.description || '',
+                project: item.project || '',
                 billable: item.billable,
                 userId: item.userId,
                 id: item._id,
@@ -29,7 +29,7 @@ const getMappedItemsFn = entries => {
         }
         return acc;
     }
-    return entries.reverse().reduce(reduceItems, {});
+    return entries.reduce(reduceItems, {});
 }
 
 const getMappedItems = createSelector([getEntries], getMappedItemsFn);

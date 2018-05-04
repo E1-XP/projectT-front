@@ -2,11 +2,10 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
+const baseUrl = `http://localhost:3001`;
+//const baseUrl = `https://project--t.herokuapp.com`;
+
 import { push } from 'react-router-redux'
-
-//const baseUrl = `http://localhost:3001`;
-const baseUrl = `https://project--t.herokuapp.com`;
-
 import { setUserData } from './user';
 import { setTimer } from './timer';
 
@@ -25,28 +24,15 @@ export const setIsAuthenticated = bool => ({
     payload: bool
 });
 
+export const allEntriesFetched = bool => ({
+    type: consts.ALL_ENTRIES_FETCHED,
+    payload: bool
+});
+
 export const loadingError = err => ({
     type: consts.LOADING_ERROR,
     payload: err
 });
-
-export const fetchAuthentication = () => dispatch => {
-    const url = `${baseUrl}/auth/refresh`;
-
-    axios.post(url).then(res => {
-        if (res.status === 200) {
-            dispatch(setUserData(res.data));
-            dispatch(setIsAuthenticated(true));
-            dispatch(setIsLoading(false));
-        }
-        else {
-            dispatch(push('/login'));
-            dispatch(setIsLoading(false));
-        }
-    }).catch(err => {
-        dispatch(loadingError(err));
-    });
-}
 
 export const handleAuth = (type, formData) => dispatch => {
     const url = `${baseUrl}/auth/${type}`;
@@ -67,6 +53,24 @@ export const handleAuth = (type, formData) => dispatch => {
             dispatch(setIsLoading(false));
         }
     }).catch(err => dispatch(loadingError(err)));
+}
+
+export const handleReAuth = () => dispatch => {
+    const url = `${baseUrl}/auth/refresh`;
+
+    axios.post(url).then(res => {
+        if (res.status === 200) {
+            dispatch(setUserData(res.data));
+            dispatch(setIsAuthenticated(true));
+            dispatch(setIsLoading(false));
+        }
+        else {
+            dispatch(push('/login'));
+            dispatch(setIsLoading(false));
+        }
+    }).catch(err => {
+        dispatch(loadingError(err));
+    });
 }
 
 export const handleLogout = () => dispatch => {

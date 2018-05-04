@@ -47,6 +47,14 @@ const Period_selection = styled.div`
     display:flex;  
 `;
 
+const modalStyle = {
+    overlay: { backgroundColor: 'transparent' },
+    content: {
+        width: '600px', margin: '0 auto', height: '398px', padding: '0', position: 'absolute',
+        top: '50px', left: 'initial', right: '185px'
+    }
+};
+
 class Dashboard extends React.Component {
     constructor() {
         super();
@@ -73,11 +81,10 @@ class Dashboard extends React.Component {
 
         this.thisYearReadable = `${moment().format('YYYY')}`;
         this.lastYearReadable = `${moment().subtract(1, 'years').format('YYYY')}`;
-    }
 
-    // componentDidMount() {
-    //     if (this.props.userData) this.setState({ mappedItems: this.getMappedItems() });
-    // }
+        this.monthLabels = ['January', 'February', 'March', 'April', 'May', 'Juni', 'July',
+            'August', 'September', 'October', 'November', 'December'];
+    }
 
     getTotalDayCount = array => {
         const toSeconds = array.reduce((acc, item) =>
@@ -87,7 +94,6 @@ class Dashboard extends React.Component {
     }
 
     getPeriodTimeArr = () => {
-        const { entries } = this.props.userData;
         const { mappedItems } = this.props;
         const { periodStart, periodStop } = this.state;
 
@@ -118,10 +124,7 @@ class Dashboard extends React.Component {
         const { entries } = this.props.userData;
         const { periodStart, periodStop } = this.state;
 
-        const monthLabels = ['January', 'February', 'March', 'April', 'May', 'Juni', 'July',
-            'August', 'September', 'October', 'November', 'December'];
-
-        const baseObj = monthLabels.reduce((acc, itm) => {
+        const baseObj = this.monthLabels.reduce((acc, itm) => {
             acc[itm] = [];
             return acc;
         }, {});
@@ -253,7 +256,6 @@ class Dashboard extends React.Component {
         return periodReadable;
     }
 
-
     openModal = () => {
         this.setState({ isModalOpen: true });
     }
@@ -264,16 +266,8 @@ class Dashboard extends React.Component {
 
     render() {
         const { userData } = this.props;
-        const { mappedItems, periodReadable, periodStart, periodStop, periodType, isModalOpen, customPeriodLength }
-            = this.state;
-
-        const modalStyle = {
-            overlay: { backgroundColor: 'transparent' },
-            content: {
-                width: '600px', margin: '0 auto', height: '398px', padding: '0', position: 'absolute',
-                top: '50px', left: 'initial', right: '185px'
-            }
-        };
+        const { mappedItems, periodReadable, periodStart, periodStop, periodType, isModalOpen,
+            customPeriodLength } = this.state;
 
         if (!Object.keys(userData).length && !Object.keys(mappedItems).length) return (<p>Loading...</p>);
 

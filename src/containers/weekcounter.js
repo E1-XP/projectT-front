@@ -6,7 +6,15 @@ const Week_counter = styled.div`
     text-transform:uppercase;
     font-size:13px;
     margin-top:61px;
-    padding:2rem;
+    padding:1.8rem;
+`;
+
+const WeekBar = styled.div`
+    background-color:red;
+    width:100%;
+    height:3px;
+    border-radius:1.5px;
+    margin-top:3rem;
 `;
 
 class WeekTimer extends React.Component {
@@ -21,6 +29,7 @@ class WeekTimer extends React.Component {
         return (
             <Week_counter>
                 This week: <span>{weekTimer}</span>
+                <WeekBar />
             </Week_counter>
         );
     }

@@ -2,11 +2,10 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-//const baseUrl = `http://localhost:3001`;
-const baseUrl = `https://project--t.herokuapp.com`;
+const baseUrl = `http://localhost:3001`;
+//const baseUrl = `https://project--t.herokuapp.com`;
 
-import { loadingError } from './global';
-
+import { loadingError, allEntriesFetched } from './global';
 
 export const setUserData = data => ({
     type: consts.SET_USER_DATA,
@@ -18,25 +17,29 @@ export const setEntries = data => ({
     payload: data
 });
 
-export const fetchData = url => dispatch => {
-    dispatch(setIsLoading(true));
+export const addEntries = data => ({
+    type: consts.ADD_ENTRIES,
+    payload: data
+});
 
-    axios.post(url).then(res => {
+export const editEntries = data => ({
+    type: consts.EDIT_ENTRIES,
+    payload: data
+});
 
-        dispatch(setUserData(res.data));
-        dispatch(setIsLoading(false));
+export const removeEntries = data => ({
+    type: consts.REMOVE_ENTRIES,
+    payload: data
+});
 
-    }).catch(err => dispatch(loadingError(err)));
-}
-
-export const fetchEntries = userid => dispatch => {
-    const url = `${baseUrl}/users/${userid}/entries`;
+export const fetchEntries = (userid, beginat, endat) => dispatch => {
+    let url = `${baseUrl}/users/${userid}/entries?`;
+    if (beginat) url += `begin=${beginat}`;
+    if (endat) url += `&end=${endat}`;
+    console.log(url);
 
     axios.get(url).then(res => {
-        dispatch(setEntries(res.data));
-    }).catch(err => {
-        dispatch(loadingError(err));
-    });
-
-    return new Promise((res, rej) => res(true));
+        if (res.data.length) dispatch(addEntries(res.data));
+        else dispatch(allEntriesFetched(true));
+    }).catch(err => dispatch(loadingError(err)));
 }

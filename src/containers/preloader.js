@@ -29,7 +29,8 @@ const Spinner = styled.div`
     border:3px solid red;
     border-right:3px solid transparent; 
     border-radius:50%;   
-    animation:${rotateAnim} .5s linear;
+    transform:translateZ(0);
+    animation:${rotateAnim} .5s infinite;
 `;
 
 class Preloader extends React.Component {
@@ -38,11 +39,11 @@ class Preloader extends React.Component {
     }
 
     handleAuth() {
-        const { fetchAuthentication, setIsLoading } = this.props;
+        const { handleReAuth, setIsLoading } = this.props;
         const sessionData = sessionStorage.getItem('session');
         const isAuth = localStorage.getItem('isAuth');
 
-        if (isAuth) fetchAuthentication();
+        if (isAuth) handleReAuth();
         else {
             // <Redirect to="/login" />;
             setIsLoading(false);
@@ -50,14 +51,14 @@ class Preloader extends React.Component {
     }
 
     render() {
-        const { isLoading } = this.props;
+        const { isLoading, children } = this.props;
 
         return isLoading ? (
             <Main_preloader>
                 <h1>ProjectT</h1>
                 <Spinner />
             </Main_preloader>)
-            : (this.props.children);
+            : (children);
     }
 }
 
@@ -68,7 +69,7 @@ const mapStateToProps = ({ global }) => ({
 
 const mapDispatchToProps = dispatch => ({
     setIsLoading: v => dispatch(actions.global.setIsLoading(v)),
-    fetchAuthentication: () => dispatch(actions.global.fetchAuthentication()),
+    handleReAuth: () => dispatch(actions.global.handleReAuth()),
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Preloader));
