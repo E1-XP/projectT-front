@@ -6,7 +6,7 @@ const baseUrl = `http://localhost:3001`;
 //const baseUrl = `https://project--t.herokuapp.com`;
 
 import { push } from 'react-router-redux'
-import { setUserData } from './user';
+import { setUserData, setSettings } from './user';
 import { setTimer } from './timer';
 
 export const setIsLoading = bool => ({
@@ -34,13 +34,13 @@ export const loadingError = err => ({
     payload: err
 });
 
-export const handleAuth = (type, formData) => dispatch => {
+export const handleAuth = (type, formData) => (dispatch, getState) => {
     const url = `${baseUrl}/auth/${type}`;
     const config = {
         headers: { 'Content-Type': "application/x-www-form-urlencoded" }
     };
 
-    setTimeout(() => dispatch(setIsLoading(true)), 500);
+    dispatch(setIsLoading(true));
 
     axios.post(url, formData).then(res => {
         console.log(res);
@@ -48,19 +48,42 @@ export const handleAuth = (type, formData) => dispatch => {
             //sessionStorage.setItem('session', JSON.stringify(res.data));
             localStorage.setItem('isAuth', true);
 
-            dispatch(setUserData(res.data));
+            const newSettings = res.data.settings;
+            const filteredData = Object.keys(res.data).reduce((acc, itm) => {
+                if (itm !== 'settings') acc[itm] = res.data[itm];
+                return acc;
+            }, {});
+            const newData = Object.assign({}, getState().user.userData, filteredData);
+
+            dispatch(setUserData(newData));
+            dispatch(setSettings(newSettings));
+
             dispatch(setIsAuthenticated(true));
             dispatch(setIsLoading(false));
         }
-    }).catch(err => dispatch(loadingError(err)));
+        else dispatch(setIsLoading(false));
+    }).catch(err => {
+        dispatch(setIsLoading(false));
+        dispatch(loadingError(err));
+    });
 }
 
-export const handleReAuth = () => dispatch => {
+export const handleReAuth = () => (dispatch, getState) => {
     const url = `${baseUrl}/auth/refresh`;
 
     axios.post(url).then(res => {
         if (res.status === 200) {
-            dispatch(setUserData(res.data));
+            //////
+            const newSettings = res.data.settings;
+            const filteredData = Object.keys(res.data).reduce((acc, itm) => {
+                if (itm !== 'settings') acc[itm] = res.data[itm];
+                return acc;
+            }, {});
+            const newData = Object.assign({}, getState().user.userData, filteredData);
+
+            dispatch(setUserData(newData));
+            dispatch(setSettings(newSettings));
+
             dispatch(setIsAuthenticated(true));
             dispatch(setIsLoading(false));
         }
@@ -69,6 +92,7 @@ export const handleReAuth = () => dispatch => {
             dispatch(setIsLoading(false));
         }
     }).catch(err => {
+        dispatch(setIsLoading(false));
         dispatch(loadingError(err));
     });
 }

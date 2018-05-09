@@ -4,14 +4,13 @@ import styled from 'styled-components';
 
 const Dropdown = styled.ul`
     position:absolute;
-
     border:1px solid #ccc;
     right: -3px;
-    width: 10rem;
+    width: 18rem;
     background-color:white;
     z-index:100;
-    top: -90px;
-    left: 43px;
+    top: -95px;
+    left: 38px;
     border-radius:7px;
 `;
 
@@ -22,16 +21,19 @@ const Dropdown_item = styled.li`
     &:hover{
         background-color:#ddd;
     }
+    &:last-child{
+        border-radius:0px 0px 7px 7px;        
+    }
 `;
 
 const Screen_blocker = styled.div`
-     display: block;
-        position:fixed;
-        top:0;
-        left:0;
-        background-color:transparent;
-        width:100%;
-        height:100%;
+    display: block;
+    position:fixed;
+    top:0;
+    left:0;
+    background-color:transparent;
+    width:100%;
+    height:100%;
 `;
 
 const Dropdown_item_border = styled(Dropdown_item) `
@@ -41,18 +43,20 @@ const Dropdown_item_border = styled(Dropdown_item) `
 const Dropdown_item_noclick = styled(Dropdown_item) `
     cursor:default;
     &:hover{
-        background-color:#fff;
+        background-color:initial;
     }
 `;
 
 const IconProfile = styled.span`
     display:flex;
     background-color:red;
-    width:2rem;
-    height:2rem;
+    width:1.7rem;
+    height:1.7rem;
+    font-size:14px;
     border-radius:50%;
     justify-content:center; 
     align-items:center;
+    font-weight:700;
 `;
 
 const Profile_link = styled.a`
@@ -62,11 +66,19 @@ const Profile_link = styled.a`
     display:flex;
     align-items: center;
     justify-content: center;
-    padding: 0.3rem;
-    border-radius: 7px;
+    margin-bottom:0.3rem;
+    border-radius: 50%;
     @media only screen and (min-width:1200px){
          justify-content:initial;
 }
+`;
+
+const Link_label = styled.span`
+    display:none;
+    @media only screen and (min-width:1200px){
+        display:block;
+        margin-right:1rem;
+    }
 `;
 
 class ProfileDropdown extends React.Component {
@@ -86,6 +98,15 @@ class ProfileDropdown extends React.Component {
         this.setState({ isOpen: false }, () => document.removeEventListener('click', this.closeMenu));
     }
 
+    getShortUsername = () => {
+        const { username } = this.props;
+
+        return username.split(' ').length >= 2 ?
+            username.split(' ')[0].charAt(0).toUpperCase() +
+            username.split(' ')[1].charAt(0).toUpperCase() :
+            username.toUpperCase().slice(0, 2);
+    }
+
     goToProfile = () => {
         this.props.history.push('/profile');
     }
@@ -97,10 +118,11 @@ class ProfileDropdown extends React.Component {
         return (
             <React.Fragment>
                 <Profile_link onClick={this.openMenu}>
-                    <IconProfile>P</IconProfile>
+                    <Link_label>{username.length > 12 ? username.substring(0, 10) + '...' : username}</Link_label>
+                    <IconProfile>{this.getShortUsername()}</IconProfile>
                     {isOpen && <Dropdown>
                         <Dropdown_item_noclick>
-                            {username}
+                            {`${username}'s workspace`}
                         </Dropdown_item_noclick>
                         <Dropdown_item onClick={this.goToProfile}>
                             Profile settings

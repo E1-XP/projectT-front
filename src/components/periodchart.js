@@ -14,6 +14,14 @@ const Chart_header = styled.div`
     float:right;
 `;
 
+const Wrapper = styled.section`
+    border: 1px solid red;
+    margin-top: 2rem;
+    width: 100%;
+    height: 350px;
+    background-color:#fff;
+`;
+
 export default class PeriodTimeChart extends React.Component {
     getTicks = (highestValue, hourInMs) => {
         let multi = 1;
@@ -137,7 +145,7 @@ export default class PeriodTimeChart extends React.Component {
         const formattedYticks = v => moment.duration(v).format("h[h]m[m]:s[s]", { largest: 1 });
 
         return (
-            <section style={{ border: '1px solid red', marginTop: '2rem', width: '100%', height: '350px' }}>
+            <Wrapper>
                 <ResponsiveContainer>
                     <BarChart data={isPeriodYears ? yearData : isPeriodCustomAndLong ? this.getWeeksFromDays(data) : data}
                         barCategoryGap={5}
@@ -152,7 +160,7 @@ export default class PeriodTimeChart extends React.Component {
                             interval={0} ticks={this.getTicks(highestValue, hourInMs)} tickFormatter={formattedYticks} />
                     </BarChart>
                 </ResponsiveContainer>
-            </section>
+            </Wrapper>
         );
     }
 }

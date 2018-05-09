@@ -12,6 +12,11 @@ export const setUserData = data => ({
     payload: data
 });
 
+export const setSettings = data => ({
+    type: consts.SET_SETTINGS,
+    payload: data
+});
+
 export const setEntries = data => ({
     type: consts.SET_ENTRIES,
     payload: data
@@ -31,6 +36,46 @@ export const removeEntries = data => ({
     type: consts.REMOVE_ENTRIES,
     payload: data
 });
+
+export const setPassword = (userid, data) => dispatch => {
+    const url = `${baseUrl}/users/${userid}/passwordedit`;
+
+    return new Promise((res, rej) => {
+        axios.post(url, data)
+            .then(resp => res(resp.data.result))
+            .catch(err => console.log(err));
+    });
+};
+
+export const setUserInfo = (userid, data) => (dispatch, getState) => {
+    const url = `${baseUrl}/users/${userid}/useredit`;
+
+    axios.post(url, data)
+        .then(resp => {
+            const newSettings = resp.data.settings;
+            const filteredData = Object.keys(resp.data).reduce((acc, itm) => {
+                if (itm !== 'settings') acc[itm] = resp.data[itm];
+                return acc;
+            }, {});
+            const newData = Object.assign({}, getState().user.userData, filteredData);
+
+            dispatch(setUserData(newData));
+            dispatch(setSettings(newSettings));
+        }).catch(err => console.log(err));
+};
+
+export const sendAvatar = (userid, data) => dispatch => {
+    const url = `${baseUrl}/users/${userid}/avatar`;
+    //const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+
+    console.log(url, data);
+    fetch(url, {
+        method: 'post',
+        body: data
+    }).then(res => {
+        console.log(res);
+    });
+};
 
 export const fetchEntries = (userid, beginat, endat) => dispatch => {
     let url = `${baseUrl}/users/${userid}/entries?`;

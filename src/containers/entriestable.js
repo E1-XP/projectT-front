@@ -152,15 +152,6 @@ class EntriesTable extends React.Component {
         updateEntry(userData._id, JSON.stringify(arrId), { billable: !bool });
     }
 
-    getProjectColor = name => {
-        const { userData } = this.props;
-
-        return name.length ?
-            '#' + userData.projects[userData.projects.map(itm => itm.name)
-                .findIndex(itm => itm === name)].color :
-            'white';
-    }
-
     onBlurDescriptionSave = (e, currentItem, idx) => {
         currentItem.length === 1 ?
             this.changeDescription(e.target.value, currentItem[0].id) :
@@ -204,7 +195,7 @@ class EntriesTable extends React.Component {
     }
 
     getTaskEntries = idx => {
-        const { handleRemove, userData } = this.props;
+        const { handleRemove, userData, getProjectColor } = this.props;
         const { filteredItems, mappedTasks } = this.state;
 
         return Object.keys(mappedTasks[idx]).map((item, i) => {
@@ -215,7 +206,7 @@ class EntriesTable extends React.Component {
             return <EntryGroup key={currentItem[0].id} currentItem={currentItem} projectDescription={projectDescription}
                 filteredItem={filteredItems[idx][item]} item={item} projectName={projectName}
                 toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
-                getProjectColor={this.getProjectColor} userData={userData}
+                getProjectColor={getProjectColor} userData={userData}
                 changeProject={this.changeProjectMultiple}
                 currentItem={currentItem} setBillableMulti={this.setBillableMulti}
                 toggleEntries={this.toggleEntries} idx={idx} item={item} handleRemove={handleRemove}

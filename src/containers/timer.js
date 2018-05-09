@@ -128,6 +128,16 @@ class Timer extends React.Component {
         this.topBarRef.setStateWithRef(str);
     }
 
+    getProjectColor = name => {
+        const { userData } = this.props;
+        if (name === 'noproject') return '#bbb';
+
+        return name.length ?
+            '#' + userData.projects[userData.projects.map(itm => itm.name)
+                .findIndex(itm => itm === name)].color :
+            'white';
+    }
+
     appendEntries = () => {
         const { userData } = this.props;
         const startAt = moment(userData.entries[userData.entries.length - 1].start).dayOfYear();
@@ -143,13 +153,14 @@ class Timer extends React.Component {
 
         return (<Container>
             <Topbar onRef={ref => this.topBarRef = ref} getWeekTime={this.getWeekTimeComposed} />
-            <WeekCounter isRunning={isRunning} userData={userData} />
+            <WeekCounter isRunning={isRunning} getProjectColor={this.getProjectColor} />
             <List>
                 {userData.entries.length ?
                     <EntriesTable
                         setTopbarDescription={this.passRefToChild}
                         handleRemove={this.handleRemove}
-                        updateEntry={this.props.updateEntry} /> :
+                        updateEntry={this.props.updateEntry}
+                        getProjectColor={this.getProjectColor} /> :
                     <List_item>Add you first task to begin</List_item>}
             </List>
             {userData.entries.length > 9 &&

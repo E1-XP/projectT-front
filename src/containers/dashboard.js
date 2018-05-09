@@ -21,6 +21,7 @@ const Wrapper = styled.div`
     margin:1rem auto;
     border:1px solid rebeccapurple;
     display:flex;
+    padding:1rem;
 `;
 
 const Header = styled.header`

@@ -19,7 +19,9 @@ const initialState = {
     },
     user: {
         userData: {},
-        settings: {}
+        settings: {
+            shouldShowTimerOnTitle: true
+        }
     },
     timer: {
         timer: '0:00:00',

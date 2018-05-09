@@ -37,10 +37,8 @@ const thumbVertical = ({ style, ...props }) => {
 }
 
 const trackVertical = ({ style, ...props }) => {
-
     return (<div {...props} style={{ ...style, width: '3px' }} />);
 }
-
 
 const routes = (
     // <Scrollbars style={scrollbarStyle} renderThumbVertical={thumbVertical}

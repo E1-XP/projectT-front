@@ -24,6 +24,12 @@ const List_item = styled.li`
     background-color:${props => props.value === props.state ? '#fb5' : '#fff'};
 `;
 
+const Wrapper = styled.section`
+    width: 100%;
+    height: 400px;
+    background-color:#fff;
+`;
+
 class ProjectsChart extends React.Component {
     constructor() {
         super();
@@ -104,7 +110,7 @@ class ProjectsChart extends React.Component {
             this.getProjectTime(hoveredItem)) : totalWeekTime(userData.entries);
 
         return (
-            <div style={{ width: '100%', height: '400px' }}>
+            <Wrapper>
                 <ResponsiveContainer>
                     <PieChart>
                         <Pie isAnimationActive={false} data={data} innerRadius={60}
@@ -118,7 +124,7 @@ class ProjectsChart extends React.Component {
                             verticalAlign="middle" iconSize={8} iconType="circle" />
                     </PieChart>
                 </ResponsiveContainer>
-            </div>
+            </Wrapper>
         );
     }
 }

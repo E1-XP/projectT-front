@@ -96,32 +96,17 @@ class TopBar extends React.Component {
 
     componentDidMount() {
         this.props.onRef(this);
-        this.setPreviouslyRunningTimer(this.props.userData);
+        this.setState({ description: this.props.runningEntryDescription });
+    }
+
+    componentWillReceiveProps(nextP) {
+        const { runningEntryDescription } = this.props;
+        console.log(nextP.runningEntryDescription);
+        if (nextP.runningEntryDescription !== runningEntryDescription) this.setState({ description: nextP.runningEntryDescription });
     }
 
     componentWillUnmount() {
         this.props.onRef(null);
-    }
-
-    setPreviouslyRunningTimer = userData => {
-        const { setRunningEntry, setIsRunning, setTimer, setRunningEntryDescription,
-            setProject, toggleTimer, setBillable } = this.props;
-
-        let runEntry = userData.entries.filter(item => item.stop === undefined);
-        if (runEntry.length) {
-            runEntry = runEntry[0];
-            const start = moment(runEntry.start).format();
-
-            setRunningEntry(runEntry._id);
-            setProject(userData.projects.filter(itm => itm.name === runEntry.project)[0]);
-            toggleTimer(true, start);
-            setRunningEntryDescription(runEntry.description || '');
-
-            const stateObj = { description: runEntry.description || '' };
-            if (runEntry.billable) setBillable(true);
-            console.log(runEntry);
-            this.setState(stateObj);
-        }
     }
 
     setStateWithRef(val) {

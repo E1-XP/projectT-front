@@ -64,7 +64,7 @@ class EntryDropdown extends React.Component {
         return (
             <React.Fragment>
                 <Item_link_relative onClick={this.openMenu}>
-                    <Icon name="more_vert" />
+                    <Icon name="more_vert" fill={isOpen ? "#4bc800" : "#bbb"} />
                     {isOpen &&
                         <Dropdown>
                             <Dropdown_item>

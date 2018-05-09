@@ -1,6 +1,7 @@
 export default `
 html,body,#root{
     height:100%;
+    background-color: rgb(250,250,250);
 }
 
 .dropdown {
@@ -27,6 +28,10 @@ html,body,#root{
  .active {
     background-color:rgba(255,255,255,.2);
  }
+
+input[type="file"].inputfile-hidden  {
+    display: none;
+}
 
  input:focus::-webkit-input-placeholder { color:transparent; }
  input:focus::-moz-placeholder { color:transparent; }

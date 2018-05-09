@@ -21,6 +21,7 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
     if (isTrue) {
         let start = moment().format();
         let initialWeekTime = getState().timer.weekTimer;
+        const shouldShowTimerOnTitle = getState().user.settings.shouldShowTimerOnTitle;
 
         if (previousTime) start = previousTime;
         dispatch(setIsRunning(true));
@@ -34,7 +35,7 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
 
             state.timer !== time && dispatch(setTimer(time));
             state.weekTimer !== weekTime && dispatch(setWeekTimer(weekTime));
-            document.title = `${time} - ProjectT`;
+            if (shouldShowTimerOnTitle) document.title = `${time} - ProjectT`;
         }, 450);
     }
     else {

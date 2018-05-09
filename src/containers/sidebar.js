@@ -20,6 +20,8 @@ const Sidebar = styled.section`
     position:fixed;
     height:100%;
     z-index:90;
+    transform:translateZ(0);
+    transition:all .2s ease-in;
     @media only screen and (min-width:1200px){
          max-width:250px;
 }
@@ -76,7 +78,7 @@ const Link_label = styled.span`
 
 class SideBar extends React.Component {
     render() {
-        const { handleLogout, userData } = this.props;
+        const { handleLogout, userData, isRunning, timer, shouldShowTimerOnTitle } = this.props;
 
         return (
             <Sidebar>
@@ -90,7 +92,7 @@ class SideBar extends React.Component {
                         <Navigation_item>
                             <Navigation_link to="/timer">
                                 <Icon name="access_time" />
-                                <Link_label>Timer</Link_label>
+                                <Link_label>{isRunning && shouldShowTimerOnTitle ? timer : 'Timer'}</Link_label>
                             </Navigation_link>
                         </Navigation_item>
                         <Navigation_item>
@@ -115,12 +117,16 @@ class SideBar extends React.Component {
     }
 }
 
-const mapStateToProps = ({ user }) => ({
-    userData: user.userData
+const mapStateToProps = ({ user, timer, global }) => ({
+    userData: user.userData,
+    timer: timer.timer,
+    isRunning: global.isRunning,
+    shouldShowTimerOnTitle: user.settings.shouldShowTimerOnTitle
+
 });
 
 const mapDispatchToProps = dispatch => ({
-    handleLogout: () => dispatch(actions.global.handleLogout)
+    handleLogout: () => dispatch(actions.global.handleLogout())
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SideBar));
