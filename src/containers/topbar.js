@@ -22,22 +22,29 @@ const Task_controller = styled.section`
     background-color:#fff;
     width:95%;
     height:75px;
-@media only screen and (min-width:1200px){
-    width:91%;
+@media only screen and (min-width:1024px){
+    width:calc(100% - 170px);
 }
 `;
 
 const Task_timing = styled.div`
-    min-width:15rem;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-right:1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+`;
+
+const Task_timing_inner = styled.div`
+    display: flex;
+    align-items: center;
+    width: 11rem;
+    margin-left:2rem;
+    margin-right:.5rem;
+    justify-content: space-between;
 `;
 
 const Task_description = styled.input`
     outline-color:transparent;
-    width:100%;
+    flex:1 1 50%;
     padding:.3rem;
     border:none;
     font-size:18px;
@@ -49,6 +56,11 @@ const Task_timer = styled.span`
 const Settings_section = styled.nav`
     display:flex;
     flex-direction:column;
+`;
+
+const Task_options = styled.div`
+    width:18px;
+    margin-left:-.5rem;
 `;
 
 const Task_button = styled.a`
@@ -101,7 +113,7 @@ class TopBar extends React.Component {
 
     componentWillReceiveProps(nextP) {
         const { runningEntryDescription } = this.props;
-        console.log(nextP.runningEntryDescription);
+
         if (nextP.runningEntryDescription !== runningEntryDescription) this.setState({ description: nextP.runningEntryDescription });
     }
 
@@ -131,7 +143,6 @@ class TopBar extends React.Component {
             setRunningEntryDescription, getWeekTime, setWeekTimer, currentProject,
             setProject, billable } = this.props;
 
-
         const now = moment().valueOf();
         const payload = {
             stop: now,
@@ -146,6 +157,15 @@ class TopBar extends React.Component {
         setRunningEntryDescription('');
         setProject(null);
         this.setState({ description: '' });
+    }
+
+    removeStartedEntry = () => {
+        const { removeEntry, toggleTimer, userData, runningEntry, setProject, setRunningEntry } = this.props;
+
+        removeEntry(userData._id, runningEntry);
+        toggleTimer(false);
+        setProject(null);
+        setRunningEntry(null);
     }
 
     changeDescription = (description, runningEntry, previousDescription, enableEmptyInput = false) => {
@@ -163,7 +183,7 @@ class TopBar extends React.Component {
     setProjectState = obj => {
         const { updateEntry, setProject, userData, runningEntry } = this.props;
 
-        if (runningEntry) updateEntry(userData._id, runningEntry, { project: obj.name });
+        if (runningEntry) updateEntry(userData._id, runningEntry, { project: obj ? obj.name : '' });
         setProject(obj);
         this.setState({ isMenuOpen: false });
     }
@@ -210,18 +230,25 @@ class TopBar extends React.Component {
                             </Item_link>}
                         {!currentProject &&
                             <Item_link>
-                                <Icon name="folder" fill="#bbb" />
+                                <Icon name="folder" fill="#bbb" size="20px" />
                             </Item_link>}
-                        <ProjectDropdown setProjectState={this.setProjectState} userData={userData}
-                            style={dropdownStyle} isOpen={this.state.isMenuOpen} />
+                        <ProjectDropdown setProjectState={this.setProjectState} userData={userData} style={dropdownStyle}
+                            isOpen={this.state.isMenuOpen} setParentState={this.setState.bind(this)} />
                     </Span_relative>
-                    <Item_link onClick={this.setBillable}>
-                        <Icon name="attach_money" size={'24px'} fill={billable ? 'green' : '#bbb'} />
-                    </Item_link>
-                    <Task_timer>{timer}</Task_timer>
-                    <Task_button isRunning={isRunning} onClick={this.handleClick}>
-                        <Icon name={isRunning ? "stop" : "play_arrow"} />
-                    </Task_button>
+                    <Task_timing_inner>
+                        <Item_link onClick={this.setBillable}>
+                            <Icon name="attach_money" size='20px' fill={billable ? 'green' : '#bbb'} />
+                        </Item_link>
+                        <Task_timer>{timer}</Task_timer>
+                        <Task_button isRunning={isRunning} onClick={this.handleClick}>
+                            <Icon name={isRunning ? "stop" : "play_arrow"} />
+                        </Task_button>
+                        <Task_options>
+                            {isRunning && <Item_link onClick={this.removeStartedEntry}>
+                                <Icon name="delete" fill="#bbb" size="16px" />
+                            </Item_link>}
+                        </Task_options>
+                    </Task_timing_inner>
                 </Task_timing>
             </Task_controller >
         );
@@ -249,7 +276,8 @@ const mapDispatchToProps = dispatch => ({
     setRunningEntry: v => dispatch(actions.entry.setRunningEntry(v)),
     setRunningEntryDescription: v => dispatch(actions.entry.setRunningEntryDescription(v)),
     createNewEntry: (userid, obj) => dispatch(actions.entry.createNewEntry(userid, obj)),
-    updateEntry: (userid, runningEntry, obj) => dispatch(actions.entry.updateEntry(userid, runningEntry, obj))
+    updateEntry: (userid, runningEntry, obj) => dispatch(actions.entry.updateEntry(userid, runningEntry, obj)),
+    removeEntry: (uid, eid) => dispatch(actions.entry.removeEntry(uid, eid))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopBar);

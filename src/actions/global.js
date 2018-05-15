@@ -36,9 +36,6 @@ export const loadingError = err => ({
 
 export const handleAuth = (type, formData) => (dispatch, getState) => {
     const url = `${baseUrl}/auth/${type}`;
-    const config = {
-        headers: { 'Content-Type': "application/x-www-form-urlencoded" }
-    };
 
     dispatch(setIsLoading(true));
 
@@ -56,8 +53,7 @@ export const handleAuth = (type, formData) => (dispatch, getState) => {
             const newData = Object.assign({}, getState().user.userData, filteredData);
 
             dispatch(setUserData(newData));
-            dispatch(setSettings(newSettings));
-
+            newSettings && dispatch(setSettings(newSettings));
             dispatch(setIsAuthenticated(true));
             dispatch(setIsLoading(false));
         }
@@ -73,7 +69,7 @@ export const handleReAuth = () => (dispatch, getState) => {
 
     axios.post(url).then(res => {
         if (res.status === 200) {
-            //////
+
             const newSettings = res.data.settings;
             const filteredData = Object.keys(res.data).reduce((acc, itm) => {
                 if (itm !== 'settings') acc[itm] = res.data[itm];
@@ -82,7 +78,7 @@ export const handleReAuth = () => (dispatch, getState) => {
             const newData = Object.assign({}, getState().user.userData, filteredData);
 
             dispatch(setUserData(newData));
-            dispatch(setSettings(newSettings));
+            newSettings && dispatch(setSettings(newSettings));
 
             dispatch(setIsAuthenticated(true));
             dispatch(setIsLoading(false));

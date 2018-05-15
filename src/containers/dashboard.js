@@ -19,22 +19,34 @@ const Wrapper = styled.div`
     width:100%;
     max-width:1200px;
     margin:1rem auto;
-    border:1px solid rebeccapurple;
     display:flex;
+    justify-content:space-between;
     padding:1rem;
+    padding-top:0;
 `;
 
 const Header = styled.header`
     display:flex;
     justify-content:space-between;
-    margin:auto 2rem;
 `;
 
 const Heading = styled.h2`
+    font-size:34px;
+    font-weight:500;
+`;
+
+const Heading_section = styled.h3`
+    font-size:24px;
+    font-weight:700;
+    display:flex;
+    position:relative;
 `;
 
 const Chart_Section = styled.section`
-    flex:1 1 65%;
+    flex-basis:72%;
+    width:0;
+    min-width:515px;
+    margin-right:1rem;
 `;
 
 const Item_link = styled.a`
@@ -44,8 +56,37 @@ const Item_link = styled.a`
     align-items:center;
 `;
 
+const Item_link_border = styled(Item_link) `
+    border-right:1px solid #ddd;
+    & > span {
+        width:1.5rem;
+        color:#bbb;
+    }
+    &:hover > span {
+        color:#333;
+    }
+`;
+
+const Item_link_hover = styled(Item_link) `
+    color:#bbb;
+    &:hover{
+     color:#333;  
+    }
+`;
+
 const Period_selection = styled.div`
     display:flex;  
+`;
+
+const Screen_blocker = styled.div`
+     display: block;
+        position:fixed;
+        top:0;
+        left:0;
+        background-color:transparent;
+        width:100%;
+        height:100%;
+        z-index:50;
 `;
 
 const modalStyle = {
@@ -62,11 +103,11 @@ class Dashboard extends React.Component {
 
         this.state = {
             periodStart: moment().startOf('isoWeek'),
-            periodStop: moment().startOf('isoWeek').add(6, 'days'),
+            periodStop: moment().endOf('isoWeek'),
             periodReadable: 'This Week',
             periodType: 'weeks',
             customPeriodLength: 0,
-            isModalOpen: false
+            isCalendarOpen: false
         }
 
         this.todayReadable = moment().format('DD MMMM');
@@ -257,17 +298,18 @@ class Dashboard extends React.Component {
         return periodReadable;
     }
 
-    openModal = () => {
-        this.setState({ isModalOpen: true });
+    openCalendar = () => {
+        this.setState({ isCalendarOpen: true }, () => document.addEventListener('click', this.closeCalendar));
     }
 
-    closeModal = () => {
-        this.setState({ isModalOpen: false });
+    closeCalendar = e => {
+        (e === undefined || !this.dropdown.contains(e.target)) &&
+            this.setState({ isCalendarOpen: false }, () => document.removeEventListener('click', this.closeCalendar));
     }
 
     render() {
         const { userData } = this.props;
-        const { mappedItems, periodReadable, periodStart, periodStop, periodType, isModalOpen,
+        const { mappedItems, periodReadable, periodStart, periodStop, periodType, isCalendarOpen,
             customPeriodLength } = this.state;
 
         if (!Object.keys(userData).length && !Object.keys(mappedItems).length) return (<p>Loading...</p>);
@@ -276,34 +318,37 @@ class Dashboard extends React.Component {
             <Wrapper>
                 <Chart_Section>
                     <Header>
-                        <h2 style={{ textAlign: 'center', color: '#555' }}>Dashboard</h2>
-                        <h3 style={{ textAlign: 'center', color: '#555', display: 'flex' }}>
-                            <Item_link onClick={this.openModal}>
-                                {periodReadable}<span>
-                                    <Icon name={isModalOpen ? 'close' : 'arrow_drop_down'}
-                                        size={isModalOpen ? '20px' : '24px'} /></span>
-                            </Item_link>
+                        <Heading>Dashboard</Heading>
+                        <Heading_section >
+                            <Item_link_border onClick={this.openCalendar}>
+                                {periodReadable}
+                                <Icon name={isCalendarOpen ? 'close' : 'arrow_drop_down'}
+                                    fill={isCalendarOpen ? '#333' : '#bbb'}
+                                    size={isCalendarOpen ? '18px' : '24px'}
+                                />
+                            </Item_link_border>
                             <Period_selection>
-                                <Item_link onClick={this.subtractPeriodState}>
+                                <Item_link_hover onClick={this.subtractPeriodState}>
                                     <Icon name="keyboard_arrow_left" />
-                                </Item_link>
-                                <Item_link onClick={this.addPeriodState}>
+                                </Item_link_hover>
+                                <Item_link_hover onClick={this.addPeriodState}>
                                     <Icon name="keyboard_arrow_right" />
-                                </Item_link>
+                                </Item_link_hover>
                             </Period_selection>
-                        </h3>
+
+                            {isCalendarOpen && <Screen_blocker />}
+                            <div ref={node => this.dropdown = node}>
+                                {/* <--modal--> */}
+                                <ModalCalendar periodStart={periodStart} periodStop={periodStop} closeModal={this.closeCalendar}
+                                    isOpen={isCalendarOpen} setReadableHeading={this.setReadableHeading} setState={this.setState.bind(this)} />
+                            </div>
+
+                        </Heading_section>
                     </Header>
                     <PeriodTimeChart data={this.getPeriodTimeArr()} getYearData={this.getYearMonthsArr}
                         customPeriodLength={customPeriodLength} periodType={periodType} />
                     <ProjectChart userData={userData} totalWeekTime={this.getTotalWeekTime}
                         periodStart={periodStart} periodStop={periodStop} />
-
-                    {/* <--modal--> */}
-                    <Modal isOpen={isModalOpen} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true}
-                        onRequestClose={this.closeModal} style={modalStyle}>
-                        <ModalCalendar periodStart={periodStart} periodStop={periodStop} closeModal={this.closeModal}
-                            setReadableHeading={this.setReadableHeading} setState={this.setState.bind(this)} />
-                    </Modal>
                 </Chart_Section>
                 <ProjectsCounter userData={userData} />
             </Wrapper>

@@ -10,7 +10,7 @@ const Dropdown = styled.ul`
     background-color:white;
     z-index:100;
     top: -95px;
-    left: 38px;
+    right: -295px;
     border-radius:7px;
 `;
 
@@ -50,6 +50,8 @@ const Dropdown_item_noclick = styled(Dropdown_item) `
 const IconProfile = styled.span`
     display:flex;
     background-color:red;
+    background-image:url(${props => props.url || 'none'});
+    background-size:cover;
     width:1.7rem;
     height:1.7rem;
     font-size:14px;
@@ -68,14 +70,14 @@ const Profile_link = styled.a`
     justify-content: center;
     margin-bottom:0.3rem;
     border-radius: 50%;
-    @media only screen and (min-width:1200px){
+    @media only screen and (min-width:1024px){
          justify-content:initial;
 }
 `;
 
 const Link_label = styled.span`
     display:none;
-    @media only screen and (min-width:1200px){
+    @media only screen and (min-width:1024px){
         display:block;
         margin-right:1rem;
     }
@@ -95,11 +97,12 @@ class ProfileDropdown extends React.Component {
     }
 
     closeMenu = e => {
-        this.setState({ isOpen: false }, () => document.removeEventListener('click', this.closeMenu));
+        !e.target.classList.contains('js-noclick') &&
+            this.setState({ isOpen: false }, () => document.removeEventListener('click', this.closeMenu));
     }
 
     getShortUsername = () => {
-        const { username } = this.props;
+        const { username } = this.props.userData;
 
         return username.split(' ').length >= 2 ?
             username.split(' ')[0].charAt(0).toUpperCase() +
@@ -113,15 +116,18 @@ class ProfileDropdown extends React.Component {
 
     render() {
         const { isOpen } = this.state;
-        const { handleLogout, username } = this.props;
+        const { handleLogout, userData } = this.props;
+        const { username } = this.props.userData;
 
         return (
             <React.Fragment>
                 <Profile_link onClick={this.openMenu}>
                     <Link_label>{username.length > 12 ? username.substring(0, 10) + '...' : username}</Link_label>
-                    <IconProfile>{this.getShortUsername()}</IconProfile>
+                    <IconProfile url={userData.avatar || null} >
+                        {!userData.avatar && this.getShortUsername()}
+                    </IconProfile>
                     {isOpen && <Dropdown>
-                        <Dropdown_item_noclick>
+                        <Dropdown_item_noclick className="js-noclick">
                             {`${username}'s workspace`}
                         </Dropdown_item_noclick>
                         <Dropdown_item onClick={this.goToProfile}>

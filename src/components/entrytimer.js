@@ -80,14 +80,14 @@ export default class EntryTimer extends React.Component {
         return (
             <Time_container_outer>
                 <Item_link_toggle onClick={this.setBillableMultiPropxy}>
-                    <Icon name="attach_money" fill={isEveryItemBillable(currentItem) ? 'green' : '#bbb'} />
+                    <Icon name="attach_money" size="20px" fill={isEveryItemBillable(currentItem) ? 'green' : null} />
                 </Item_link_toggle>
                 <Time_container_inner onClick={this.toggleEntriesProxy}>
                     <span> {getTotalDayCount(currentItem)}</span>
                     <Item_toggle>{this.getStopStartTime(currentItem)}</Item_toggle>
                 </Time_container_inner>
                 <Item_link_toggle onClick={this.proxiedStartNewEntry} >
-                    <Icon name="play_arrow" fill="#ccc" />
+                    <Icon name="play_arrow" size="32px" />
                 </Item_link_toggle>
                 <EntryDropdown Item_link_relative={Item_link_relative}
                     handleRemove={this.handleRemoveProxy} />

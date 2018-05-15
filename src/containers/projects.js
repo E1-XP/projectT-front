@@ -1,10 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import shuffle from 'lodash.shuffle';
+import styled from 'styled-components';
+
 import * as actions from '../actions';
 
-import styled from 'styled-components';
 import Modal from 'react-modal';
-
 Modal.setAppElement('#root');
 
 import ProjectsTable from '../components/projectstable';
@@ -20,6 +21,11 @@ const Header = styled.header`
     width:100%;
     display:flex;   
     justify-content:space-between;
+`;
+
+const Heading = styled.h2`
+    font-size:34px;
+    font-weight:500;
 `;
 
 const Modal_Header = styled.header`
@@ -41,15 +47,28 @@ const Modal_Footer = styled.footer`
     justify-content:flex-end;
 `;
 
-const Button_Create = styled.button`
+const Button = styled.button`
+  cursor: pointer;
     border:none;
     padding:.8rem;
-    background-color:#4cd137;
-    color:#fff;
+    font-weight:700;
+    font-size:14px;
+    transition:all .2s ease-in;        
+    color:#fff;    
 `;
 
-const Button_Remove = styled(Button_Create) `
+const Button_Create = styled(Button) `
+    background-color:#4bc800;
+    &:hover{
+        background-color:#3fa900;
+    }
+`;
+
+const Button_Remove = styled(Button) `
     background-color:red;
+    &:hover{
+        background-color:#c20000;
+    }
 `;
 
 const Button_Create_Modal = styled(Button_Create) `
@@ -77,7 +96,6 @@ const Color_Indicator_Inner = styled.span`
     left:0;
     justify-content:center;
     align-items:center;
-
     &:hover{
         background-color:rgba(0,0,0,.3);
     }
@@ -102,6 +120,19 @@ const Footer = styled.footer`
     display:flex;
 `;
 
+const modalStyle = {
+    overlay: {},
+    content: { width: '550px', margin: '0 auto', height: '270px', padding: '0', boxShadow: `0 5px 15px rgba(128,128,128,0.5)` }
+};
+const colorSelectorStyle = {
+    overlay: { backgroundColor: 'transparent' },
+    content: {
+        width: '200px', margin: '0 auto', height: '150px', padding: '1rem', position: 'absolute',
+        top: '200px', right: '263px'
+    }
+};
+const colors = [`#1abc9c`, `#3498db`, '#34495e', `#e74c3c`, `#d35400`, `#f1c40f`, `#95a5a6`, `#8e44ad`];
+
 class Projects extends React.Component {
     constructor() {
         super();
@@ -112,8 +143,7 @@ class Projects extends React.Component {
             projectInput: "",
             clientInput: "",
             selectedColor: null,
-            colors: [`#1abc9c`, `#3498db`, '#34495e',
-                `#e74c3c`, `#d35400`, `#f1c40f`, `#95a5a6`, `#8e44ad`]
+            colors: shuffle(colors)
         }
     }
 
@@ -126,7 +156,10 @@ class Projects extends React.Component {
     }
 
     openModal = () => {
-        this.setState({ isModalOpen: true });
+        const { colors } = this.state;
+        const selectedColor = colors[Math.floor(Math.random() * (colors.length - 1))];
+
+        this.setState({ isModalOpen: true, selectedColor });
     }
 
     closeModal = () => {
@@ -145,7 +178,8 @@ class Projects extends React.Component {
         const { projectInput, clientInput, selectedColor } = this.state;
 
         this.props.createProject(this.props.userData._id, projectInput, selectedColor, clientInput);
-        this.setState({ projectInput: '', clientInput: '' });
+        this.setState({ projectInput: '', clientInput: '', isModalOpen: false });
+
     }
 
     handleProjectRemove = () => {
@@ -159,7 +193,7 @@ class Projects extends React.Component {
 
     getSelectorColors = () => {
         const { colors, selectedColor } = this.state;
-        const setActive = (itm) => this.setState({ selectedColor: itm });
+        const setActive = (itm) => this.setState({ selectedColor: itm, isColorSelectorOpen: false });
 
         return colors.map(itm =>
             (<Color_Indicator_Multi key={itm} color={itm} onClick={() => setActive(itm)}>
@@ -172,22 +206,10 @@ class Projects extends React.Component {
     render() {
         const { userData, removeProject } = this.props;
 
-        const modalStyle = {
-            overlay: { backgroundColor: 'rgba(0,0,0,.2)' },
-            content: { width: '550px', margin: '0 auto', height: '270px', padding: '0', boxShadow: `0 5px 15px rgba(128,128,128,0.5)` }
-        };
-        const colorSelectorStyle = {
-            overlay: { backgroundColor: 'transparent' },
-            content: {
-                width: '200px', margin: '0 auto', height: '150px', padding: '1rem', position: 'absolute',
-                top: '200px', right: '263px'
-            }
-        };
-
         return (
             <Wrapper>
                 <Header>
-                    <h2>Projects</h2>
+                    <Heading>Projects</Heading>
                     <Button_Create onClick={this.openModal}>Create Project</Button_Create>
                 </Header>
                 <section>
@@ -198,9 +220,10 @@ class Projects extends React.Component {
                         Remove Selected
                     </Button_Remove>
                 </Footer>
+
                 {/* <---modal---> */}
                 <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true}
-                    overlayRef={node => this.overlayRef = node} onRequestClose={this.closeModal}
+                    overlayRef={node => this.overlayRef = node} onRequestClose={this.closeModal} closeTimeoutMS={200}
                     style={modalStyle}>
                     <Modal_Header>
                         <h2>Create Project</h2>
@@ -231,6 +254,7 @@ class Projects extends React.Component {
                         <Button_Create_Modal onClick={this.handleProjectCreate}>Create Project</Button_Create_Modal>
                     </Modal_Footer>
                 </Modal>
+
             </Wrapper >
         );
     }

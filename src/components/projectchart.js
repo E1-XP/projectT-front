@@ -21,13 +21,16 @@ const List_item = styled.li`
     display:flex;
     justify-content:space-between;
     padding:.5rem;
-    background-color:${props => props.value === props.state ? '#fb5' : '#fff'};
+    background-color:${props => props.value === props.state ? '#efeb97' : '#fff'};
 `;
 
 const Wrapper = styled.section`
     width: 100%;
-    height: 400px;
+    height: 300px;
     background-color:#fff;
+    margin-top:2rem;
+    margin-bottom:4rem;
+    box-shadow: 0 1px 3px rgba(128,128,128,0.2);
 `;
 
 class ProjectsChart extends React.Component {
@@ -41,17 +44,21 @@ class ProjectsChart extends React.Component {
     }
 
     projectsLengthSum = projectStr => {
-        const { periodStart, periodStop } = this.props;
+        const { periodStart, periodStop, userData } = this.props;
 
         const condition = itm => projectStr === undefined ?
             (itm.project === projectStr || itm.project === '') :
             itm.project === projectStr;
 
-        const total = this.props.userData.entries
-            .filter(itm => itm.stop !== undefined && condition(itm) &&
-                itm.start > periodStart.valueOf() && itm.stop < moment(periodStop).valueOf())
-            .reduce((acc, item) =>
-                acc + moment.duration(moment(Number(item.stop)).diff(item.start)).valueOf(), 0);
+        const filterCondition = itm => itm.stop !== undefined && condition(itm) &&
+            itm.start > periodStart.valueOf() && itm.stop < moment(periodStop).valueOf();
+
+        const total = userData.entries
+            .reduce((acc, item) => {
+                return filterCondition(item) ?
+                    acc + moment.duration(moment(Number(item.stop)).diff(item.start)).valueOf() :
+                    acc;
+            }, 0);
 
         return total;
     }
@@ -111,10 +118,10 @@ class ProjectsChart extends React.Component {
 
         return (
             <Wrapper>
-                <ResponsiveContainer>
-                    <PieChart>
-                        <Pie isAnimationActive={false} data={data} innerRadius={60}
-                            outerRadius={130} dataKey="v" onMouseEnter={handleMouseEnter}
+                <ResponsiveContainer >
+                    <PieChart width={700} height={300}>
+                        <Pie isAnimationActive={false} data={data} innerRadius={65}
+                            outerRadius={140} dataKey="v" onMouseEnter={handleMouseEnter}
                             onMouseLeave={handleMouseLeave} activeIndex={activeIdx} >
                             {data.map((itm, idx) => (<Cell key={`cell-${idx}`}
                                 style={{ opacity: hoveredItem === itm.name ? '.7' : '1' }} />))}

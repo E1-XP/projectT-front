@@ -21,6 +21,7 @@ const Item_link = styled.a`
 const Input_task = styled.input`
     border: none;
     outline-color: transparent;
+    background-color:transparent;
 `;
 
 const Item_project = styled.span`
@@ -30,6 +31,10 @@ const Item_project = styled.span`
 const GroupEntries_length = styled.span`
     cursor:pointer;
     margin-right: .5rem;
+    border:1px solid #efefef;
+    border-radius:8px;
+    padding:.3rem .6rem;
+    background-color:${({ isOpen }) => isOpen ? '#efefef' : 'transparent'};
     color: ${({ color }) => color};
 `;
 
@@ -42,6 +47,7 @@ const Item_link_relative = styled.span`
 
 const Wrapper = styled.div`
     position: relative;
+    margin-left:1.5rem;
 `;
 
 export default class EntryHead extends React.Component {
@@ -54,16 +60,6 @@ export default class EntryHead extends React.Component {
 
         this.dropdownStyle = { top: '25px', left: '50%' };
     }
-
-    // shouldComponentUpdate(nxtProps, nxtState) {
-    //     const { filteredItem, idx, item, projectDescription, userData,
-    //         currentItem, projectName } = this.props;
-
-    //     if (nxtProps.filteredItem === filteredItem && nxtProps.idx === idx
-    //         && nxtProps.currentItem === currentItem && nxtProps.projectName === projectName
-    //         && nxtProps.item === item) return false;
-    //     else return true;
-    // }
 
     openMenu = () => {
         this.setState({ isMenuOpen: true });
@@ -90,13 +86,14 @@ export default class EntryHead extends React.Component {
     render() {
         const { filteredItem, idx, item, projectDescription, userData, currentItem, getProjectColor,
             projectName, Item_link_toggle } = this.props;
+        const { isMenuOpen } = this.state;
 
         //console.log('rendering entryheader');
         return (
             <Wrapper>
                 {currentItem.length > 1 &&
                     <GroupEntries_length color={filteredItem ? '#4bc800;' : '#333'}
-                        onClick={this.toggleEntriesProxy}>
+                        onClick={this.toggleEntriesProxy} isOpen={filteredItem} >
                         {currentItem.length}
                     </GroupEntries_length>}
                 <Input_task type="text" placeholder="Add description"
@@ -109,11 +106,11 @@ export default class EntryHead extends React.Component {
                             {projectName}
                         </Item_project>
                     </Item_link>}
-                {!projectName && <Item_link_toggle onClick={this.openMenu}>
-                    <Icon name="folder" />
+                {!projectName && <Item_link_toggle isOpen={isMenuOpen} onClick={this.openMenu}>
+                    <Icon name="folder" size="20px" />
                 </Item_link_toggle>}
                 {<ProjectDropdown project={projectName} userData={userData} isOpen={this.state.isMenuOpen}
-                    setProjectState={this.onProjectClick} style={this.dropdownStyle} />}
+                    setProjectState={this.onProjectClick} style={this.dropdownStyle} setParentState={this.setState.bind(this)} />}
             </Wrapper>
         );
     }

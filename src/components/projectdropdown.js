@@ -29,9 +29,12 @@ const Item = styled.li`
 `;
 
 const List = styled.ul`
+    max-height:12rem;
+    overflow-y:auto;
 `;
 
 const Input = styled.input`
+    margin-left:.5rem;
     border:none;
     outline-color:transparent;
 `;
@@ -41,6 +44,7 @@ const Searchbar = styled.div`
     justify-content:center;
     border-radius:5px;
     border:1px solid #ddd;    
+    padding:.1rem;
 `;
 
 const Wrapper = {
@@ -76,7 +80,6 @@ class ProjectDropdown extends React.Component {
     }
 
     componentWillReceiveProps(nxtProps) {
-        console.log('called update');
         if (nxtProps.isOpen && this.state.isMenuOpen !== nxtProps.isOpen) this.openMenu();
     }
 
@@ -90,9 +93,9 @@ class ProjectDropdown extends React.Component {
 
     closeMenu = e => {
         const liElems = Array.from(document.querySelectorAll('.js-click-close'));
-        console.log(e.target.nodeName)
 
         if (!this.dropdown.contains(e.target) || liElems.some(itm => itm.contains(e.target))) {
+            this.props.setParentState({ isMenuOpen: false });
             this.setState({ isMenuOpen: false }, e => document.removeEventListener('click', this.closeMenu));
         }
     }
@@ -144,7 +147,7 @@ class ProjectDropdown extends React.Component {
                 {isMenuOpen && <Screen_blocker />}
                 {isMenuOpen && <div ref={node => this.dropdown = node} style={this.wrapperStyle}>
                     <Searchbar >
-                        <Icon name="search" />
+                        <Icon name="search" fill="#ccc" size="20px" />
                         <Input placeholder="Find project..." className="input-standard"
                             value={inputValue} onChange={this.setInputState} />
                     </Searchbar>

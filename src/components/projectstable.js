@@ -28,19 +28,28 @@ const Table_Row_Header = styled.tr`
     border-bottom:2px solid #bbb;
     display:flex;
     width:400%;
+    background-color:white;
 `;
 
 const TH = styled.th`
     padding:1rem;
     height:4.2rem;
+    align-items:center;
+    justify-content:center;    
     display:flex;
     width:100%;
+    &:first-of-type{
+        width:4rem;
+    }
 `;
 
 const TD = styled.td`
     padding:1rem;
     height:4.2rem;    
     text-align:center;
+    &:first-of-type{
+        width:4rem;
+    }
 `;
 
 const No_Entries = styled.td`
@@ -51,8 +60,9 @@ const No_Entries = styled.td`
 `;
 
 const Icon_Link = styled.a`
-    
+    cursor: pointer;
 `;
+
 
 const Color_Indicator = styled.span`
     display:inline-block;
@@ -143,16 +153,17 @@ class ProjectsTable extends React.Component {
         this.setState({ checkedProjects });
     }
 
-    projectsLengthSum = (projectStr) => {
+    projectsLengthSum = projectStr => {
         const { entries } = this.props.data;
         const now = moment();
-        const total = entries
-            .filter(item => item.stop !== undefined)
-            .filter(itm => itm.project === projectStr)
-            .reduce((acc, item) =>
-                acc + moment.duration(moment(Number(item.stop)).diff(item.start)).valueOf(), 0);
+        const condition = itm => itm.stop !== undefined && itm.project === projectStr;
 
-        return total;
+        return entries
+            .reduce((acc, item) => {
+                return condition(item) ?
+                    acc + moment.duration(moment(Number(item.stop)).diff(item.start)).valueOf() :
+                    acc;
+            }, 0);
     }
 
     getProjectTime = projectStr => {
@@ -164,19 +175,50 @@ class ProjectsTable extends React.Component {
         this.setState({ sortOrder, sortBy });
     }
 
-    sortFn = (sortBy) => (a, b) => {
+    sortFn = sortBy => (a, b) => {
         const { sortOrder } = this.state;
 
         let boolArg;
-        a = a.name;
-        b = b.name;
+        if (sortBy === 'name') {
+            a = a.name;
+            b = b.name;
+        }
+        else if (sortBy === 'client') {
+            a = a.client;
+            b = b.client;
 
-        switch (sortOrder) {
-            case 'asc': boolArg = a < b; break;
-            case 'desc': boolArg = a > b; break;
+        }
+        else if (sortBy === 'status') {
+            a = this.projectsLengthSum(a.name);
+            b = this.projectsLengthSum(b.name);
         }
 
-        return (boolArg) ? -1 : (!boolArg ? 1 : 0);
+        switch (sortOrder) {
+            case 'asc': boolArg = a > b; break;
+            case 'desc': boolArg = b > a; break;
+        }
+
+        return boolArg ? -1 : (!boolArg ? 1 : 0);
+    }
+
+    generateItems = () => {
+        const { sortBy, checkedProjects } = this.state;
+
+        return this.props.data.projects
+            .sort(this.sortFn(sortBy))
+            .map((itm, i) =>
+                (<Table_Row key={itm.name}>
+                    <TD>
+                        <CheckBox name={itm.name} state={this.state.checkedProjects}
+                            handleChecks={this.handleChecks} />
+                    </TD>
+                    <TD>{itm.name}
+                        <Color_Indicator color={`#${itm.color}`} />
+                    </TD>
+                    <TD>{itm.client ? itm.client : '(No Client)'}</TD>
+                    <TD>{this.projectsLengthSum(itm.name) ?
+                        this.getProjectTime(itm.name) : '(Not Started)'}</TD>
+                </Table_Row>))
     }
 
     render() {
@@ -193,22 +235,9 @@ class ProjectsTable extends React.Component {
                             handleChecks={this.handleChecks} /></TH>
                         <TH>Project<Sortable_Panel sortBy={'name'} stateFn={this.setSortState} /></TH>
                         <TH>Client<Sortable_Panel sortBy={'client'} stateFn={this.setSortState} /></TH>
-                        <TH>Status<Sortable_Panel sortBy={'name'} stateFn={this.setSortState} /></TH>
+                        <TH>Status<Sortable_Panel sortBy={'status'} stateFn={this.setSortState} /></TH>
                     </Table_Row_Header>
-
-                    {projects.length ? projects.sort(this.sortFn(sortBy)).map((itm, i) =>
-                        (<Table_Row key={itm.name}>
-                            <TD>
-                                <CheckBox name={itm.name} state={this.state.checkedProjects}
-                                    handleChecks={this.handleChecks} />
-                            </TD>
-                            <TD>{itm.name}
-                                <Color_Indicator color={`#${itm.color}`} />
-                            </TD>
-                            <TD>{itm.client ? itm.client : '(No Client)'}</TD>
-                            <TD>{this.projectsLengthSum(itm.name) ?
-                                this.getProjectTime(itm.name) : '(Not Started)'}</TD>
-                        </Table_Row>)) :
+                    {projects.length ? this.generateItems() :
                         <tr><No_Entries>Press the 'Create Project' button to get started.</No_Entries></tr>}
                 </tbody>
             </Table >

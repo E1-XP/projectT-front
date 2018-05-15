@@ -5,6 +5,24 @@ import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
+const Wrapper = styled.section`
+    margin-top:.5rem;
+    width:25%;
+    min-width:205px;
+`;
+
+const Heading = styled.h3`
+    color:#aaa;
+    font-weight:500;
+`;
+
+const List = styled.ul`
+    margin-top:1.7rem;
+    padding:.5rem;
+    box-shadow: 0 1px 4px rgba(128,128,128,0.4);
+    background-color:white;
+`;
+
 const Color_Indicator = styled.span`
     display:inline-block;
     width:.3rem;
@@ -17,6 +35,8 @@ const Color_Indicator = styled.span`
 const List_item = styled.li`
     display:flex;
     justify-content:space-between;
+    padding: 0.1rem;
+    font-size: 14px;
 `;
 
 const ProjectsCounter = ({ userData }) => {
@@ -39,9 +59,9 @@ const ProjectsCounter = ({ userData }) => {
     };
 
     return (
-        <section style={{ border: '1px solid red' }}>
-            <h2>Most Tracked</h2>
-            <ul>
+        <Wrapper>
+            <Heading>Most Tracked</Heading>
+            <List>
                 {userData.projects.length ?
                     userData.projects.map((itm, i) =>
                         (<List_item key={itm.name}>
@@ -51,8 +71,8 @@ const ProjectsCounter = ({ userData }) => {
                             <span>{getProjectTime(itm.name)}</span>
                         </List_item>)) :
                     <li>No projects</li>}
-            </ul>
-        </section>
+            </List>
+        </Wrapper>
     );
 }
 

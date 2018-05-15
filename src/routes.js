@@ -12,6 +12,7 @@ import Projects from './containers/projects';
 import Profile from './containers/profile';
 import Form from './containers/form';
 import NotFound from './components/404';
+import ErrorPage from './components/errorpage';
 
 const App_container = styled.div`
     display:flex;
@@ -22,7 +23,7 @@ const Main_content = styled.main`
     flex-direction:column;
     width:95%;
     margin-left:52px;
-    @media only screen and (min-width:1200px){
+    @media only screen and (min-width:1024px){
         margin-left:171px;
         width:91%;
     }
@@ -57,6 +58,7 @@ const routes = (
                         <Route path="/dashboard" component={Dashboard} />
                         <Route path="/projects" component={Projects} />
                         <Route path="/profile" component={Profile} />
+                        <Route path="/500" component={ErrorPage} />
                         <Route component={NotFound} />
                     </Switch>
                 </Main_content>

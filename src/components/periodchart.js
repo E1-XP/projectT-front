@@ -15,11 +15,11 @@ const Chart_header = styled.div`
 `;
 
 const Wrapper = styled.section`
-    border: 1px solid red;
-    margin-top: 2rem;
+    margin-top: 1rem;
     width: 100%;
     height: 350px;
     background-color:#fff;
+    box-shadow: 0 1px 3px rgba(128,128,128,0.2);
 `;
 
 export default class PeriodTimeChart extends React.Component {
@@ -148,15 +148,14 @@ export default class PeriodTimeChart extends React.Component {
             <Wrapper>
                 <ResponsiveContainer>
                     <BarChart data={isPeriodYears ? yearData : isPeriodCustomAndLong ? this.getWeeksFromDays(data) : data}
-                        barCategoryGap={5}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 10 }} >
+                        barCategoryGap={5} margin={{ top: 20, right: -10, left: 0, bottom: 10 }} >
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis interval={xAxisInterval(checkedData.length)} tickLine={false} dataKey="readable" height={60} tick={this.getCustomTick} />
                         <Bar dataKey="time" data={checkedData} isAnimationActive={false} maxBarSize={100} minPointSize={4}>
                             {shouldShowLabelList() && <LabelList dataKey="duration" position="top" content={this.getCustomLabel} />}
                             {checkedData.map((itm, i) => <Cell fill={itm.hasValue ? "#45aaf2" : '#999'} key={`${i}-${itm.time}`} />)}
                         </Bar>
-                        <YAxis stroke="#999" orientation="right" axisLine={false} mirror={false} tickLine={false}
+                        <YAxis stroke="#ccc" orientation="right" axisLine={false} mirror={false} tickLine={false}
                             interval={0} ticks={this.getTicks(highestValue, hourInMs)} tickFormatter={formattedYticks} />
                     </BarChart>
                 </ResponsiveContainer>

@@ -12,8 +12,11 @@ import WeekCounter from '../containers/weekcounter';
 import EntriesTable from '../containers/entriestable';
 import Icon from '../components/icon';
 
+import getMappedItems from '../selectors/getmappeditems';
+
 const Container = styled.div`
     background-color:rgb(250,250,250);
+    padding-bottom:3rem;
 `;
 
 const Container_center = styled.div`
@@ -147,7 +150,7 @@ class Timer extends React.Component {
     }
 
     render() {
-        const { userData, isRunning, allEntriesFetched } = this.props;
+        const { userData, isRunning, allEntriesFetched, mappedItems } = this.props;
 
         if (!userData.entries) return (<p>Loading...</p>);
 
@@ -163,7 +166,7 @@ class Timer extends React.Component {
                         getProjectColor={this.getProjectColor} /> :
                     <List_item>Add you first task to begin</List_item>}
             </List>
-            {userData.entries.length > 9 &&
+            {Object.keys(mappedItems).length > 9 &&
                 <Container_center>
                     {allEntriesFetched && <p>No data available for this period</p>}
                     {!this.state.isFetchingEntries && !allEntriesFetched && <Button_load onClick={this.appendEntries}>
@@ -180,7 +183,8 @@ const mapStateToProps = ({ user, entry, global }) => ({
     runningEntry: entry.runningEntry,
     runningEntryDescription: entry.runningEntryDescription,
     isRunning: global.isRunning,
-    allEntriesFetched: global.allEntriesFetched
+    allEntriesFetched: global.allEntriesFetched,
+    mappedItems: getMappedItems(user.userData)
 });
 
 const mapDispatchToProps = dispatch => ({

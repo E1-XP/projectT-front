@@ -4,6 +4,9 @@ import styled from 'styled-components';
 import EntryHeader from './entryheader';
 import EntryTimer from './entrytimer';
 
+const Entry_section = styled.section`
+`;
+
 const Itembody_body = styled.ul`
 `;
 
@@ -43,11 +46,6 @@ const GroupEntries_length = styled.span`
     color: ${({ color }) => color};
 `;
 
-const Input_task = styled.input`
-    border: none;
-    outline-color: transparent;
-`;
-
 const Item_link = styled.a`
     color:#ccc;
     cursor:pointer;
@@ -58,11 +56,22 @@ const Item_link_relative = styled.span`
     position:relative;
     opacity:0;
     pointer-events:none;
+    color:${props => props.fill || '#ccc'};
+        &:hover{
+            color:${props => props.fill || '#999'};
+        }
 `;
 
 const Item_link_toggle = styled(Item_link) `
-    opacity:0;
+    opacity:${props => props.isOpen ? '1' : '0'};
     pointer-events:none;
+    color:${props => props.isOpen ? '#999' : '#ccc'};
+    background-color:${props => props.isOpen ? '#eee' : 'transparent'};
+    padding: .2rem .4rem;
+    border-radius: 5px;
+    &:hover{
+        color:#999;
+    }
 `;
 
 const Item_toggle = styled.span`
@@ -73,10 +82,12 @@ const Itembody_header = styled.header`
     display:flex;
     justify-content:space-between;
     padding:1rem 0;
-    margin:auto .3rem;
-    margin-left:1.5rem;
+    margin:auto 0;
     height:4rem;
     align-items:center;
+    &:hover{
+        background-color:#f5f5f5;
+    }
     &:hover ${Item_link_toggle} {
         opacity:1;
         pointer-events:all;
@@ -106,7 +117,7 @@ export default class EntryGroup extends React.Component {
         const { currentItem, filteredItem, item, getSingleEntries } = this.props;
 
         return (
-            <section key={currentItem[0].id}>
+            <Entry_section key={currentItem[0].id}>
                 <Itembody_header>
                     <EntryHeader {...this.props} Item_link_toggle={Item_link_toggle} />
                     <EntryTimer {...this.props} Item_link_toggle={Item_link_toggle}
@@ -115,6 +126,6 @@ export default class EntryGroup extends React.Component {
                 <Itembody_body>
                     {(filteredItem && currentItem.length > 1) && getSingleEntries(currentItem)}
                 </Itembody_body>
-            </section>);
+            </Entry_section>);
     }
 }

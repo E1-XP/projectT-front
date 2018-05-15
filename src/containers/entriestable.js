@@ -34,7 +34,7 @@ const Item_header = styled.header`
     align-items:center;    
     padding:1rem;
     margin:auto .3rem;
-    margin-right:2.2rem;
+    margin-right:3.3rem;
 `;
 
 const Item_day = styled.span`
@@ -198,21 +198,28 @@ class EntriesTable extends React.Component {
         const { handleRemove, userData, getProjectColor } = this.props;
         const { filteredItems, mappedTasks } = this.state;
 
-        return Object.keys(mappedTasks[idx]).map((item, i) => {
-            const projectName = item.split('\n')[0].trim();
-            const projectDescription = item.split('\n')[1].trim();
-            const currentItem = mappedTasks[idx][item];
+        return Object.keys(mappedTasks[idx])
+            .sort((a, b) => {
+                const aLen = mappedTasks[idx][a].length - 1;
+                const bLen = mappedTasks[idx][b].length - 1;
 
-            return <EntryGroup key={currentItem[0].id} currentItem={currentItem} projectDescription={projectDescription}
-                filteredItem={filteredItems[idx][item]} item={item} projectName={projectName}
-                toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
-                getProjectColor={getProjectColor} userData={userData}
-                changeProject={this.changeProjectMultiple}
-                currentItem={currentItem} setBillableMulti={this.setBillableMulti}
-                toggleEntries={this.toggleEntries} idx={idx} item={item} handleRemove={handleRemove}
-                getTotalDayCount={this.getTotalDayCount} isEveryItemBillable={this.isEveryItemBillable}
-                startNewEntry={this.startNewEntry} getSingleEntries={this.getSingleEntries} />
-        });
+                return mappedTasks[idx][b][bLen].stop - mappedTasks[idx][a][aLen].stop;
+            })
+            .map((item, i) => {
+                const projectName = item.split('\n')[0].trim();
+                const projectDescription = item.split('\n')[1].trim();
+                const currentItem = mappedTasks[idx][item];
+
+                return <EntryGroup key={currentItem[0].id} currentItem={currentItem} projectDescription={projectDescription}
+                    filteredItem={filteredItems[idx][item]} item={item} projectName={projectName}
+                    toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
+                    getProjectColor={getProjectColor} userData={userData}
+                    changeProject={this.changeProjectMultiple}
+                    currentItem={currentItem} setBillableMulti={this.setBillableMulti}
+                    toggleEntries={this.toggleEntries} idx={idx} item={item} handleRemove={handleRemove}
+                    getTotalDayCount={this.getTotalDayCount} isEveryItemBillable={this.isEveryItemBillable}
+                    startNewEntry={this.startNewEntry} getSingleEntries={this.getSingleEntries} />
+            });
     }
 
     render() {

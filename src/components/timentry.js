@@ -14,8 +14,15 @@ const Item_link = styled.a`
 `;
 
 const Item_link_toggle = styled(Item_link) `
-        opacity:0;
-        pointer-events:none;
+    opacity:${props => props.isOpen ? '1' : '0'};
+    pointer-events:none;
+    color:${props => props.isOpen ? '#999' : '#ccc'};
+    background-color:${props => props.isOpen ? '#eee' : 'transparent'};
+    padding: .2rem .4rem;
+    border-radius: 5px;
+    &:hover{
+        color:#999;
+    }
 `;
 
 const Item_link_relative = styled.span`
@@ -23,6 +30,10 @@ const Item_link_relative = styled.span`
     position:relative;
     opacity:0;
     pointer-events:none;
+    color:${props => props.fill || '#ccc'};
+        &:hover{
+            color:${props => props.fill || '#999'};
+        }
 `;
 
 const Time_container_inner = styled.div`
@@ -46,13 +57,12 @@ const Item_row = styled.li`
     text-align:center;
     padding:.5rem 0rem;
     padding-left:2.5rem;
-    margin-right: .3rem;
     height:4rem;
     display:flex;
     justify-content:space-between;
     align-items:center;
     &:hover {
-        background-color:#eee;
+        background-color:#f5f5f5;
     }
     &:hover ${Item_link_relative} {
         opacity:1;
@@ -181,22 +191,23 @@ export default class TimeEntry extends React.Component {
                             {item.project}
                         </Item_project>
                     </Item_link>}
-                    {!item.project && <Item_link_toggle onClick={this.openMenu}>
-                        <Icon name="folder" />
+                    {!item.project && <Item_link_toggle isOpen={isMenuOpen} onClick={this.openMenu}>
+                        <Icon name="folder" size="20px" />
                     </Item_link_toggle>}
                     <ProjectDropdown project={item.project} userData={userData} isOpen={isMenuOpen}
-                        setProjectState={this.onProjectClick} style={dropdownStyle} />
+                        setProjectState={this.onProjectClick} style={dropdownStyle}
+                        setParentState={this.setState.bind(this)} />
                 </Info_container>
                 <Time_container_outer>
                     <Item_link_toggle onClick={this.setBillableProxy}>
-                        <Icon name="attach_money" fill={item.billable ? 'green' : '#bbb'} />
+                        <Icon name="attach_money" size="20px" fill={item.billable ? 'green' : null} />
                     </Item_link_toggle>
                     <Time_container_inner>
                         <span>{item.duration}</span>
                         <Item_toggle>{this.getStopStartTime(item.start, item.stop)}</Item_toggle>
                     </Time_container_inner>
                     <Item_link_toggle onClick={this.startNewEntryProxy}>
-                        <Icon name="play_arrow" fill='#ccc' />
+                        <Icon name="play_arrow" size="32px" />
                     </Item_link_toggle>
                     <EntryDropdown Item_link_relative={Item_link_relative}
                         handleRemove={this.handleRemoveProxy} />

@@ -19,10 +19,10 @@ const Sidebar = styled.section`
     align-items:center;
     position:fixed;
     height:100%;
-    z-index:90;
+    z-index:150;
     transform:translateZ(0);
     transition:all .2s ease-in;
-    @media only screen and (min-width:1200px){
+    @media only screen and (min-width:1024px){
          max-width:250px;
 }
 `;
@@ -52,7 +52,7 @@ const Navigation_link = styled(NavLink) `
     justify-content: center;
     padding: 0.3rem;
     border-radius: 7px;
-    @media only screen and (min-width:1200px){
+    @media only screen and (min-width:1024px){
          justify-content:initial;
 }
 &:hover{
@@ -71,9 +71,12 @@ const Header_link = styled(Link) `
 
 const Link_label = styled.span`
     display:none;
-    @media only screen and (min-width:1200px){
+    @media only screen and (min-width:1024px){
         display:block;
         margin-left:1rem;
+        &:first-of-type{
+            margin:0;
+        }
 }`;
 
 class SideBar extends React.Component {
@@ -84,7 +87,7 @@ class SideBar extends React.Component {
             <Sidebar>
                 <Sidebar_header>
                     <Header_link to="/timer">
-                        <h1>T</h1>
+                        <Link_label>Project</Link_label> <h1>T</h1>
                     </Header_link>
                 </Sidebar_header>
                 <Sidebar_navigation>
@@ -97,7 +100,7 @@ class SideBar extends React.Component {
                         </Navigation_item>
                         <Navigation_item>
                             <Navigation_link to="/dashboard" activeClassName="active" >
-                                <Icon name="insert_chart" />
+                                <Icon name="bar_chart" />
                                 <Link_label>Dashboard</Link_label>
                             </Navigation_link>
                         </Navigation_item>
@@ -110,7 +113,7 @@ class SideBar extends React.Component {
                     </Navigation_list>
                 </Sidebar_navigation>
                 <Sidebar_profile>
-                    <ProfileDropdown username={userData.username} handleLogout={handleLogout} />
+                    <ProfileDropdown userData={userData} handleLogout={handleLogout} />
                 </Sidebar_profile>
             </Sidebar>
         );

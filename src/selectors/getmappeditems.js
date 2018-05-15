@@ -29,7 +29,7 @@ const getMappedItemsFn = entries => {
         }
         return acc;
     }
-    return entries.reduce(reduceItems, {});
+    return entries.sort((a,b)=>b.start-a.start).reduce(reduceItems, {});
 }
 
 const getMappedItems = createSelector([getEntries], getMappedItemsFn);

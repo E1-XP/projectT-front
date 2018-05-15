@@ -11,11 +11,17 @@ const Wrapper = styled.div`
     max-width:1200px;
     margin:1rem auto;
     padding:1rem;
+    padding-top:0;
 `;
 
 const Header = styled.header`
     display:flex;
     justify-content:space-between;
+`;
+
+const Heading = styled.h2`
+    font-size:34px;
+    font-weight:500;
 `;
 
 const Main_content = styled.section`
@@ -36,9 +42,7 @@ const Button = styled.button`
     display:flex;
     align-items:center;
     cursor:pointer;
-    &:hover{
-        
-    }
+    transition:all .2s ease-in;
 `;
 
 const Button_done = styled(Button) `
@@ -46,11 +50,17 @@ const Button_done = styled(Button) `
     margin-left: auto;
     display: flex;
     justify-content: center;
+    &:hover{
+        background-color:#3fa900;
+    }
 `;
 
 const Button_password = styled(Button) `
-    background-color:rgb(50,50,50);
+    background-color:#323232;
     margin-right:.7rem;
+    &:hover{
+        background-color:#2a2a2a;
+    }
 `;
 
 const Side = styled.div`
@@ -257,9 +267,9 @@ class Profile extends React.Component {
 
     sendFile = e => {
         const { userData } = this.props;
-        const file = e.target.files[0];
+        const data = new FormData(document.querySelector('#formAvatar'));
 
-        this.props.sendFile(userData._id, file);
+        this.props.sendFile(userData._id, data);
     }
 
     validatePasswordForm = () => {
@@ -309,12 +319,12 @@ class Profile extends React.Component {
         const { data, isPasswordFormInvalid, modalPassword } = this.state;
 
         const modalStyle = {
-            overlay: { backgroundColor: 'rgba(0,0,0,.2)' },
+            overlay: {},
             content: { width: '550px', margin: '0 auto', height: isPasswordFormInvalid ? '440px' : '400px', padding: '0', boxShadow: `0 5px 15px rgba(128,128,128,0.5)` }
         };
         return (<Wrapper>
             <Header>
-                <h2>My Profile</h2>
+                <Heading>My Profile</Heading>
                 <Button_bar>
                     <Button_password onClick={this.openModal}>
                         <Icon_button name="settings" /> Change password
@@ -330,8 +340,10 @@ class Profile extends React.Component {
                         <Avatar_img src={userData.avatar || placeholderImg} />
                         <Avatar_settings>
                             <Icon name="settings" />
-                            <input className="inputfile-hidden" type="file" name="upload"
-                                onChange={this.sendFile} />
+                            <form encType="multipart/form-data" name="formAv" id="formAvatar">
+                                <input className="inputfile-hidden" type="file" name="avatar"
+                                    onChange={this.sendFile} />
+                            </form>
                         </Avatar_settings>
                     </Avatar_section>
                 </Side>
@@ -353,7 +365,7 @@ class Profile extends React.Component {
 
             {/* <!--modal--> */}
             <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true} style={modalStyle}
-                shouldCloseOnOverlayClick={true} onRequestClose={this.closeModal} >
+                shouldCloseOnOverlayClick={true} onRequestClose={this.closeModal} closeTimeoutMS={200}>
                 <div>
                     <Modal_header>
                         Change Password

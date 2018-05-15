@@ -9,7 +9,9 @@ const initialState = {
         isLoading: true,
         isRunning: false,
         isUserLoggedIn: false,
-        allEntriesFetched: false
+        hasErrored: false,
+        allEntriesFetched: false,
+        isOnline: true
     },
     entry: {
         runningEntry: null,

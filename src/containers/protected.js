@@ -22,16 +22,16 @@ class Protected_container extends React.Component {
 
         if (!userData.entries || !userData.entries.length) return null;
 
-        let runEntry = userData.entries.filter(item => item.stop === undefined);
-        if (runEntry.length) {
-            runEntry = runEntry[0];
-            const start = moment(runEntry.start).format();
+        const entryThatStillRuns = userData.entries.find(itm => !itm.stop);
 
-            setRunningEntry(runEntry._id);
-            setProject(userData.projects.filter(itm => itm.name === runEntry.project)[0]);
+        if (entryThatStillRuns) {
+            const start = moment(entryThatStillRuns.start).format();
+
+            setRunningEntry(entryThatStillRuns._id);
+            setProject(userData.projects.filter(itm => itm.name === entryThatStillRuns.project)[0]);
             toggleTimer(true, start);
-            setRunningEntryDescription(runEntry.description || '');
-            if (runEntry.billable) setBillable(true);
+            setRunningEntryDescription(entryThatStillRuns.description || '');
+            entryThatStillRuns.billable && setBillable(true);
         }
     }
 
@@ -39,9 +39,11 @@ class Protected_container extends React.Component {
         const { isUserLoggedIn, children } = this.props;
         const path = this.props.location.pathname.toLowerCase();
 
-        return (isUserLoggedIn) ? children : ((path === '/login' || path === '/signup') ? null : <Redirect to="/login" />);
+        return (isUserLoggedIn) ? children :
+            ((path === '/login' || path === '/signup') ? null : <Redirect to="/login" />);
     }
 }
+
 const mapStateToProps = ({ global, user }) => ({
     isUserLoggedIn: global.isUserLoggedIn,
     userData: user.userData

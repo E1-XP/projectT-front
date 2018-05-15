@@ -41,16 +41,16 @@ export const setPassword = (userid, data) => dispatch => {
     const url = `${baseUrl}/users/${userid}/passwordedit`;
 
     return new Promise((res, rej) => {
-        axios.post(url, data)
+        axios.put(url, data)
             .then(resp => res(resp.data.result))
             .catch(err => console.log(err));
     });
 };
 
 export const setUserInfo = (userid, data) => (dispatch, getState) => {
-    const url = `${baseUrl}/users/${userid}/useredit`;
+    const url = `${baseUrl}/users/${userid}/`;
 
-    axios.post(url, data)
+    axios.put(url, data)
         .then(resp => {
             const newSettings = resp.data.settings;
             const filteredData = Object.keys(resp.data).reduce((acc, itm) => {
@@ -66,14 +66,14 @@ export const setUserInfo = (userid, data) => (dispatch, getState) => {
 
 export const sendAvatar = (userid, data) => dispatch => {
     const url = `${baseUrl}/users/${userid}/avatar`;
+    const config = {
+        onUploadProgress: progressEvent => console.log(progressEvent.loaded)
+    }
     //const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
     console.log(url, data);
-    fetch(url, {
-        method: 'post',
-        body: data
-    }).then(res => {
-        console.log(res);
+    axios.put(url, data, config).then(res => {
+        dispatch(setUserData(res.data));
     });
 };
 

@@ -7,12 +7,23 @@ momentDFPlugin(moment);
 
 import { DateRange } from 'react-date-range';
 
+const Wrapper = styled.div`
+    position: absolute;
+    z-index: 100;
+    width: 560px;
+    right: 48px;
+    top: 35px;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.25);
+`;
+
 const Period_selector = styled.nav`
     width:100%;
     display:flex;
     flex-wrap:wrap;
-    background-color:#bbb;
+    background-color:#dedede;
+    color:#888;
     padding:.8rem;
+    font-size:16px;
 `;
 
 const Period_item = styled.a`
@@ -21,9 +32,50 @@ const Period_item = styled.a`
     text-align:center;
     padding:.5rem;
     &:hover{
-     color:red;
+     color:black;
     }
 `;
+
+const dateRangeTheme = {
+    Calendar: {
+        background: 'transparent',
+        color: '#95a5a6',
+    },
+    MonthAndYear: {
+        background: '#ddd'
+    },
+    MonthButton: {
+        background: 'transparent'
+    },
+    MonthArrowPrev: {
+        color: '#333',
+        fontSize: '26px',
+        cursor: 'pointer'
+    },
+    MonthArrowNext: {
+        color: '#333',
+        fontSize: '26px',
+        cursor: 'pointer'
+    },
+    Weekday: {
+        backgroundColor: '#ddd'
+    },
+    DaySelected: {
+        background: 'green'
+    },
+    DayActive: {
+        background: '#4bc800',
+        boxShadow: 'none'
+    },
+    DayInRange: {
+        background: '#4bc800',
+        color: '#fff'
+    },
+    DayHover: {
+        background: '#ddd',
+        color: '#7f8c8d'
+    }
+};
 
 export default class ModalCalendar extends React.Component {
     handleSelect = range => {
@@ -53,7 +105,7 @@ export default class ModalCalendar extends React.Component {
         console.log(length);
         if (!length) return 'days';
         else if (length === 6) return 'weeks';
-        else if (length < 7) return 'custom';
+        //  else if (length < 7) return 'custom';
         else if (isValidMonth()) return 'months';
         else return 'custom';
         //console.log(periodStart.clone().format('D'),
@@ -90,7 +142,7 @@ export default class ModalCalendar extends React.Component {
 
         setState({
             periodStart: moment().startOf('isoWeek'),
-            periodStop: moment().startOf('isoWeek').add(6, 'd'),
+            periodStop: moment().endOf('isoWeek'),
             periodReadable: 'This Week',
             periodType: 'weeks'
         });
@@ -158,66 +210,26 @@ export default class ModalCalendar extends React.Component {
     }
 
     render() {
-        const { closeModal, periodStart, periodStop } = this.props;
-
-        const dateRangeTheme = {
-            Calendar: {
-                background: 'transparent',
-                color: '#95a5a6',
-            },
-            MonthAndYear: {
-                background: '#ddd'
-            },
-            MonthButton: {
-                background: 'transparent'
-            },
-            MonthArrowPrev: {
-                color: '#333',
-                fontSize: '26px',
-                cursor: 'pointer'
-            },
-            MonthArrowNext: {
-                color: '#333',
-                fontSize: '26px',
-                cursor: 'pointer'
-            },
-            Weekday: {
-                backgroundColor: '#ddd'
-            },
-            DaySelected: {
-                background: 'green'
-            },
-            DayActive: {
-                background: '#4bc800',
-                boxShadow: 'none'
-            },
-            DayInRange: {
-                background: '#4bc800',
-                color: '#fff'
-            },
-            DayHover: {
-                background: '#ddd',
-                color: '#7f8c8d'
-            }
-        };
+        const { closeModal, periodStart, periodStop, isOpen } = this.props;
 
         return (
-            <div>
-                <DateRange
-                    startDate={periodStart} endDate={periodStop}
-                    firstDayOfWeek={1} onInit={this.handleSelect}
-                    onChange={this.handleSelect} theme={dateRangeTheme} />
-                <Period_selector>
-                    <Period_item onClick={this.setToday}>Today</Period_item>
-                    <Period_item onClick={this.setThisWeek}>This Week</Period_item>
-                    <Period_item onClick={this.setThisMonth}>This Month</Period_item>
-                    <Period_item onClick={this.setThisYear}>This Year</Period_item>
-                    <Period_item onClick={this.setYesterday}>Yesterday</Period_item>
-                    <Period_item onClick={this.setLastWeek}>Last Week</Period_item>
-                    <Period_item onClick={this.setLastMonth}>Last Month</Period_item>
-                    <Period_item onClick={this.setLastYear}>Last Year</Period_item>
-                </Period_selector>
-            </div>
-        );
+            <React.Fragment>
+                {isOpen && <Wrapper>
+                    <DateRange
+                        startDate={periodStart} endDate={periodStop}
+                        firstDayOfWeek={1} onInit={this.handleSelect}
+                        onChange={this.handleSelect} theme={dateRangeTheme} />
+                    <Period_selector>
+                        <Period_item onClick={this.setToday}>Today</Period_item>
+                        <Period_item onClick={this.setThisWeek}>This Week</Period_item>
+                        <Period_item onClick={this.setThisMonth}>This Month</Period_item>
+                        <Period_item onClick={this.setThisYear}>This Year</Period_item>
+                        <Period_item onClick={this.setYesterday}>Yesterday</Period_item>
+                        <Period_item onClick={this.setLastWeek}>Last Week</Period_item>
+                        <Period_item onClick={this.setLastMonth}>Last Month</Period_item>
+                        <Period_item onClick={this.setLastYear}>Last Year</Period_item>
+                    </Period_selector>
+                </Wrapper>}
+            </React.Fragment>);
     }
 }
