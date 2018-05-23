@@ -13,6 +13,7 @@ import Profile from './containers/profile';
 import Form from './containers/form';
 import NotFound from './components/404';
 import ErrorPage from './components/errorpage';
+import StatusBar from './containers/connectstatusbar';
 
 const App_container = styled.div`
     display:flex;
@@ -49,7 +50,7 @@ const routes = (
         <Preloader >
             <Route path="/signup" component={Form} />
             <Route path="/login" component={Form} />
-            <Protected_container >
+            <Protected_container>
                 <Sidebar />
                 <Main_content>
                     <Switch>
@@ -62,6 +63,7 @@ const routes = (
                         <Route component={NotFound} />
                     </Switch>
                 </Main_content>
+                <StatusBar />
             </Protected_container>
         </Preloader>
     </App_container>

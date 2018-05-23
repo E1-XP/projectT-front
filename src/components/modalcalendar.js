@@ -92,7 +92,7 @@ export default class ModalCalendar extends React.Component {
             periodType
         }
         if (periodType === 'custom') state.customPeriodLength = periodStop.clone().diff(periodStart, 'days');
-
+        console.log('new state', state);
         this.props.setState(state);
     }
 
@@ -105,108 +105,97 @@ export default class ModalCalendar extends React.Component {
         console.log(length);
         if (!length) return 'days';
         else if (length === 6) return 'weeks';
-        //  else if (length < 7) return 'custom';
         else if (isValidMonth()) return 'months';
         else return 'custom';
-        //console.log(periodStart.clone().format('D'),
-        // periodStop.clone().format('D'), periodStart.clone().startOf('month').format('D'), 'BIGTEST');
-        //1 30 1
     }
 
     setToday = () => {
-        const { setState, closeModal } = this.props;
+        const { closeModal } = this.props;
 
-        setState({
+        closeModal(null, {
             periodStart: moment().startOf('day'),
             periodStop: moment().endOf('day'),
             periodReadable: 'Today',
-            periodType: 'days'
+            periodType: 'days',
         });
-        closeModal();
+
     }
 
     setYesterday = () => {
-        const { setState, closeModal } = this.props;
+        const { closeModal } = this.props;
 
-        setState({
+        closeModal(null, {
             periodStart: moment().startOf('day').subtract(1, 'd'),
             periodStop: moment().endOf('day').subtract(1, 'd'),
             periodReadable: 'Yesterday',
             periodType: 'days'
         });
-        closeModal();
     }
 
     setThisWeek = () => {
-        const { setState, closeModal } = this.props;
+        const { closeModal } = this.props;
 
-        setState({
+        closeModal(null, {
             periodStart: moment().startOf('isoWeek'),
             periodStop: moment().endOf('isoWeek'),
             periodReadable: 'This Week',
             periodType: 'weeks'
         });
-        closeModal();
     }
 
     setLastWeek = () => {
-        const { setState, closeModal } = this.props;
+        const { closeModal } = this.props;
 
-        setState({
+        closeModal(null, {
             periodStart: moment().startOf('isoWeek').subtract(7, 'd'),
             periodStop: moment().startOf('isoWeek').subtract(1, 'd'),
             periodReadable: 'Last Week',
             periodType: 'weeks'
         });
-        closeModal();
     }
 
     setThisMonth = () => {
-        const { setState, closeModal } = this.props;
+        const { closeModal } = this.props;
 
-        setState({
+        closeModal(null, {
             periodStart: moment().startOf('month'),
             periodStop: moment().endOf('month'),
             periodReadable: 'This Month',
             periodType: 'months'
         });
-        closeModal();
     }
 
     setLastMonth = () => {
-        const { setState, closeModal } = this.props;
+        const { setState } = this.props;
 
-        setState({
+        closeModal(null, {
             periodStart: moment().startOf('month').subtract(1, 'M'),
             periodStop: moment().endOf('month').subtract(1, 'M'),
             periodReadable: 'Last Month',
             periodType: 'months'
         });
-        closeModal();
     }
 
     setThisYear = () => {
-        const { setState, closeModal } = this.props;
+        const { setState } = this.props;
 
-        setState({
+        closeModal(null, {
             periodStart: moment().startOf('year'),
             periodStop: moment().endOf('year'),
             periodReadable: 'This Year',
             periodType: 'years'
         });
-        closeModal();
     }
 
     setLastYear = () => {
-        const { setState, closeModal } = this.props;
+        const { setState } = this.props;
 
-        setState({
+        closeModal(null, {
             periodStart: moment().startOf('year').subtract(1, 'y'),
             periodStop: moment().endOf('year').subtract(1, 'y'),
             periodReadable: 'Last Year',
             periodType: 'years'
         });
-        closeModal();
     }
 
     render() {

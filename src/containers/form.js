@@ -26,6 +26,7 @@ const Header = styled.header`
 const Nav = styled.nav`
     display:flex;
     justify-content:space-between;
+    align-items:center;
     width:7rem;
 `;
 
@@ -187,7 +188,7 @@ class Form extends React.Component {
                                 name="password2" placeholder="confirm password" state={isSignUp ? newAccountValidation.pass2 : null} />}
                         {!isSignUp && <StaySigned_section>
                             <Check type="checkbox" checked={checked} name="staysigned" onChange={this.toggleChecked} />
-                            <label htmlFor="staysigned">Stay logged in</label>
+                            <label htmlFor="staysigned"><span></span>Stay logged in</label>
                         </StaySigned_section>}
                         <Button>Submit</Button>
                     </Form_section>

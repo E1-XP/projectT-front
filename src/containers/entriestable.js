@@ -21,6 +21,7 @@ const List_item = styled.li`
     border-bottom:1px solid #ddd;
     border-top:1px solid #eee;
     margin-bottom:2rem;
+    color:#333;
 `;
 
 const Item_link = styled.a`
@@ -41,15 +42,17 @@ const Item_day = styled.span`
     font-weight:700;
 `;
 
+const DayCount_span = styled.span`
+    font-weight:700;
+`;
 
 class EntriesTable extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            filteredItems: {},
+            filteredItems: [],
             mappedTasks: {}
-            // taskEntries:
         }
 
         this.today = moment().format('ddd, Do MMM');
@@ -57,7 +60,6 @@ class EntriesTable extends React.Component {
     }
 
     componentDidMount() {
-        // if (this.props.userData) {
         const { mappedItems } = this.props;
         const filteredItems = this.getFilteredItems(mappedItems);
         const mappedTasks = this.getMappedTasks(mappedItems);
@@ -65,10 +67,10 @@ class EntriesTable extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (JSON.stringify(nextProps.mappedItems) !== JSON.stringify(this.props.mappedItems)) {
-            const filteredItems = Object.assign({},
-                this.getFilteredItems(nextProps.mappedItems), this.state.filteredItems);
+        if (nextProps.mappedItems !== this.props.mappedItems) {
+            const filteredItems = Object.assign({}, this.getFilteredItems(nextProps.mappedItems), this.state.filteredItems);
             const mappedTasks = this.getMappedTasks(nextProps.mappedItems);
+
             this.setState({ filteredItems, mappedTasks });
         }
     }
@@ -82,7 +84,6 @@ class EntriesTable extends React.Component {
 
     startNewEntry = item => {
         const { setTopbarDescription, userData, createNewEntry } = this.props;
-        console.log(item, 'ITEM');
 
         const paramsObj = {};
         paramsObj.billable = item.billable;
@@ -94,8 +95,8 @@ class EntriesTable extends React.Component {
     }
 
     getTotalDayCount = array => {
-        const total = array.reduce((acc, item) =>
-            acc + moment.duration(item.stop - item.start), 0);
+        const total = array
+            .reduce((acc, item) => acc + moment.duration(item.stop - item.start), 0);
 
         return moment.duration(total).format('h:mm:ss', { stopTrim: "hh mm ss" });
     }
@@ -110,7 +111,7 @@ class EntriesTable extends React.Component {
     changeDescription = (description, runningEntry, previousDescription) => {
         const { userData, updateEntry } = this.props;
         if (!runningEntry) runningEntry = this.props.runningEntry;
-        console.log('change desc', description);
+        console.log('change desc', description, previousDescription, '-previous');
 
         const descrCandidate = description.trim();
         descrCandidate !== previousDescription
@@ -153,6 +154,8 @@ class EntriesTable extends React.Component {
     }
 
     onBlurDescriptionSave = (e, currentItem, idx) => {
+        if (currentItem[0].description === e.target.value) return null;
+
         currentItem.length === 1 ?
             this.changeDescription(e.target.value, currentItem[0].id) :
             this.changeDescriptionMultiple(e.target.value, currentItem, idx);
@@ -199,13 +202,8 @@ class EntriesTable extends React.Component {
         const { filteredItems, mappedTasks } = this.state;
 
         return Object.keys(mappedTasks[idx])
-            .sort((a, b) => {
-                const aLen = mappedTasks[idx][a].length - 1;
-                const bLen = mappedTasks[idx][b].length - 1;
-
-                return mappedTasks[idx][b][bLen].stop - mappedTasks[idx][a][aLen].stop;
-            })
-            .map((item, i) => {
+            .sort((a, b) => mappedTasks[idx][b][0].stop - mappedTasks[idx][a][0].stop)
+            .map((item, i, arr) => {
                 const projectName = item.split('\n')[0].trim();
                 const projectDescription = item.split('\n')[1].trim();
                 const currentItem = mappedTasks[idx][item];
@@ -233,7 +231,7 @@ class EntriesTable extends React.Component {
                 <List_item key={itm}>
                     <Item_header>
                         <Item_day>{this.getDayField(itm)}</Item_day>
-                        <span>{this.getTotalDayCount(mappedItems[itm])}</span>
+                        <DayCount_span>{this.getTotalDayCount(mappedItems[itm])}</DayCount_span>
                     </Item_header>
                     {this.getTaskEntries(idx)}
                 </List_item >);

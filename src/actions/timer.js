@@ -41,10 +41,33 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
     }
     else {
         const entryThatStillRuns = getState().user.userData.entries.find(itm => !itm.stop);
+        const runningEntry = getState().entry.runningEntry;
         const dayStart = moment().startOf('day');
 
-        entryThatStillRuns && entryThatStillRuns.start < dayStart.valueOf() &&
-            handleMultipleDaysBetweenStop(entryThatStillRuns);
+        if (entryThatStillRuns && entryThatStillRuns.start < dayStart.valueOf()) {
+            const state = getState().entry;
+            const entryState = {
+                project: state.currentProject.name || '',
+                description: state.runningEntryDescription,
+                billable: state.billable
+            };
+            handleMultipleDaysBetweenStop(entryThatStillRuns, entryState, dispatch);
+
+        }
+        else if (runningEntry) {
+            const now = moment().valueOf();
+            const state = getState().entry;
+            const project = (state.currentProject && state.currentProject.name) ? state.currentProject.name : '';
+
+            const payload = {
+                stop: now,
+                description: state.runningEntryDescription,
+                project,
+                billable: state.billable
+            };
+
+            dispatch(updateEntry(getState().user.userData._id, state.runningEntry, payload));
+        }
 
         clearInterval(window.interval);
         dispatch(setIsRunning(false));
@@ -54,25 +77,37 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
     }
 };
 
-const handleMultipleDaysBetweenStop = entryThatStillRuns => {
+const handleMultipleDaysBetweenStop = (entryThatStillRuns, entryState, dispatch) => {
     const userId = entryThatStillRuns.userId;
     const dayStart = moment().startOf('day');
-    let dayDiff = moment(entryThatStillRuns.start).diff(dayStart.valueOf(), 'days');
+    let dayDiff = moment(dayStart.valueOf()).diff(entryThatStillRuns.start, 'days');
+    const stop = moment(entryThatStillRuns.start).clone().endOf('day').valueOf();
 
-    const currentEntryParams = { stop: moment(entryThatStillRuns.start).endOf('day').valueOf() };
+    console.log(stop, dayDiff, 'stop and daydiff');
+    const currentEntryParams = {
+        ...entryState,
+        stop
+    };
+    console.log('DISPATCH 1 UPDATE');
     dispatch(updateEntry(userId, entryThatStillRuns._id, currentEntryParams));
 
-    dayDiff -= 1;
-    while (dayDiff) {
+    while (dayDiff > 0) {
         const startOfDay = dayStart.clone().subtract(dayDiff, 'day');
         const newEntryParams = {
-            start: startOfDay.valueOf(), stop: moment(startOfDay).endOf('day').valueOf()
+            ...entryState,
+            start: startOfDay.valueOf(),
+            stop: moment(startOfDay).endOf('day').valueOf()
         };
 
-        dispatch(createNewEntry(userId, newEntryParams, true));
+        console.log('DISPATCH 2 IN LOOP CREATE');
+        dispatch(createNewEntry(userId, newEntryParams, true, true));
         dayDiff -= 1;
     }
 
-    const newEntryParams = { start: dayStart.valueOf(), stop: Date.now() };
-    dispatch(createNewEntry(userId, newEntryParams, true));
+    const newEntryParams = {
+        ...entryState,
+        start: dayStart.valueOf(), stop: Date.now()
+    };
+    console.log('DISPATCH 3 CREATE');
+    dispatch(createNewEntry(userId, newEntryParams, true, true));
 }

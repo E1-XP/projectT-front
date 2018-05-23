@@ -3,6 +3,7 @@ import { routerMiddleware } from 'react-router-redux'
 import thunk from 'redux-thunk';
 import rootReducer from './reducers';
 import history from './history';
+//import { createNewEntry } from './actions/entry';
 
 const initialState = {
     global: {
@@ -35,5 +36,5 @@ const store = createStore(rootReducer, initialState,
     applyMiddleware(thunk, routerMiddleware(history)));
 
 store.subscribe(() => console.log('STORE UPDATED.', store.getState()));
-
+//store.dispatch(createNewEntry('5aed60ebf94ad304ec8fc130', { start: 1526646141000 }));
 export default store;

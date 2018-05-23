@@ -8,6 +8,7 @@ import * as actions from '../actions';
 import Modal from 'react-modal';
 Modal.setAppElement('#root');
 
+import ColorPickerDropdown from '../components/colorpickerdropdown';
 import ProjectsTable from '../components/projectstable';
 import Icon from '../components/icon';
 
@@ -71,39 +72,14 @@ const Button_Remove = styled(Button) `
     }
 `;
 
-const Button_Create_Modal = styled(Button_Create) `
-    width:50%;
-`;
 const Color_Indicator = styled.div`
     padding:.5rem;
     width:1.5rem;
     background-color:${props => props.color};
 `;
 
-const Color_Indicator_Multi = styled(Color_Indicator) `
-    margin:.2rem;
-    height:1.5rem;
+const Relative_container = styled.div`
     position:relative;
-`;
-
-const Color_Indicator_Inner = styled.span`
-    width:1.5rem;
-    height:1.5rem;
-    display:flex;
-    border-radius:50%;
-    position:absolute;
-    top:0;
-    left:0;
-    justify-content:center;
-    align-items:center;
-    &:hover{
-        background-color:rgba(0,0,0,.3);
-    }
-`;
-
-const Color_Container = styled.div`
-    display:flex;
-    flex-wrap:wrap;
 `;
 
 const Icon_Link = styled.a`
@@ -116,7 +92,7 @@ const Icon_Link_Modal = styled(Icon_Link) `
     border:1px solid #ccc;
 `;
 
-const Footer = styled.footer`
+const Footer = styled.section`
     display:flex;
 `;
 
@@ -124,13 +100,7 @@ const modalStyle = {
     overlay: {},
     content: { width: '550px', margin: '0 auto', height: '270px', padding: '0', boxShadow: `0 5px 15px rgba(128,128,128,0.5)` }
 };
-const colorSelectorStyle = {
-    overlay: { backgroundColor: 'transparent' },
-    content: {
-        width: '200px', margin: '0 auto', height: '150px', padding: '1rem', position: 'absolute',
-        top: '200px', right: '263px'
-    }
-};
+
 const colors = [`#1abc9c`, `#3498db`, '#34495e', `#e74c3c`, `#d35400`, `#f1c40f`, `#95a5a6`, `#8e44ad`];
 
 class Projects extends React.Component {
@@ -176,10 +146,10 @@ class Projects extends React.Component {
 
     handleProjectCreate = () => {
         const { projectInput, clientInput, selectedColor } = this.state;
+        if (!projectInput || !clientInput) return null;
 
         this.props.createProject(this.props.userData._id, projectInput, selectedColor, clientInput);
         this.setState({ projectInput: '', clientInput: '', isModalOpen: false });
-
     }
 
     handleProjectRemove = () => {
@@ -191,72 +161,57 @@ class Projects extends React.Component {
         if (names.length) removeProject(userData._id, names);
     }
 
-    getSelectorColors = () => {
-        const { colors, selectedColor } = this.state;
-        const setActive = (itm) => this.setState({ selectedColor: itm, isColorSelectorOpen: false });
-
-        return colors.map(itm =>
-            (<Color_Indicator_Multi key={itm} color={itm} onClick={() => setActive(itm)}>
-                <Color_Indicator_Inner>
-                    {itm === selectedColor && <Icon name="done" fill='#fff' size="16px" />}
-                </Color_Indicator_Inner>
-            </Color_Indicator_Multi>));
-    }
-
     render() {
         const { userData, removeProject } = this.props;
 
-        return (
-            <Wrapper>
-                <Header>
-                    <Heading>Projects</Heading>
-                    <Button_Create onClick={this.openModal}>Create Project</Button_Create>
-                </Header>
-                <section>
-                    <ProjectsTable ref={node => this.refTable = node} data={userData} />
-                </section>
-                <Footer>
-                    <Button_Remove onClick={this.handleProjectRemove}>
-                        Remove Selected
+        return (<Wrapper>
+            <Header>
+                <Heading>Projects</Heading>
+                <Button_Create onClick={this.openModal}>Create Project</Button_Create>
+            </Header>
+            <section>
+                <ProjectsTable ref={node => this.refTable = node} data={userData} />
+            </section>
+            <Footer>
+                <Button_Remove onClick={this.handleProjectRemove}>
+                    Remove Selected
                     </Button_Remove>
-                </Footer>
+            </Footer>
 
-                {/* <---modal---> */}
-                <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true}
-                    overlayRef={node => this.overlayRef = node} onRequestClose={this.closeModal} closeTimeoutMS={200}
-                    style={modalStyle}>
-                    <Modal_Header>
-                        <h2>Create Project</h2>
-                        <Icon_Link onClick={this.closeModal}>
-                            <Icon name="close" />
-                        </Icon_Link>
-                    </Modal_Header>
-                    <Modal_Section>
+            {/* <---modal---> */}
+            <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true}
+                overlayRef={node => this.overlayRef = node} onRequestClose={this.closeModal} closeTimeoutMS={200}
+                style={modalStyle}>
+                <Modal_Header>
+                    <h3>Create Project</h3>
+                    <Icon_Link onClick={this.closeModal}>
+                        <Icon name="close" />
+                    </Icon_Link>
+                </Modal_Header>
+                <Modal_Section>
+                    <Relative_container>
                         <Icon_Link_Modal style={{ position: 'relative' }} onClick={this.openColorSelector}>
                             <Color_Indicator color={this.state.selectedColor} />
                             <Icon name="arrow_drop_down" />
                         </Icon_Link_Modal>
-                        <input value={this.state.projectInput}
-                            onChange={e => this.setState({ projectInput: e.target.value })}
-                            placeholder="Project name..." />
-                        <input value={this.state.clientInput}
-                            onChange={e => this.setState({ clientInput: e.target.value })}
-                            placeholder="Client..." />
 
-                        {/* <---color-modal---> */}
-                        <Modal isOpen={this.state.isColorSelectorOpen} shouldCloseOnEsc={true} style={colorSelectorStyle}
-                            shouldCloseOnOverlayClick={true} onRequestClose={this.closeColorSelector}>
-                            <Color_Container>
-                                {this.getSelectorColors()}
-                            </Color_Container></Modal>
-                    </Modal_Section>
-                    <Modal_Footer>
-                        <Button_Create_Modal onClick={this.handleProjectCreate}>Create Project</Button_Create_Modal>
-                    </Modal_Footer>
-                </Modal>
+                        <ColorPickerDropdown isOpen={this.state.isColorSelectorOpen}
+                            state={this.state} setState={this.setState.bind(this)} />
 
-            </Wrapper >
-        );
+                    </Relative_container>
+                    <input value={this.state.projectInput}
+                        onChange={e => this.setState({ projectInput: e.target.value })}
+                        placeholder="Project name..." />
+                    <input value={this.state.clientInput}
+                        onChange={e => this.setState({ clientInput: e.target.value })}
+                        placeholder="Client..." />
+                </Modal_Section>
+                <Modal_Footer>
+                    <Button_Create onClick={this.handleProjectCreate}>Create Project</Button_Create>
+                </Modal_Footer>
+            </Modal>
+
+        </Wrapper>);
     }
 }
 

@@ -1,190 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
 
 import * as actions from '../actions';
-import Modal from 'react-modal';
+
+import ProfileComponent from '../components/profile';
 import Icon from '../components/icon';
 
-const Wrapper = styled.div`
-    width:100%;
-    max-width:1200px;
-    margin:1rem auto;
-    padding:1rem;
-    padding-top:0;
-`;
-
-const Header = styled.header`
-    display:flex;
-    justify-content:space-between;
-`;
-
-const Heading = styled.h2`
-    font-size:34px;
-    font-weight:500;
-`;
-
-const Main_content = styled.section`
-    display:flex;
-    margin-top:4rem;
-`;
-
-const Button_bar = styled.div`
-    display:flex;    
-`;
-
-const Button = styled.button`
-    border:none;
-    padding:.6rem;
-    font-size:14px;
-    font-weight:700;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    cursor:pointer;
-    transition:all .2s ease-in;
-`;
-
-const Button_done = styled(Button) `
-    background-color:#47be00;
-    margin-left: auto;
-    display: flex;
-    justify-content: center;
-    &:hover{
-        background-color:#3fa900;
-    }
-`;
-
-const Button_password = styled(Button) `
-    background-color:#323232;
-    margin-right:.7rem;
-    &:hover{
-        background-color:#2a2a2a;
-    }
-`;
-
-const Side = styled.div`
-
-`;
-
-const Settings_section = styled.section`
-    flex:1 1 50%;
-`;
-
-const Avatar_settings = styled.label`
-    cursor:pointer;
-    background-color:#ddd;
-    width:55px;
-    display:flex;
-    justify-content:center;
-    color:#333;
-    position:absolute;
-    top:0;
-    right:0;
-    padding:.7rem;
-    &:hover{
-        background-color:#eee;
-    }
-`;
-
-const Avatar_section = styled.figure`
-    border:1px solid #ddd;
-    position:relative;
-`;
-
-const Avatar_img = styled.img`
-    max-width:170px;
-    position:relative;
-`;
-
-const Input = styled.input`
-    padding:1rem;
-    border:none;
-    font-size:20px;
-    box-shadow:0 1px 3px rgba(128,128,128,0.2);
-    outline-color:#ddd;
-    margin-bottom:1.5rem;
-`;
-
-const Form_wrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-`;
-
-const Label = styled.label`
-    padding-bottom:.5rem;
-    font-weight:500;
-`;
-
-const Input_group = styled.div`
-    display:flex;
-    padding:.3rem;
-`;
-
-const Modal_header = styled.header`
-    padding:1.5rem;
-    padding-left:2rem;
-    display:flex;
-    justify-content:space-between;
-    font-weight:500;
-    border-bottom:1px solid #ddd;
-`;
-
-const Modal_content = styled.section`
-    display:flex;
-    flex-direction:column;
-    padding:1rem;
-`;
-
-const Modal_error = styled.div`
-    padding:1rem;
-    background-color:red;
-    color:white;
-    font-weight:700;
-    display:${props => props.visible ? 'block' : 'none'};
-`;
-
-const Label_check = styled.label`
-    float:left;
-    margin-left:1rem;
-`;
-
-const Checkbox = styled.input`
-   /* -moz-appearance:none;
-   -webkit-appearance:none; */
-   /* background-color: #fafafa;
-	border: 1px solid #ccc;
-	padding:initial;
-	display: inline-block;
-    &:checked{
-        color:#47be00;
-    } */
-    &:checked, &:not(:checked) { 
-        display:none;
-    }
- + label::before {
-    content: "";  
-    display: inline-block;  
-    width: 15px;  
-    height: 15px;  
-    vertical-align:middle;
-    margin-right: 8px;  
-    border:1px solid #aaa;    
-    border-radius: 1px;  
-}
-&:checked + label::before {
-    content:"\\2714"; 
-    color:white;
-    background-color: #666; 
-    text-align:center;
-    line-height:15px;
-    text-shadow:0px 0px 3px #eee;
-} 
-`;
-
 const Icon_button = props => (<Icon fill="#ddd" size="22px" {...props} />);
-
-const placeholderImg = 'https://lh6.googleusercontent.com/-ph4JkGJ7wdY/AAAAAAAAAAI/AAAAAAAAAYw/g2wqnP4pMhM/photo.jpg';
 
 class Profile extends React.Component {
     constructor() {
@@ -193,6 +15,7 @@ class Profile extends React.Component {
         this.state = {
             isModalOpen: false,
             isDropdownOpen: false,
+            isUploading: false,
             isPasswordFormInvalid: false,
             errorMessage: '',
             data: {
@@ -269,7 +92,18 @@ class Profile extends React.Component {
         const { userData } = this.props;
         const data = new FormData(document.querySelector('#formAvatar'));
 
-        this.props.sendFile(userData._id, data);
+        this.setState({ isUploading: true });
+
+        this.props.sendFile(userData._id, data).then(() => {
+            document.getElementById('avInput').value = null;
+            this.setState({ isUploading: false });
+        });
+    }
+
+    resetAvatar = () => {
+        const { userData, setUserInfo } = this.props;
+
+        setUserInfo(userData._id, { avatar: '' });
     }
 
     validatePasswordForm = () => {
@@ -316,76 +150,13 @@ class Profile extends React.Component {
 
     render() {
         const { userData } = this.props;
-        const { data, isPasswordFormInvalid, modalPassword } = this.state;
+        const { data, isPasswordFormInvalid, modalPassword, isUploading } = this.state;
 
-        const modalStyle = {
-            overlay: {},
-            content: { width: '550px', margin: '0 auto', height: isPasswordFormInvalid ? '440px' : '400px', padding: '0', boxShadow: `0 5px 15px rgba(128,128,128,0.5)` }
-        };
-        return (<Wrapper>
-            <Header>
-                <Heading>My Profile</Heading>
-                <Button_bar>
-                    <Button_password onClick={this.openModal}>
-                        <Icon_button name="settings" /> Change password
-                    </Button_password>
-                    <Button_done onClick={this.setUserInfo}>
-                        <Icon_button name="done" /> Done
-                        </Button_done>
-                </Button_bar>
-            </Header>
-            <Main_content>
-                <Side>
-                    <Avatar_section>
-                        <Avatar_img src={userData.avatar || placeholderImg} />
-                        <Avatar_settings>
-                            <Icon name="settings" />
-                            <form encType="multipart/form-data" name="formAv" id="formAvatar">
-                                <input className="inputfile-hidden" type="file" name="avatar"
-                                    onChange={this.sendFile} />
-                            </form>
-                        </Avatar_settings>
-                    </Avatar_section>
-                </Side>
-                <Settings_section>
-                    <Form_wrapper>
-                        <Label htmlFor="username">Your name</Label>
-                        <Input name="username" value={data.username} onChange={this.setUsernameInputState} />
-                        <Label htmlFor="email">Email</Label>
-                        <Input name="email" value={data.email} onChange={this.setEmailInputState} />
-                        <Input_group>
-                            <Checkbox type="checkbox" name="showtitletimer" value={data.settings.shouldShowTimerOnTitle}
-                                checked={data.settings.shouldShowTimerOnTitle}
-                                onChange={this.setShouldShowTimerOnTitle} />
-                            <Label_check htmlFor="showtitletimer"> Show running time on the title bar</Label_check>
-                        </Input_group>
-                    </Form_wrapper>
-                </Settings_section>
-            </Main_content>
-
-            {/* <!--modal--> */}
-            <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true} style={modalStyle}
-                shouldCloseOnOverlayClick={true} onRequestClose={this.closeModal} closeTimeoutMS={200}>
-                <div>
-                    <Modal_header>
-                        Change Password
-                    </Modal_header>
-                    <Modal_error visible={this.state.isPasswordFormInvalid}>
-                        {this.state.errorMessage}
-                    </Modal_error>
-                    <Modal_content>
-                        <Input value={modalPassword.current} placeholder="Current password" type="password"
-                            onChange={e => this.setState({ modalPassword: { ...this.state.modalPassword, current: e.target.value } })} />
-                        <Input value={modalPassword.newpass} placeholder="New password" type="password"
-                            onChange={e => this.setState({ modalPassword: { ...this.state.modalPassword, newpass: e.target.value } })} />
-                        <Input value={modalPassword.newpass2} placeholder="New password again" type="password"
-                            onChange={e => this.setState({ modalPassword: { ...this.state.modalPassword, newpass2: e.target.value } })} />
-                        <Button_done onClick={this.validatePasswordForm}> Save </Button_done>
-                    </Modal_content>
-                </div>
-            </Modal>
-
-        </Wrapper>);
+        return (<ProfileComponent state={this.state} userData={userData} sendFile={this.sendFile}
+            openModal={this.openModal} setUserInfo={this.setUserInfo} resetAvatar={this.resetAvatar}
+            setUsernameInputState={this.setEmailInputState} setEmailInputState={this.setEmailInputState}
+            setShouldShowTimerOnTitle={this.setShouldShowTimerOnTitle} Icon_button={Icon_button}
+            closeModal={this.closeModal} validatePasswordForm={this.validatePasswordForm} />);
     }
 }
 

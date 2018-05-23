@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import {
     BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList,
     Cell, Text, ResponsiveContainer
@@ -18,13 +18,70 @@ const Wrapper = styled.section`
     margin-top: 1rem;
     width: 100%;
     height: 350px;
-    background-color:#fff;
-    box-shadow: 0 1px 3px rgba(128,128,128,0.2);
+    position:relative;
+    > div > div {
+            box-shadow: 0 1px 3px rgba(128,128,128,0.2);
+            height:281px !important;
+            border-bottom: 2px solid #888;
+            background-color:#fff;   
+        }
+`;
+
+const Overlay = styled.div`
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background-color:rgba(255,255,255,.6);
+    transition:all .2s linear;
+    z-index:50;    
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:700;
+    color:#bbb;
+    font-size:18px;
+    opacity: ${props => props.visible ? 1 : 0};
+    pointer-events:none;
+`;
+
+const rotateAnim = keyframes`
+    from{
+        transform:rotate(0deg);
+    }
+    to{
+        transform:rotate(360deg);
+    }
+`;
+
+const Spinner = styled.span`
+    width:50px;
+    height:50px;
+    border:3px solid #ddd;
+    border-right:3px solid transparent; 
+    border-radius:50%;   
+    transform:translateZ(0);
+    animation:${rotateAnim} .5s linear infinite;
 `;
 
 export default class PeriodTimeChart extends React.Component {
-    getTicks = (highestValue, hourInMs) => {
+    componentDidUpdate(prevP, prevS) {
+        const { periodType, allEntriesFetched, getYearData, data, setIsLoading, isLoading, shouldUpdate } = this.props;
+
+        const isPeriodYears = periodType === 'years';
+        const areSomeItemsEmpty = isPeriodYears ? getYearData().some(itm => !itm.time) : data.some(itm => !itm.time);
+
+        if (shouldUpdate && isLoading && !allEntriesFetched && areSomeItemsEmpty) {
+            this.props.getMoreEntries();
+        }
+        else if (shouldUpdate && isLoading) setIsLoading(false);
+    }
+
+    getTicks = (highestValue) => {
+        const hourInMs = 3600000;
         let multi = 1;
+
         while (highestValue > (hourInMs * multi) * 5) { multi += 1; }
 
         return Array(5).fill(null).map((itm, i) => (hourInMs * multi) * (i + 1));
@@ -47,8 +104,6 @@ export default class PeriodTimeChart extends React.Component {
     }
 
     getWeeksFromDays = data => {
-        console.log(data, 'HERE IT IS');
-
         const reducedData = data.reduce((acc, itm) => {
             acc[itm.week] ?
                 acc[itm.week] = {
@@ -72,12 +127,19 @@ export default class PeriodTimeChart extends React.Component {
                     getDuration(reducedData[itm]) : '0:00'
             }));
 
-        console.log('AFTER', reducedToArr);
         return reducedToArr;
     }
 
     getCustomLabel = ({ value, x, y, width, height }) => {
-        return (<text x={x + (width / 4)} y={y - 10} fill={value === '0:00' ? '#999' : "#45aaf2"} >{value}</text>);
+        if (this.props.periodType === 'years') {
+            const tmpVal = value.split(':');
+            value = `${tmpVal[0]}:${tmpVal[1]}`;
+        }
+        return (<React.Fragment>
+            <rect x={x} y={y - 40} width={width} height={25} style={{ fill: 'white', stroke: '#ddd' }} />
+            <text x={x + (width / 2)} y={y - 22.5} textAnchor="middle" style={{ fontSize: '13px' }}
+                fill={value === '0:00' ? '#999' : "#45aaf2"} >{value}</text>
+        </React.Fragment>);
     }
 
     getCustomTick = ({ x, y, width, height, stroke, payload }) => {
@@ -109,15 +171,15 @@ export default class PeriodTimeChart extends React.Component {
 
         return (<g>
             <text x={x} y={y + 15} textAnchor="middle"
-                style={{ fontSize: isPeriodYears ? '12px' : '14px', fontWeight: payload.value === todayReadable ? 700 : 400 }}>
+                style={{ fontSize: isPeriodYears ? '12px' : '13px', fontWeight: payload.value === todayReadable ? 700 : 400 }}>
                 {payload.value.split(',')[0]}  </text>
-            <text style={{ fontSize: '14px', fontWeight: payload.value === todayReadable ? 700 : 400 }}
+            <text style={{ fontSize: '13px', fontWeight: payload.value === todayReadable ? 700 : 400 }}
                 x={x} y={y + 35} textAnchor="middle">{payload.value.split(',')[1]}</text>
         </g>);
     }
 
     render() {
-        const { data, getYearData, periodType, customPeriodLength } = this.props;
+        const { data, getYearData, periodType, customPeriodLength, isLoading, allEntriesFetched } = this.props;
         let yearData;
         if (periodType === 'years') yearData = getYearData();
         //if ! return loading
@@ -127,10 +189,10 @@ export default class PeriodTimeChart extends React.Component {
         const isPeriodCustomAndLong = isPeriodCustom && customPeriodLength > 31;
         const isPeriodTypeShort = ['months', 'years'].indexOf(periodType) === -1;
 
-        const hourInMs = 3600000;
-        const highestValue = isPeriodYears ?
-            yearData.concat().sort((a, b) => b.time - a.time)[0].time :
-            data.concat().sort((a, b) => b.time - a.time)[0].time;
+        const highestValue = (dataSrc => dataSrc.concat().sort((a, b) => b.time - a.time)[0].time)
+            (isPeriodYears ? yearData : data);
+
+        const areSomeItemsEmpty = isPeriodYears ? yearData.some(itm => !itm.time) : data.some(itm => !itm.time);
 
         const todayReadable = moment().format('ddd, Do MMM');
         const checkedData = this.getCheckedData(!isPeriodYears, data, yearData, isPeriodCustomAndLong);
@@ -144,22 +206,25 @@ export default class PeriodTimeChart extends React.Component {
 
         const formattedYticks = v => moment.duration(v).format("h[h]m[m]:s[s]", { largest: 1 });
 
-        return (
-            <Wrapper>
-                <ResponsiveContainer>
-                    <BarChart data={isPeriodYears ? yearData : isPeriodCustomAndLong ? this.getWeeksFromDays(data) : data}
-                        barCategoryGap={5} margin={{ top: 20, right: -10, left: 0, bottom: 10 }} >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis interval={xAxisInterval(checkedData.length)} tickLine={false} dataKey="readable" height={60} tick={this.getCustomTick} />
-                        <Bar dataKey="time" data={checkedData} isAnimationActive={false} maxBarSize={100} minPointSize={4}>
-                            {shouldShowLabelList() && <LabelList dataKey="duration" position="top" content={this.getCustomLabel} />}
-                            {checkedData.map((itm, i) => <Cell fill={itm.hasValue ? "#45aaf2" : '#999'} key={`${i}-${itm.time}`} />)}
-                        </Bar>
-                        <YAxis stroke="#ccc" orientation="right" axisLine={false} mirror={false} tickLine={false}
-                            interval={0} ticks={this.getTicks(highestValue, hourInMs)} tickFormatter={formattedYticks} />
-                    </BarChart>
-                </ResponsiveContainer>
-            </Wrapper>
-        );
+        console.log(isPeriodYears ? yearData : data);
+        return (<Wrapper>
+            <Overlay visible={isLoading || !isLoading && !highestValue || !highestValue}>
+                {isLoading ? (<Spinner />) : (highestValue ? '' : 'No data available')}
+            </Overlay>
+            <ResponsiveContainer >
+                <BarChart data={isPeriodYears ? yearData : isPeriodCustomAndLong ? this.getWeeksFromDays(data) : data}
+                    barCategoryGap={5} margin={{ top: 30, right: 30, left: 50, bottom: 10 }} >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis interval={xAxisInterval(checkedData.length)} tickLine={false} dataKey="readable" height={60}
+                        tick={this.getCustomTick} />
+                    <Bar dataKey="time" data={checkedData} isAnimationActive={false} maxBarSize={100} minPointSize={4}>
+                        {shouldShowLabelList() && <LabelList dataKey="duration" position="top" content={this.getCustomLabel} />}
+                        {checkedData.map((itm, i) => <Cell fill={itm.hasValue ? "#45aaf2" : '#999'} key={`${i}-${itm.time}`} />)}
+                    </Bar>
+                    <YAxis stroke="#ccc" orientation="right" axisLine={false} mirror={false} tickLine={false} width={30}
+                        interval={0} ticks={this.getTicks(highestValue)} tickFormatter={formattedYticks} />
+                </BarChart>
+            </ResponsiveContainer>
+        </Wrapper>);
     }
 }

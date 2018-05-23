@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as actions from '../actions';
 
 import styled from 'styled-components';
+import throttle from 'lodash.throttle';
 import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
@@ -44,13 +45,16 @@ const Task_timing_inner = styled.div`
 
 const Task_description = styled.input`
     outline-color:transparent;
-    flex:1 1 50%;
+    flex:1 1 25%;
     padding:.3rem;
     border:none;
     font-size:18px;
 `;
 
 const Task_timer = styled.span`
+    color:#333;
+    font-weight:500;
+    font-size:18px;    
 `;
 
 const Settings_section = styled.nav`
@@ -66,9 +70,9 @@ const Task_options = styled.div`
 const Task_button = styled.a`
     cursor:pointer;
     color:white;
-    background-color:${props => props.isRunning ? 'red' : '#4bc800;'};
+    background-color:${props => props.isRunning ? '#e20505' : '#4bc800;'};
     border-radius:50%;
-    padding:.3rem;
+    padding:.4rem;
     display:flex;
     justify-content:center;
     align-items:center;
@@ -93,7 +97,7 @@ const Span_relative = styled.span`
     position: relative;
 `;
 
-const dropdownStyle = { top: 25, left: '-4rem' };
+const dropdownStyle = { top: 25, left: '-6rem' };
 
 class TopBar extends React.Component {
     constructor(props) {
@@ -139,20 +143,11 @@ class TopBar extends React.Component {
     }
 
     stopTimer = () => {
-        const { userData, toggleTimer, runningEntry, updateEntry, runningEntryDescription,
-            setRunningEntryDescription, getWeekTime, setWeekTimer, currentProject,
-            setProject, billable } = this.props;
-
-        const now = moment().valueOf();
-        const payload = {
-            stop: now,
-            description: runningEntryDescription,
-            project: (currentProject && currentProject.name) ? currentProject.name : '',
-            billable
-        };
+        const { userData, toggleTimer, runningEntry, updateEntry, runningEntryDescription, getWeekTime,
+            setRunningEntryDescription, setWeekTimer, currentProject, setProject, billable } = this.props;
 
         toggleTimer(false);
-        updateEntry(userData._id, runningEntry, payload);
+
         setWeekTimer(getWeekTime(userData.entries));
         setRunningEntryDescription('');
         setProject(null);
@@ -163,9 +158,9 @@ class TopBar extends React.Component {
         const { removeEntry, toggleTimer, userData, runningEntry, setProject, setRunningEntry } = this.props;
 
         removeEntry(userData._id, runningEntry);
+        setRunningEntry(null);
         toggleTimer(false);
         setProject(null);
-        setRunningEntry(null);
     }
 
     changeDescription = (description, runningEntry, previousDescription, enableEmptyInput = false) => {
@@ -198,7 +193,7 @@ class TopBar extends React.Component {
     setRunningDescription = e => {
         const { updateEntry, setRunningEntryDescription, userData, runningEntry } = this.props;
 
-        updateEntry(userData._id, runningEntry, { description: e.target.value });
+        if (runningEntry) updateEntry(userData._id, runningEntry, { description: e.target.value });
         setRunningEntryDescription(e.target.value);
     }
 
@@ -214,44 +209,42 @@ class TopBar extends React.Component {
         const { isRunning, timer, setRunningEntryDescription, userData, currentProject, billable } = this.props;
         const { description, isTimerModeManual } = this.state;
 
-        return (
-            <Task_controller>
-                <Task_description
-                    type="text"
-                    placeholder={isRunning ? '(no description)' : 'What are you working on?'}
-                    value={description} onChange={this.setDescriptionState}
-                    onBlur={this.setRunningDescription} />
-                <Task_timing>
-                    <Span_relative onClick={this.openMenu}>
-                        {currentProject &&
-                            <Item_link>
-                                <Color_indicator color={currentProject.color} />
-                                <span>{currentProject.name}</span>
-                            </Item_link>}
-                        {!currentProject &&
-                            <Item_link>
-                                <Icon name="folder" fill="#bbb" size="20px" />
-                            </Item_link>}
-                        <ProjectDropdown setProjectState={this.setProjectState} userData={userData} style={dropdownStyle}
-                            isOpen={this.state.isMenuOpen} setParentState={this.setState.bind(this)} />
-                    </Span_relative>
-                    <Task_timing_inner>
-                        <Item_link onClick={this.setBillable}>
-                            <Icon name="attach_money" size='20px' fill={billable ? 'green' : '#bbb'} />
-                        </Item_link>
-                        <Task_timer>{timer}</Task_timer>
-                        <Task_button isRunning={isRunning} onClick={this.handleClick}>
-                            <Icon name={isRunning ? "stop" : "play_arrow"} />
-                        </Task_button>
-                        <Task_options>
-                            {isRunning && <Item_link onClick={this.removeStartedEntry}>
-                                <Icon name="delete" fill="#bbb" size="16px" />
-                            </Item_link>}
-                        </Task_options>
-                    </Task_timing_inner>
-                </Task_timing>
-            </Task_controller >
-        );
+        return (<Task_controller>
+            <Task_description
+                type="text"
+                placeholder={isRunning ? '(no description)' : 'What are you working on?'}
+                value={description} onChange={this.setDescriptionState}
+                onBlur={this.setRunningDescription} />
+            <Task_timing>
+                <Span_relative onClick={this.openMenu}>
+                    {currentProject &&
+                        <Item_link>
+                            <Color_indicator color={currentProject.color} />
+                            <span>{currentProject.name}</span>
+                        </Item_link>}
+                    {!currentProject &&
+                        <Item_link>
+                            <Icon name="folder" fill="#bbb" size="20px" />
+                        </Item_link>}
+                    <ProjectDropdown setProjectState={this.setProjectState} userData={userData} style={dropdownStyle}
+                        isOpen={this.state.isMenuOpen} setParentState={this.setState.bind(this)} />
+                </Span_relative>
+                <Task_timing_inner>
+                    <Item_link onClick={this.setBillable}>
+                        <Icon name="attach_money" size='20px' fill={billable ? 'green' : '#bbb'} />
+                    </Item_link>
+                    <Task_timer>{timer}</Task_timer>
+                    <Task_button isRunning={isRunning} onClick={throttle(this.handleClick, 500)}>
+                        <Icon name={isRunning ? "stop" : "play_arrow"} />
+                    </Task_button>
+                    <Task_options>
+                        {isRunning && <Item_link onClick={this.removeStartedEntry}>
+                            <Icon name="delete" fill="#bbb" size="16px" />
+                        </Item_link>}
+                    </Task_options>
+                </Task_timing_inner>
+            </Task_timing>
+        </Task_controller>);
     }
 }
 

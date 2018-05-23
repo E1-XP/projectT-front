@@ -29,38 +29,43 @@ export const setRunningEntryDescription = desc => ({
     payload: desc
 });
 
-export const createNewEntry = (userid, queryParams, ignoreIsRunning = false) => (dispatch, getState) => {
-    let queryStr = ``;
-    Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
-    console.log(queryParams);
+export const createNewEntry = (userid, queryParams, ignoreIsRunning = false, multiDayMode = false) =>
+    (dispatch, getState) => {
+        let queryStr = ``;
+        Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
+        console.log(queryParams);
 
-    const url = `${baseUrl}/users/${userid}/entries?${queryStr}`;
-    console.log(url);
+        const url = `${baseUrl}/users/${userid}/entries?${queryStr}`;
+        console.log(url, 'NEW');
 
-    const createEntry = () => axios.post(url)
-        .then(res => {
+        const createEntry = () => axios.post(url).then(res => {
             const projects = getState().user.userData.projects;
             const projectObj = projects[projects.map(itm => itm.name)
                 .findIndex(itm => itm === queryParams.project)];
 
-            dispatch(setProject(projectObj));
-            dispatch(setRunningEntry(res.data._id));
-            dispatch(setRunningEntryDescription(queryParams.description || ""));
-            dispatch(toggleTimer(true));
-            dispatch(setBillable(queryParams.billable));
+            dispatch(editEntries(res.data));
 
+            if (!queryParams.stop) {
+                dispatch(setProject(projectObj));
+                dispatch(setRunningEntry(res.data._id));
+                dispatch(setRunningEntryDescription(queryParams.description || ""));
+                dispatch(setBillable(queryParams.billable));
+            }
+            !multiDayMode && dispatch(toggleTimer(true));
         }).catch(err => dispatch(loadingError(err)));
 
-    if (!ignoreIsRunning && getState().global.isRunning) {
-        const state = getState();
-        const params = { stop: Date.now() };
+        if (!ignoreIsRunning && getState().global.isRunning) {
+            const state = getState();
+            const params = { stop: Date.now() };
 
-        dispatch(toggleTimer(false));
-        dispatch(updateEntry(state.user.userData._id, state.entry.runningEntry, params));
-        setTimeout(() => dispatch(createEntry), 50);
+            if (!multiDayMode) {
+                dispatch(toggleTimer(false));
+                dispatch(updateEntry(state.user.userData._id, state.entry.runningEntry, params));
+                createEntry();
+            }
+        }
+        else createEntry();
     }
-    else createEntry();
-}
 
 export const updateEntry = (userid, runningEntryId, queryParams) => dispatch => {
     let queryStr = ``;
@@ -69,8 +74,8 @@ export const updateEntry = (userid, runningEntryId, queryParams) => dispatch => 
     const url = `${baseUrl}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
     console.log(url);
 
-    axios.put(url).then(res => {
-        dispatch(editEntries(res.data));
+    axios.put(url).then(resp => {
+        dispatch(editEntries(resp.data));
         if (queryParams.stop) dispatch(setRunningEntry(null));
 
     }).catch(err => dispatch(loadingError(err)));

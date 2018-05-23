@@ -19,12 +19,17 @@ export const setIsRunning = bool => ({
     payload: bool
 });
 
+export const setIsOnline = bool => ({
+    type: consts.IS_ONLINE,
+    payload: bool
+});
+
 export const setIsAuthenticated = bool => ({
     type: consts.IS_AUTHENTICATED,
     payload: bool
 });
 
-export const allEntriesFetched = bool => ({
+export const setAllEntriesFetched = bool => ({
     type: consts.ALL_ENTRIES_FETCHED,
     payload: bool
 });

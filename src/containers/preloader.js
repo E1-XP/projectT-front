@@ -30,7 +30,7 @@ const Spinner = styled.div`
     border-right:3px solid transparent; 
     border-radius:50%;   
     transform:translateZ(0);
-    animation:${rotateAnim} .5s infinite;
+    animation:${rotateAnim} .5s linear infinite;
 `;
 
 class Preloader extends React.Component {

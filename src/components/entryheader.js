@@ -48,6 +48,7 @@ const Item_link_relative = styled.span`
 const Wrapper = styled.div`
     position: relative;
     margin-left:1.5rem;
+    white-space: nowrap;
 `;
 
 export default class EntryHead extends React.Component {
@@ -89,29 +90,27 @@ export default class EntryHead extends React.Component {
         const { isMenuOpen } = this.state;
 
         //console.log('rendering entryheader');
-        return (
-            <Wrapper>
-                {currentItem.length > 1 &&
-                    <GroupEntries_length color={filteredItem ? '#4bc800;' : '#333'}
-                        onClick={this.toggleEntriesProxy} isOpen={filteredItem} >
-                        {currentItem.length}
-                    </GroupEntries_length>}
-                <Input_task type="text" placeholder="Add description"
-                    defaultValue={projectDescription === '$empty#' ? '' : projectDescription}
-                    onBlur={this.onBlurDescriptionSaveProxy} />
-                {projectName &&
-                    <Item_link onClick={this.openMenu}>
-                        <Color_indicator color={getProjectColor(projectName)} />
-                        <Item_project color={getProjectColor(projectName)}>
-                            {projectName}
-                        </Item_project>
-                    </Item_link>}
-                {!projectName && <Item_link_toggle isOpen={isMenuOpen} onClick={this.openMenu}>
-                    <Icon name="folder" size="20px" />
-                </Item_link_toggle>}
-                {<ProjectDropdown project={projectName} userData={userData} isOpen={this.state.isMenuOpen}
-                    setProjectState={this.onProjectClick} style={this.dropdownStyle} setParentState={this.setState.bind(this)} />}
-            </Wrapper>
-        );
+        return (<Wrapper>
+            {currentItem.length > 1 &&
+                <GroupEntries_length color={filteredItem ? '#4bc800;' : '#333'}
+                    onClick={this.toggleEntriesProxy} isOpen={filteredItem} >
+                    {currentItem.length}
+                </GroupEntries_length>}
+            <Input_task type="text" placeholder="Add description"
+                defaultValue={projectDescription === '$empty#' ? '' : projectDescription}
+                onBlur={this.onBlurDescriptionSaveProxy} />
+            {projectName &&
+                <Item_link onClick={this.openMenu}>
+                    <Color_indicator color={getProjectColor(projectName)} />
+                    <Item_project color={getProjectColor(projectName)}>
+                        {projectName}
+                    </Item_project>
+                </Item_link>}
+            {!projectName && <Item_link_toggle isOpen={isMenuOpen} onClick={this.openMenu}>
+                <Icon name="folder" size="20px" />
+            </Item_link_toggle>}
+            {<ProjectDropdown project={projectName} userData={userData} isOpen={this.state.isMenuOpen}
+                setProjectState={this.onProjectClick} style={this.dropdownStyle} setParentState={this.setState.bind(this)} />}
+        </Wrapper>);
     }
 }

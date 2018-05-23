@@ -22,7 +22,7 @@ const Dropdown = styled.ul`
     position:absolute;
     border:1px solid #ddd;
     top:32px;
-    right: -3px;
+    right: 0px;
     width: 7.5rem;
     background-color:white;
     z-index:10;

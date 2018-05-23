@@ -52,7 +52,7 @@ const Wrapper = {
     position: 'absolute',
     zIndex: 50,
     backgroundColor: 'white',
-    boxShadow: '0 2px 6px 0 rgba(0,0,0,.1)',
+    boxShadow: '0 2px 6px 0 rgba(0,0,0,.2)',
     padding: '.7rem',
     maxHeight: '15rem'
 }

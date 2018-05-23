@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
+import Tooltip from 'rc-tooltip';
+
 import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
@@ -13,6 +15,8 @@ const Week_counter = styled.div`
     font-size:13px;
     margin-top:61px;
     padding:1.8rem;
+    color:#777;
+    font-weight:500;
 `;
 
 const WeekBar = styled.div`
@@ -28,23 +32,38 @@ const WeekBarPart = styled.div`
     width:${props => props.width + '%'};
     height:100%;
     float:left;
-    /* &:after{
-        content:${props => props.name};
-        display: block;
-        height: 15px;
-        width: 50px;
-        background-color:red;
-        border:1px solid black;
-        position:absolute;
-        top:0;
-        left:0;
-    } */
+    > span {
+        color:${props => props.color};
+        position:relative;
+        display:inline-block;
+        bottom:1.2rem;
+        width:100%;     
+    }
+`;
+
+const Bar_text = styled.span`
+    font-weight:500;
+    white-space:nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+`;
+
+const Timer = styled.span`
+    color:black;
 `;
 
 class WeekTimer extends React.Component {
     shouldComponentUpdate(nextProps) {
         if (this.props.isRunning && !nextProps.isRunning) return false;
         return true;
+    }
+
+    showInfoOnHover = (itm, total) => {
+        const { weekProjectsSum } = this.props;
+        const percent = `${~~((weekProjectsSum[itm] / total) * 100)}%`;
+        const readable = moment.duration(weekProjectsSum[itm]).format('h:mm:ss', { stopTrim: "hh mm ss" });
+
+        return `${itm === 'noproject' ? '(No Project)' : itm}  ${readable}  ${percent}`;
     }
 
     getBarParts = () => {
@@ -54,8 +73,17 @@ class WeekTimer extends React.Component {
 
         const totalSum = Object.keys(weekProjectsSum).reduce((acc, itm) => acc + weekProjectsSum[itm], 0);
 
-        return Object.keys(weekProjectsSum).map(itm => (<WeekBarPart key={itm} width={(weekProjectsSum[itm] / totalSum) * 100}
-            name={itm} color={getProjectColor(itm)} />));
+        return Object.keys(weekProjectsSum).map(itm => {
+            const width = (weekProjectsSum[itm] / totalSum) * 100;
+
+            return (<Tooltip key={itm} overlay={this.showInfoOnHover(itm, totalSum)} placement="top"
+                mouseLeaveDelay={.2}>
+                <WeekBarPart key={itm} width={width} name={itm} color={getProjectColor(itm)} >
+                    {width > 3 && <Bar_text width={width} >{itm === 'noproject' ? '(NO PROJECT)' :
+                        itm.toUpperCase()}</Bar_text>}
+                </WeekBarPart>
+            </Tooltip>)
+        });
     }
 
     render() {
@@ -63,7 +91,7 @@ class WeekTimer extends React.Component {
 
         return (
             <Week_counter>
-                This week: <span>{weekTimer}</span>
+                This week: <Timer>{weekTimer}</Timer>
                 <WeekBar>
                     {this.getBarParts()}
                 </WeekBar>
