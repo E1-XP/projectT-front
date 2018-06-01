@@ -77,7 +77,7 @@ const Modal_error = styled.div`
 
 const ProfileModal = props => {
     const { isOpen, style, onRequestClose, errorMessage, modalPassword, state,
-        validatePasswordForm } = props;
+        validatePasswordForm, setState } = props;
 
     const modalStyle = {
         overlay: {},
@@ -99,11 +99,11 @@ const ProfileModal = props => {
                 </Modal_error>
                 <Modal_content>
                     <Input value={modalPassword.current} placeholder="Current password" type="password"
-                        onChange={e => this.setState({ modalPassword: { ...state.modalPassword, current: e.target.value } })} />
+                        onChange={e => setState({ modalPassword: { ...state.modalPassword, current: e.target.value } })} />
                     <Input value={modalPassword.newpass} placeholder="New password" type="password"
-                        onChange={e => this.setState({ modalPassword: { ...state.modalPassword, newpass: e.target.value } })} />
+                        onChange={e => setState({ modalPassword: { ...state.modalPassword, newpass: e.target.value } })} />
                     <Input value={modalPassword.newpass2} placeholder="New password again" type="password"
-                        onChange={e => this.setState({ modalPassword: { ...state.modalPassword, newpass2: e.target.value } })} />
+                        onChange={e => setState({ modalPassword: { ...state.modalPassword, newpass2: e.target.value } })} />
                     <Button_done onClick={validatePasswordForm}> Save </Button_done>
                 </Modal_content>
             </div>

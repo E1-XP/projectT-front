@@ -4,11 +4,11 @@ import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
-const getEntries = userData => userData.entries;
+const getEntries = state => state.user.userData.entries;
 
 const getMappedItemsFn = entries => {
     const getReadable = item => moment(item.start).format('ddd, Do MMM');
-    const getDuration = item => moment.duration(moment(Number(item.stop)).diff(item.start)).format('h:mm:ss', { stopTrim: "hh mm ss" });
+    const getDuration = item => moment.duration(moment(item.stop).diff(item.start)).format('h:mm:ss', { stopTrim: "hh mm ss" });
 
     const reduceItems = (acc, item) => {
         if (item.stop !== undefined) {
@@ -21,15 +21,17 @@ const getMappedItemsFn = entries => {
                 userId: item.userId,
                 id: item._id,
                 readable: getReadable(item),
-                duration: getDuration(item),
-                visible: false
+                duration: getDuration(item)
             };
 
             acc[mapped.readable] ? acc[mapped.readable].push(mapped) : acc[mapped.readable] = [mapped];
         }
         return acc;
     }
-    return entries.sort((a,b)=>b.start-a.start).reduce(reduceItems, {});
+
+    return entries
+        .sort((a, b) => b.start - a.start)
+        .reduce(reduceItems, {});
 }
 
 const getMappedItems = createSelector([getEntries], getMappedItemsFn);

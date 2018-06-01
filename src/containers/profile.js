@@ -31,6 +31,8 @@ class Profile extends React.Component {
                 newpass2: ''
             }
         }
+
+        this.setStateBind = this.setState.bind(this);
     }
 
     componentDidMount() {
@@ -152,11 +154,11 @@ class Profile extends React.Component {
         const { userData } = this.props;
         const { data, isPasswordFormInvalid, modalPassword, isUploading } = this.state;
 
-        return (<ProfileComponent state={this.state} userData={userData} sendFile={this.sendFile}
-            openModal={this.openModal} setUserInfo={this.setUserInfo} resetAvatar={this.resetAvatar}
-            setUsernameInputState={this.setEmailInputState} setEmailInputState={this.setEmailInputState}
-            setShouldShowTimerOnTitle={this.setShouldShowTimerOnTitle} Icon_button={Icon_button}
-            closeModal={this.closeModal} validatePasswordForm={this.validatePasswordForm} />);
+        return (<ProfileComponent state={this.state} setState={this.setStateBind} userData={userData}
+            sendFile={this.sendFile} openModal={this.openModal} setUserInfo={this.setUserInfo}
+            resetAvatar={this.resetAvatar} setUsernameInputState={this.setEmailInputState} closeModal={this.closeModal}
+            setEmailInputState={this.setEmailInputState} setShouldShowTimerOnTitle={this.setShouldShowTimerOnTitle}
+            Icon_button={Icon_button} validatePasswordForm={this.validatePasswordForm} />);
     }
 }
 

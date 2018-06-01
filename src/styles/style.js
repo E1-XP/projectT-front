@@ -28,8 +28,35 @@ body,
     background-color: #ddd;
 }
 
-.rdr-Day {
+.rdr-Days > span {
     border: 1px solid #ddd;
+}
+
+.rdr-Days .rdr-Day {
+    font-size: 15px !important;
+}
+.rdr-MonthAndYear span {
+    font-size:14px !important;
+}
+
+.thumb-vertical {
+    background-color:#e20505;;
+    height: 100%;
+    top: 0;
+    right: 0;
+    z-index: 100;
+}
+
+.track-vertical {
+    height: 100%;
+    top: 0;
+    right: 0;
+    z-index: 99;
+    width:6px !important;
+}
+
+.track-horizontal {
+    display:none;
 }
 
 .ReactModal__Overlay {
@@ -46,6 +73,13 @@ body,
 .ReactModal__Overlay--before-close {
     opacity: 0;
     transform: translateY(-400px);
+}
+
+.ReactModal__Content.ReactModal__Content--after-open {
+    left: calc(40px + 52px) !important;
+    @media only screen and (min-width:1024px) {
+        left: calc(40px + 167.5px) !important;        
+    }
 }
 
 .active {
@@ -115,6 +149,14 @@ input:focus::-moz-placeholder {
 
 .recharts-responsive-container {
     margin:0 auto;
+}
+
+.recharts-wrapper {
+    box-shadow: 0 1px 3px rgba(128,128,128,0.2);
+}
+
+.rc-tooltip-inner {
+    width:105%;
 }
 
 .rc-tooltip.rc-tooltip-zoom-enter,

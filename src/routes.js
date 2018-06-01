@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect, Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { Scrollbars } from 'react-custom-scrollbars';
+import Scrollbar from './components/scrollbar';
 import Preloader from './containers/preloader';
 import Protected_container from './containers/protected';
 import Sidebar from './containers/sidebar';
@@ -22,36 +22,21 @@ const App_container = styled.div`
 const Main_content = styled.main`
     display:flex;
     flex-direction:column;
-    width:95%;
+    width: calc(100% - 54px);
     margin-left:52px;
     @media only screen and (min-width:1024px){
         margin-left:171px;
-        width:91%;
+        width: calc(100% - 172px);
     }
 `;
 
-const scrollbarStyle = { height: '100%', width: '100%' };
-
-const thumbVertical = ({ style, ...props }) => {
-    const styleC = { backgroundColor: 'red', zIndex: 50, width: '3px' };
-
-    return (<div style={{ ...style, ...styleC }} {...props} />);
-}
-
-const trackVertical = ({ style, ...props }) => {
-    return (<div {...props} style={{ ...style, width: '3px' }} />);
-}
-
-const routes = (
-    // <Scrollbars style={scrollbarStyle} renderThumbVertical={thumbVertical}
-    // renderTrackVertical={trackVertical}
-    // >
-    <App_container>
-        <Preloader >
-            <Route path="/signup" component={Form} />
-            <Route path="/login" component={Form} />
-            <Protected_container>
-                <Sidebar />
+const routes = (<App_container>
+    <Preloader >
+        <Route path="/signup" component={Form} />
+        <Route path="/login" component={Form} />
+        <Protected_container>
+            <Sidebar />
+            <Scrollbar>
                 <Main_content>
                     <Switch>
                         <Route exact path="/" render={() => (<Redirect to="/timer" />)} />
@@ -63,11 +48,10 @@ const routes = (
                         <Route component={NotFound} />
                     </Switch>
                 </Main_content>
-                <StatusBar />
-            </Protected_container>
-        </Preloader>
-    </App_container>
-    // </Scrollbars>
-);
+            </Scrollbar>
+            <StatusBar />
+        </Protected_container>
+    </Preloader>
+</App_container>);
 
 export default routes;

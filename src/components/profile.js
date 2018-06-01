@@ -188,7 +188,7 @@ const Label_check = styled.label`
 const placeholderImg = 'https://lh6.googleusercontent.com/-ph4JkGJ7wdY/AAAAAAAAAAI/AAAAAAAAAYw/g2wqnP4pMhM/photo.jpg';
 
 const Profile = props => {
-    const { userData, state, data, isPasswordFormInvalid, modalPassword, isUploading,
+    const { userData, state, data, isPasswordFormInvalid, modalPassword, isUploading, setState,
         sendFile, openModal, closeModal, setUserInfo, resetAvatar, setUsernameInputState,
         setEmailInputState, setShouldShowTimerOnTitle, validatePasswordForm, Icon_button } = props;
 
@@ -235,9 +235,8 @@ const Profile = props => {
             </Settings_section>
         </Main_content>
 
-        {/* <!--modal--> */}
         <ProfileModal isOpen={state.isModalOpen} onRequestClose={closeModal}
-            state={state} modalPassword={state.modalPassword}
+            state={state} modalPassword={state.modalPassword} setState={setState}
             validatePasswordForm={validatePasswordForm} />
 
     </Wrapper>);

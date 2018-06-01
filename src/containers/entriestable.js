@@ -1,12 +1,8 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import styled from 'styled-components';
 import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
-
-import * as actions from '../actions/entry';
-import getMappedItems from '../selectors/getmappeditems';
 
 import EntryGroup from '../components/entrygroup';
 import EntryHeader from '../components/entryheader';
@@ -51,8 +47,9 @@ class EntriesTable extends React.Component {
         super(props);
 
         this.state = {
-            filteredItems: [],
-            mappedTasks: {}
+            filteredItems: {},
+            mappedTasks: {},
+            isUpdating: false
         }
 
         this.today = moment().format('ddd, Do MMM');
@@ -66,19 +63,31 @@ class EntriesTable extends React.Component {
         this.setState({ filteredItems, mappedTasks });
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.mappedItems !== this.props.mappedItems) {
-            const filteredItems = Object.assign({}, this.getFilteredItems(nextProps.mappedItems), this.state.filteredItems);
-            const mappedTasks = this.getMappedTasks(nextProps.mappedItems);
+    componentWillReceiveProps(nextP) {
+        const { mappedItems, isFetching } = this.props;
+
+        if (isFetching && JSON.stringify(nextP.mappedItems) === JSON.stringify(mappedItems)) return null;
+
+        if (nextP.mappedItems !== mappedItems) {
+            const filteredItems = Object.assign({}, this.getFilteredItems(nextP.mappedItems), this.state.filteredItems);
+            const mappedTasks = this.getMappedTasks(nextP.mappedItems);
 
             this.setState({ filteredItems, mappedTasks });
         }
     }
+    shouldComponentUpdate(nxtP, nxtS) {
+        if (this.state.isUpdating) return false;
+        return true;
+    }
 
-    toggleEntries = (idx, item) => {
+    componentDidUpdate() {
+        if (this.state.isUpdating) this.setState({ isUpdating: false });
+    }
+
+    toggleEntries = (day, item) => {
         const { filteredItems } = this.state;
 
-        filteredItems[idx][item] = !filteredItems[idx][item];
+        filteredItems[day][item] = !filteredItems[day][item];
         this.setState({ filteredItems });
     }
 
@@ -114,8 +123,9 @@ class EntriesTable extends React.Component {
         console.log('change desc', description, previousDescription, '-previous');
 
         const descrCandidate = description.trim();
-        descrCandidate !== previousDescription
-            && updateEntry(userData._id, runningEntry, { description: descrCandidate });
+        if (descrCandidate !== previousDescription) {
+            updateEntry(userData._id, runningEntry, { description: descrCandidate });
+        }
     }
 
     changeDescriptionMultiple = (desc, array, idx) => {
@@ -132,19 +142,29 @@ class EntriesTable extends React.Component {
     }
 
     changeProjectMultiple = (project, array) => {
-        const { userData, updateEntry } = this.props;
-
+        const { userData, updateEntry, mappedItems } = this.props;
         const arrId = array.map(itm => itm.id);
 
         updateEntry(userData._id, JSON.stringify(arrId), { project });
+
+        const readable = moment(array[0].start).format('ddd, Do MMM');
+        const dayObj = this.getFilteredItems({ [readable]: mappedItems[readable] });
+
+        const key = array[0].readable;
+        const keyStr = `${project} \n${array[0].description || '$empty#'} `;
+        const keyStrPrevVal = `${array[0].project} \n${array[0].description || '$empty#'} `;
+        const getBoolVal = this.state.filteredItems[key][keyStrPrevVal];
+
+        const filteredItems = { ...this.state.filteredItems, [key]: { ...dayObj, [keyStr]: getBoolVal } };
+        this.setState(() => ({ isUpdating: true }), () => this.setState({ filteredItems }));
     }
 
-    isEveryItemBillable = (array) => {
+    isEveryItemBillable = array => {
         if (array[0].billable && array.every(itm => itm.billable === array[0].billable)) return true;
         else return false;
     }
 
-    setBillableMulti = (array) => {
+    setBillableMulti = array => {
         const { userData, updateEntry } = this.props;
 
         const arrId = array.map(itm => itm.id);
@@ -153,21 +173,36 @@ class EntriesTable extends React.Component {
         updateEntry(userData._id, JSON.stringify(arrId), { billable: !bool });
     }
 
-    onBlurDescriptionSave = (e, currentItem, idx) => {
-        if (currentItem[0].description === e.target.value) return null;
+    onBlurDescriptionSave = (value, currentItem, key, previousVal) => {
+        const { mappedItems } = this.props;
+        const { filteredItems } = this.state;
+
+        if (currentItem[0].description === value) return null;
 
         currentItem.length === 1 ?
-            this.changeDescription(e.target.value, currentItem[0].id) :
-            this.changeDescriptionMultiple(e.target.value, currentItem, idx);
+            this.changeDescription(value, currentItem[0].id) :
+            this.changeDescriptionMultiple(value, currentItem, key);
+
+        if (previousVal !== undefined) {
+            const keyStr = `${currentItem[0].project} \n${value || '$empty#'} `;
+            const keyStrPrevVal = `${currentItem[0].project} \n${previousVal || '$empty#'} `;
+
+            const getBoolVal = previousVal !== undefined ? filteredItems[key][keyStrPrevVal] : false;
+            const singleDayMod = { ...filteredItems[key], [keyStr]: getBoolVal };
+
+            this.setState({ filteredItems: Object.assign({}, filteredItems, { [key]: singleDayMod }) });
+        }
     }
 
-    getSingleEntries = entries => {
+    getSingleEntries = (entries, key) => {
+
         return Object.keys(entries).map((item, i) =>
             <TimeEntry key={item} item={entries[i]}
+                idx={key}
                 userData={this.props.userData}
                 setTopbarDescription={this.props.setTopbarDescription}
                 startNewEntry={this.startNewEntry}
-                changeDescription={this.changeDescription}
+                changeDescription={this.onBlurDescriptionSave}
                 changeProject={this.changeProject}
                 updateEntry={this.props.updateEntry}
                 handleRemove={this.props.handleRemove}
@@ -175,26 +210,34 @@ class EntriesTable extends React.Component {
     }
 
     getMappedTasks = mappedItems => {
-        const reduceFn = (acc, itm) => {
+        const reduceInner = (acc, itm) => {
             const keyStr = `${itm.project} \n${itm.description || '$empty#'} `;
 
             if (!acc[keyStr]) acc[keyStr] = [];
             acc[keyStr].push(itm);
             return acc;
         }
+
         return Object.keys(mappedItems)
-            .map(itm => mappedItems[itm].reduce(reduceFn, {}));
+            .reduce((acc, itm) => {
+                acc[itm] = mappedItems[itm].reduce(reduceInner, {});
+                return acc;
+            }, {});
     }
 
     getFilteredItems = mappedItems => {
-        return Object.keys(mappedItems)
-            .map(itm => mappedItems[itm]
-                .reduce((acc, itm) => {
-                    const keyStr = `${itm.project} \n${itm.description || '$empty#'} `;
+        console.log('call getfiltereditems');
+        const reduceInner = (acc, itm) => {
+            const keyStr = `${itm.project} \n${itm.description || '$empty#'} `;
 
-                    if (!acc[keyStr]) acc[keyStr] = false;
-                    return acc;
-                }, {}));
+            if (!acc[keyStr]) acc[keyStr] = false;
+            return acc;
+        };
+
+        return Object.keys(mappedItems).reduce((acc, itm) => {
+            acc[itm] = mappedItems[itm].reduce(reduceInner, {});
+            return acc;
+        }, {});
     }
 
     getTaskEntries = idx => {
@@ -209,19 +252,16 @@ class EntriesTable extends React.Component {
                 const currentItem = mappedTasks[idx][item];
 
                 return <EntryGroup key={currentItem[0].id} currentItem={currentItem} projectDescription={projectDescription}
-                    filteredItem={filteredItems[idx][item]} item={item} projectName={projectName}
+                    filteredItem={filteredItems[idx][item]} item={item} projectName={projectName} getSingleEntries={this.getSingleEntries}
                     toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
-                    getProjectColor={getProjectColor} userData={userData}
-                    changeProject={this.changeProjectMultiple}
-                    currentItem={currentItem} setBillableMulti={this.setBillableMulti}
-                    toggleEntries={this.toggleEntries} idx={idx} item={item} handleRemove={handleRemove}
-                    getTotalDayCount={this.getTotalDayCount} isEveryItemBillable={this.isEveryItemBillable}
-                    startNewEntry={this.startNewEntry} getSingleEntries={this.getSingleEntries} />
+                    getProjectColor={getProjectColor} userData={userData} changeProject={this.changeProjectMultiple}
+                    setBillableMulti={this.setBillableMulti} handleRemove={handleRemove} getTotalDayCount={this.getTotalDayCount}
+                    isEveryItemBillable={this.isEveryItemBillable} startNewEntry={this.startNewEntry} />
             });
     }
 
     render() {
-        const { mappedItems, toggleEntries, changeDescription } = this.props;
+        const { mappedItems } = this.props;
         const { filteredItems } = this.state;
 
         if (!Object.keys(filteredItems).length) return (<p>Loading...</p>);
@@ -233,20 +273,9 @@ class EntriesTable extends React.Component {
                         <Item_day>{this.getDayField(itm)}</Item_day>
                         <DayCount_span>{this.getTotalDayCount(mappedItems[itm])}</DayCount_span>
                     </Item_header>
-                    {this.getTaskEntries(idx)}
+                    {this.getTaskEntries(itm)}
                 </List_item >);
     }
 }
 
-const mapStateToProps = ({ user }) => {
-    return {
-        userData: user.userData,
-        mappedItems: getMappedItems(user.userData)
-    }
-};
-
-const mapDispatchToProps = dispatch => ({
-    createNewEntry: (uid, obj) => dispatch(actions.createNewEntry(uid, obj))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(EntriesTable);
+export default EntriesTable;

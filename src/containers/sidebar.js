@@ -21,7 +21,6 @@ const Sidebar = styled.section`
     height:100%;
     z-index:150;
     transform:translateZ(0);
-    transition:all .2s ease-in;
     @media only screen and (min-width:1024px){
          max-width:250px;
 }

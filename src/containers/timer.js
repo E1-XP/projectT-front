@@ -12,11 +12,13 @@ import WeekCounter from '../containers/weekcounter';
 import EntriesTable from '../containers/entriestable';
 import Icon from '../components/icon';
 
-import getMappedItems from '../selectors/getmappeditems';
+import getFilteredMappedItems from '../selectors/getfilteredmappeditems';
 
 const Container = styled.div`
     background-color:rgb(250,250,250);
     padding-bottom:3rem;
+    margin-right:12px;
+    position:relative;
 `;
 
 const Container_center = styled.div`
@@ -83,25 +85,52 @@ class Timer extends React.Component {
     }
 
     componentDidMount() {
-        const { userData, setWeekTimer } = this.props;
+        const { userData, setWeekTimer, setAllEntriesFetched, allEntriesFetched, setDaysToShowLength } = this.props;
 
-        if (userData.entries.length) {
-            setWeekTimer(this.getWeekTimeComposed(userData.entries));
-        }
+        setDaysToShowLength(10);
+
+        if (allEntriesFetched) setAllEntriesFetched(false);
+
+        if (userData.entries.length) setWeekTimer(this.getWeekTimeComposed(userData.entries));
+    }
+
+    shouldComponentUpdate(nextP, nextS) {
+        const { mappedItems, daysToShowLength, allEntriesFetched, weekTimer } = this.props;
+        const { isFetchingEntries } = this.state;
+
+        if (allEntriesFetched!==nextP.allEntriesFetched)  return true;
+        
+        if (isFetchingEntries === nextS.isFetchingEntries &&
+            JSON.stringify(nextP.mappedItems) === JSON.stringify(mappedItems)) return false;
+
+        if (nextP.mappedItems !== mappedItems || nextP.daysToShowLength !== daysToShowLength ||
+            nextP.weekTimer !== weekTimer || nextS.isFetchingEntries !== isFetchingEntries) return true;
+
+        return false;
     }
 
     componentWillReceiveProps(nextProps) {
-        const { userData, setWeekTimer, isRunning } = this.props;
+        const { userData, setWeekTimer, isRunning, setAllEntriesFetched, allEntriesFetched, mappedItems } = this.props;
         const { isFetchingEntries } = this.state;
 
-        if (!isRunning) setWeekTimer(this.getWeekTimeComposed(userData.entries));
+        if (allEntriesFetched && Object.keys(nextProps.mappedItems).length !== Object.keys(mappedItems).length) {
+            setAllEntriesFetched(false);
+        }
+
+        if ((isRunning && !nextProps.isRunning && nextProps.mappedItems !== mappedItems) ||
+            (!nextProps.isRunning && nextProps.mappedItems !== mappedItems)) {
+            setWeekTimer(this.getWeekTimeComposed(nextProps.userData.entries));
+        }
+
         if (nextProps.allEntriesFetched && isFetchingEntries) this.setState({ isFetchingEntries: false });
-        if (nextProps.userData.entries.length !== userData.entries.length && isFetchingEntries) this.setState({ isFetchingEntries: false });
+
+        else if (nextProps.userData.entries.length !== userData.entries.length && isFetchingEntries) {
+            this.setState({ isFetchingEntries: false });
+        }
     }
 
     handleRemove = id => {
-        const { removeEntry } = this.props;
-        const { userData } = this.props;
+        const { removeEntry, userData } = this.props;
         console.log(id);
         removeEntry(userData._id, id);
     }
@@ -111,8 +140,8 @@ class Timer extends React.Component {
 
         const total = entries
             .reduce((acc, itm) => {
-                return (itm.stop !== undefined && itm.start > thisWeekStart.valueOf()) ?
-                    acc + moment.duration(moment(itm.stop).diff(itm.start)).valueOf() :
+                return (itm.stop !== undefined && itm.start >= thisWeekStart.valueOf()) ?
+                    acc + itm.stop - itm.start :
                     acc;
             }, 0);
 
@@ -135,22 +164,25 @@ class Timer extends React.Component {
         const { userData } = this.props;
         if (name === 'noproject') return '#bbb';
 
-        return name.length ?
-            '#' + userData.projects[userData.projects.map(itm => itm.name)
-                .findIndex(itm => itm === name)].color :
-            'white';
+        if (name.length) {
+            const item = userData.projects[userData.projects.map(itm => itm.name).findIndex(itm => itm === name)]
+            if (item) return '#' + item.color;
+        }
+        return 'white';
     }
 
     appendEntries = () => {
-        const { userData } = this.props;
+        const { userData, setDaysToShowLength, daysToShowLength } = this.props;
         const startAt = moment(userData.entries[userData.entries.length - 1].start).dayOfYear();
 
         this.setState({ isFetchingEntries: true });
-        this.props.fetchEntries(userData._id, startAt);
+        this.props.fetchEntries(userData._id, startAt)
+            .then(() => setDaysToShowLength(daysToShowLength + 10));
     }
 
     render() {
-        const { userData, isRunning, allEntriesFetched, mappedItems } = this.props;
+        const { userData, isRunning, allEntriesFetched, mappedItems, daysToShowLength, createNewEntry } = this.props;
+        const { isFetchingEntries } = this.state;
 
         if (!userData.entries) return (<p>Loading...</p>);
 
@@ -160,38 +192,44 @@ class Timer extends React.Component {
             <List>
                 {userData.entries.length ?
                     <EntriesTable
+                        userData={userData}
+                        mappedItems={mappedItems}
                         setTopbarDescription={this.passRefToChild}
-                        handleRemove={this.handleRemove}
+                        createNewEntry={createNewEntry}
                         updateEntry={this.props.updateEntry}
-                        getProjectColor={this.getProjectColor} /> :
+                        handleRemove={this.handleRemove}
+                        getProjectColor={this.getProjectColor}
+                        daysToShowLength={daysToShowLength}
+                        isFetching={isFetchingEntries} /> :
                     <List_item>Add you first task to begin</List_item>}
             </List>
             {Object.keys(mappedItems).length > 9 &&
                 <Container_center>
-                    {allEntriesFetched && <p>No data available for this period</p>}
-                    {!this.state.isFetchingEntries && !allEntriesFetched && <Button_load onClick={this.appendEntries}>
-                        Load more entries
-                    </Button_load>}
-                    {this.state.isFetchingEntries && <Spinner />}
+                    {isFetchingEntries ? <Spinner /> :
+                        ((!isFetchingEntries && allEntriesFetched) ? <p>No data available for this period</p> :
+                            <Button_load onClick={this.appendEntries}>Load more entries</Button_load>)}
                 </Container_center>}
         </Container>);
     }
 }
 
-const mapStateToProps = ({ user, entry, global }) => ({
+const mapStateToProps = ({ user, entry, global, timer }) => ({
     userData: user.userData,
-    runningEntry: entry.runningEntry,
-    runningEntryDescription: entry.runningEntryDescription,
     isRunning: global.isRunning,
+    weekTimer: timer.weekTimer,
+    daysToShowLength: global.daysToShowLength,
     allEntriesFetched: global.allEntriesFetched,
-    mappedItems: getMappedItems(user.userData)
+    mappedItems: getFilteredMappedItems({ global, user })
 });
 
 const mapDispatchToProps = dispatch => ({
     fetchEntries: (uid, begin, end) => dispatch(actions.user.fetchEntries(uid, begin, end)),
+    createNewEntry: (uid, obj) => dispatch(actions.entry.createNewEntry(uid, obj)),
     removeEntry: (v, v2) => dispatch(actions.entry.removeEntry(v, v2)),
     updateEntry: (userid, runningEntry, obj) => dispatch(actions.entry.updateEntry(userid, runningEntry, obj)),
-    setWeekTimer: str => dispatch(actions.timer.setWeekTimer(str))
+    setWeekTimer: str => dispatch(actions.timer.setWeekTimer(str)),
+    setDaysToShowLength: num => dispatch(actions.global.setDaysToShowLength(num)),
+    setAllEntriesFetched: bool => dispatch(actions.global.setAllEntriesFetched(bool))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Timer); 

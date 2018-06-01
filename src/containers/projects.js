@@ -90,10 +90,18 @@ const Icon_Link = styled.a`
 
 const Icon_Link_Modal = styled(Icon_Link) `
     border:1px solid #ccc;
+    position:relative;
+    padding:.5rem;
 `;
 
 const Footer = styled.section`
     display:flex;
+`;
+
+const Input = styled.input`
+    border: 1px solid #bbb;
+    padding:.5rem;
+    outline-color:transparent;
 `;
 
 const modalStyle = {
@@ -115,6 +123,8 @@ class Projects extends React.Component {
             selectedColor: null,
             colors: shuffle(colors)
         }
+
+        this.setStateBind = this.setState.bind(this);
     }
 
     componentDidMount() {
@@ -146,7 +156,7 @@ class Projects extends React.Component {
 
     handleProjectCreate = () => {
         const { projectInput, clientInput, selectedColor } = this.state;
-        if (!projectInput || !clientInput) return null;
+        if (!projectInput) return null;
 
         this.props.createProject(this.props.userData._id, projectInput, selectedColor, clientInput);
         this.setState({ projectInput: '', clientInput: '', isModalOpen: false });
@@ -178,7 +188,6 @@ class Projects extends React.Component {
                     </Button_Remove>
             </Footer>
 
-            {/* <---modal---> */}
             <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true}
                 overlayRef={node => this.overlayRef = node} onRequestClose={this.closeModal} closeTimeoutMS={200}
                 style={modalStyle}>
@@ -190,19 +199,19 @@ class Projects extends React.Component {
                 </Modal_Header>
                 <Modal_Section>
                     <Relative_container>
-                        <Icon_Link_Modal style={{ position: 'relative' }} onClick={this.openColorSelector}>
+                        <Icon_Link_Modal onClick={this.openColorSelector}>
                             <Color_Indicator color={this.state.selectedColor} />
                             <Icon name="arrow_drop_down" />
                         </Icon_Link_Modal>
 
                         <ColorPickerDropdown isOpen={this.state.isColorSelectorOpen}
-                            state={this.state} setState={this.setState.bind(this)} />
+                            state={this.state} setState={this.setStateBind} />
 
                     </Relative_container>
-                    <input value={this.state.projectInput}
+                    <Input value={this.state.projectInput}
                         onChange={e => this.setState({ projectInput: e.target.value })}
                         placeholder="Project name..." />
-                    <input value={this.state.clientInput}
+                    <Input value={this.state.clientInput}
                         onChange={e => this.setState({ clientInput: e.target.value })}
                         placeholder="Client..." />
                 </Modal_Section>

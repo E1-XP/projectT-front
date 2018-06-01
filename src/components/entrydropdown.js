@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
+import { withRouter } from 'react-router-dom';
 
 import Icon from './icon';
 
 const Screen_blocker = styled.div`
-     display: block;
-    position:fixed;
+    display: block;
+    position:absolute;
     top:0;
     left:0;
     background-color:transparent;
@@ -49,12 +50,21 @@ class EntryDropdown extends React.Component {
         }
     }
 
+    componentWillUnmount() {
+        document.removeEventListener('click', this.closeMenu);
+    }
+
     openMenu = () => {
         this.setState({ isOpen: true }, () => document.addEventListener('click', this.closeMenu));
     }
 
     closeMenu = e => {
         this.setState({ isOpen: false }, () => document.removeEventListener('click', this.closeMenu));
+    }
+
+    goToProjects = () => {
+        console.log('ok');
+        return this.props.history.push('/projects');
     }
 
     onRemove = () => {
@@ -71,7 +81,7 @@ class EntryDropdown extends React.Component {
                     <Icon name="more_vert" fill={isOpen ? "#4bc800" : null} />
                     {isOpen &&
                         <Dropdown>
-                            <Dropdown_item>
+                            <Dropdown_item onClick={this.goToProjects}>
                                 <Item_link_relative fill="#333">
                                     Go to Projects
                             </Item_link_relative>
@@ -89,4 +99,4 @@ class EntryDropdown extends React.Component {
     }
 }
 
-export default EntryDropdown;
+export default withRouter(EntryDropdown);

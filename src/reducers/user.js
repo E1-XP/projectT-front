@@ -12,7 +12,9 @@ export default (state = {}, action) => {
             return Object.assign({}, state, { userData });
         };
         case types.ADD_ENTRIES: {
-            const entries = state.userData.entries.concat(action.payload);
+            const payload = action.payload.filter(itm => state.userData.entries
+                .findIndex(el => el._id === itm._id) < 0);
+            const entries = state.userData.entries.concat(payload);
             const userData = Object.assign({}, state.userData, { entries });
 
             return Object.assign({}, state, { userData });

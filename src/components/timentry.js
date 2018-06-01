@@ -81,6 +81,10 @@ const Input_task = styled.input`
     border:none;
     outline-color:transparent;
     background-color:transparent;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+    margin-right:3px;
 `;
 
 const Item_project = styled.span`
@@ -101,7 +105,7 @@ const Info_container = styled.div`
     white-space: nowrap;
 `;
 
-const dropdownStyle = { top: 25, left: '50%' };
+const dropdownStyle = { top: 25, left: 104 };
 
 export default class TimeEntry extends React.Component {
     constructor(props) {
@@ -111,6 +115,12 @@ export default class TimeEntry extends React.Component {
             description: "",
             isMenuOpen: false
         }
+
+        this.setStateBind = this.setState.bind(this);
+    }
+
+    componentDidUpdate() {
+        if (this.input.value !== this.props.item.description) this.input.value = this.getDescription();
     }
 
     openMenu = () => {
@@ -121,19 +131,13 @@ export default class TimeEntry extends React.Component {
         this.setState({ isMenuOpen: false }, () => document.removeEventListener('click', this.closeMenu));
     }
 
-    setDescription(e) {
-        const { item, changeDescription } = this.props;
-
-        changeDescription(e.target.value, item.id, item.description);
-    }
-
     setBillable = (entryid, bool) => {
         const { userData, updateEntry } = this.props;
 
         updateEntry(userData._id, entryid, { billable: bool });
     }
 
-    getStopStartTime(start, stop) {
+    getStopStartTime = (start, stop) => {
         const startFormat = moment(start).format('hh:mm A');
         const stopFormat = moment(Number(stop)).format('hh:mm A');
 
@@ -156,7 +160,9 @@ export default class TimeEntry extends React.Component {
     }
 
     setDescriptionProxy = e => {
-        this.setDescription(e);
+        const { item, idx, changeDescription } = this.props;
+
+        changeDescription(e.target.value, [item], idx);
     }
 
     handleRemoveProxy = () => {
@@ -183,7 +189,7 @@ export default class TimeEntry extends React.Component {
 
         return (<Item_row key={item.id}>
             <Info_container>
-                <Input_task type="text" defaultValue={this.getDescription()}
+                <Input_task type="text" defaultValue={this.getDescription()} innerRef={node => this.input = node}
                     onBlur={this.setDescriptionProxy} placeholder='Add description' />
                 {item.project && <Item_link onClick={this.openMenu}>
                     <Color_indicator color={this.getProjectColor(item.project)} />
@@ -196,11 +202,11 @@ export default class TimeEntry extends React.Component {
                 </Item_link_toggle>}
                 <ProjectDropdown project={item.project} userData={userData} isOpen={isMenuOpen}
                     setProjectState={this.onProjectClick} style={dropdownStyle}
-                    setParentState={this.setState.bind(this)} />
+                    setParentState={this.setStateBind} />
             </Info_container>
             <Time_container_outer>
                 <Item_link_toggle onClick={this.setBillableProxy}>
-                    <Icon name="attach_money" size="20px" fill={item.billable ? 'green' : null} />
+                    <Icon name="attach_money" size="20px" fill={item.billable ? '#4bc800' : null} />
                 </Item_link_toggle>
                 <Time_container_inner>
                     <span>{item.duration}</span>

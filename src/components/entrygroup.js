@@ -114,7 +114,7 @@ export default class EntryGroup extends React.Component {
     }
 
     render() {
-        const { currentItem, filteredItem, item, getSingleEntries } = this.props;
+        const { currentItem, filteredItem, item, getSingleEntries, idx } = this.props;
 
         return (
             <Entry_section key={currentItem[0].id}>
@@ -124,7 +124,7 @@ export default class EntryGroup extends React.Component {
                         Item_toggle={Item_toggle} Item_link_relative={Item_link_relative} />
                 </Itembody_header>
                 <Itembody_body>
-                    {(filteredItem && currentItem.length > 1) && getSingleEntries(currentItem)}
+                    {(filteredItem && currentItem.length > 1) && getSingleEntries(currentItem, idx)}
                 </Itembody_body>
             </Entry_section>);
     }

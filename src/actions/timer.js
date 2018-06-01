@@ -18,6 +18,7 @@ export const setWeekTimer = string => ({
 });
 
 export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState) => {
+    console.log('istrue', isTrue);
     if (isTrue) {
         let start = moment().format();
         let initialWeekTime = getState().timer.weekTimer;
@@ -37,12 +38,14 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
             state.timer !== time && dispatch(setTimer(time));
             state.weekTimer !== weekTime && dispatch(setWeekTimer(weekTime));
             if (shouldShowTimerOnTitle) document.title = `${time} - ProjectT`;
-        }, 450);
+        }, 350);
     }
     else {
         const entryThatStillRuns = getState().user.userData.entries.find(itm => !itm.stop);
         const runningEntry = getState().entry.runningEntry;
         const dayStart = moment().startOf('day');
+
+        console.log(runningEntry);
 
         if (entryThatStillRuns && entryThatStillRuns.start < dayStart.valueOf()) {
             const state = getState().entry;

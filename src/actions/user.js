@@ -2,8 +2,8 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-const baseUrl = `http://localhost:3001`;
-//const baseUrl = `https://project--t.herokuapp.com`;
+//const baseUrl = `http://localhost:3001`;
+const baseUrl = `https://project--t.herokuapp.com`;
 
 import { loadingError, setAllEntriesFetched } from './global';
 
@@ -90,9 +90,16 @@ export const fetchEntries = (userid, beginat, endat) => dispatch => {
 
         axios.get(url).then(resp => {
             console.log(resp.data);
-            if (resp.data.length) dispatch(addEntries(resp.data));
-            else dispatch(setAllEntriesFetched(true));
-            res();
+            if (resp.data.length) {
+                dispatch(addEntries(resp.data));
+                res(1);
+            }
+            else {
+                setTimeout(() => {
+                    dispatch(setAllEntriesFetched(true));
+                    res(0);
+                }, 300);
+            }
 
         }).catch(err => dispatch(loadingError(err)));
     });

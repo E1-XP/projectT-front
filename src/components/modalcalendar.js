@@ -166,7 +166,7 @@ export default class ModalCalendar extends React.Component {
     }
 
     setLastMonth = () => {
-        const { setState } = this.props;
+        const { closeModal } = this.props;
 
         closeModal(null, {
             periodStart: moment().startOf('month').subtract(1, 'M'),
@@ -177,7 +177,7 @@ export default class ModalCalendar extends React.Component {
     }
 
     setThisYear = () => {
-        const { setState } = this.props;
+        const { closeModal } = this.props;
 
         closeModal(null, {
             periodStart: moment().startOf('year'),
@@ -188,7 +188,7 @@ export default class ModalCalendar extends React.Component {
     }
 
     setLastYear = () => {
-        const { setState } = this.props;
+        const { closeModal } = this.props;
 
         closeModal(null, {
             periodStart: moment().startOf('year').subtract(1, 'y'),

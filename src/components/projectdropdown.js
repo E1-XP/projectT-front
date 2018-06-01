@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Icon from './icon';
+import Scrollbar from './scrollbar';
 
 const Color_indicator = styled.span`
     display:inline-block;
@@ -30,7 +31,7 @@ const Item = styled.li`
 
 const List = styled.ul`
     max-height:12rem;
-    overflow-y:auto;
+    /* overflow-y:auto; */
 `;
 
 const Input = styled.input`
@@ -45,6 +46,11 @@ const Searchbar = styled.div`
     border-radius:5px;
     border:1px solid #ddd;    
     padding:.1rem;
+    margin-bottom:.5rem;
+`;
+
+const Pos_absolute = styled.div`
+    position:absolute;
 `;
 
 const Wrapper = {
@@ -58,13 +64,13 @@ const Wrapper = {
 }
 
 const Screen_blocker = styled.div`
-     display: block;
-        position:fixed;
-        top:0;
-        left:0;
-        background-color:transparent;
-        width:100%;
-        height:100%;
+    display: block;
+    position:absolute;
+    top:0;
+    left:0;
+    background-color:transparent;
+    width:100%;
+    height:100%;
 `;
 
 class ProjectDropdown extends React.Component {
@@ -129,13 +135,15 @@ class ProjectDropdown extends React.Component {
             }
         });
 
-        return (<List>{this.shouldShowItem('no project') &&
-            <Item key='no project' onClick={(e) => setProjectState(null)} className="js-click-close">
-                <Item_link> <Color_indicator color={'bbb'} />no project</Item_link>
-            </Item>}
+        return (<List>
+            {this.shouldShowItem('no project') &&
+                <Item key='no project' onClick={(e) => setProjectState(null)} className="js-click-close">
+                    <Item_link> <Color_indicator color={'bbb'} />no project</Item_link>
+                </Item>}
             {listItems}
             {shouldShowEmptyItem && <Item key='nothing to show' >
-                <Item_link>No projects found</Item_link></Item>}</List>);
+                <Item_link>No projects found</Item_link></Item>}
+        </List>);
     }
 
     render() {
@@ -145,14 +153,18 @@ class ProjectDropdown extends React.Component {
         return (
             <React.Fragment>
                 {isMenuOpen && <Screen_blocker />}
-                {isMenuOpen && <div ref={node => this.dropdown = node} style={this.wrapperStyle}>
-                    <Searchbar >
-                        <Icon name="search" fill="#ccc" size="20px" />
-                        <Input placeholder="Find project..." className="input-standard"
-                            value={inputValue} onChange={this.setInputState} />
-                    </Searchbar>
-                    {this.generateItemArray()}
-                </div>}
+                <Pos_absolute>
+                    {isMenuOpen && <div ref={node => this.dropdown = node} style={this.wrapperStyle}>
+                        <Searchbar >
+                            <Icon name="search" fill="#ccc" size="20px" />
+                            <Input placeholder="Find project..." className="input-standard"
+                                value={inputValue} onChange={this.setInputState} />
+                        </Searchbar>
+                        <Scrollbar>
+                            {this.generateItemArray()}
+                        </Scrollbar>
+                    </div>}
+                </Pos_absolute>
             </React.Fragment>);
     }
 }

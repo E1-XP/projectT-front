@@ -41,7 +41,7 @@ const Overlay = styled.div`
     width:100%;
     height:100%;
     background-color:rgba(255,255,255,.6);
-    transition:all .2s linear;
+    transition:all .4s linear;
     z-index:50;    
     display:flex;
     justify-content:center;
@@ -80,6 +80,11 @@ class ProjectsChart extends React.Component {
             hoveredItem: null,
             activeIdx: -1
         }
+    }
+
+    shouldComponentUpdate(nextP) {
+        if (nextP.isOpen && !this.props.isOpen) return false;
+        return true;
     }
 
     getProjectsLengthSum = projectStr => {

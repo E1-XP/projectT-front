@@ -2,8 +2,8 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-const baseUrl = `http://localhost:3001`;
-//const baseUrl = `https://project--t.herokuapp.com`;
+//const baseUrl = `http://localhost:3001`;
+const baseUrl = `https://project--t.herokuapp.com`;
 
 import { toggleTimer } from './timer';
 import { setEntries, editEntries, removeEntries, setUserData } from './user';
@@ -35,30 +35,36 @@ export const createNewEntry = (userid, queryParams, ignoreIsRunning = false, mul
         Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
         console.log(queryParams);
 
-        const url = `${baseUrl}/users/${userid}/entries?${queryStr}`;
+        const url = `${baseUrl}/users/${userid}/entries?${queryStr}start=${Date.now()}`;
         console.log(url, 'NEW');
 
-        const createEntry = () => axios.post(url).then(res => {
+        const createEntry = () => {
+            !multiDayMode && dispatch(toggleTimer(true));
+
             const projects = getState().user.userData.projects;
             const projectObj = projects[projects.map(itm => itm.name)
                 .findIndex(itm => itm === queryParams.project)];
 
-            dispatch(editEntries(res.data));
-
             if (!queryParams.stop) {
                 dispatch(setProject(projectObj));
-                dispatch(setRunningEntry(res.data._id));
                 dispatch(setRunningEntryDescription(queryParams.description || ""));
                 dispatch(setBillable(queryParams.billable));
             }
-            !multiDayMode && dispatch(toggleTimer(true));
-        }).catch(err => dispatch(loadingError(err)));
+
+            axios.post(url).then(resp => {
+                console.log(queryParams.stop, 'stop');
+                !queryParams.stop && dispatch(setRunningEntry(resp.data._id));
+                dispatch(editEntries(resp.data));
+
+            }).catch(err => dispatch(loadingError(err)));
+        }
 
         if (!ignoreIsRunning && getState().global.isRunning) {
             const state = getState();
             const params = { stop: Date.now() };
 
             if (!multiDayMode) {
+                console.log('WILL DISPATCH UPDATE')
                 dispatch(toggleTimer(false));
                 dispatch(updateEntry(state.user.userData._id, state.entry.runningEntry, params));
                 createEntry();
@@ -72,10 +78,11 @@ export const updateEntry = (userid, runningEntryId, queryParams) => dispatch => 
     Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
 
     const url = `${baseUrl}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
-    console.log(url);
+    console.log(url, 'updte');
 
     axios.put(url).then(resp => {
         dispatch(editEntries(resp.data));
+        console.log('SETTING ID AS NULL', queryParams.stop)
         if (queryParams.stop) dispatch(setRunningEntry(null));
 
     }).catch(err => dispatch(loadingError(err)));

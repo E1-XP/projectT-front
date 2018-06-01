@@ -108,6 +108,8 @@ class TopBar extends React.Component {
             isTimerModeManual: false,
             isMenuOpen: false
         }
+
+        this.setStateBind = this.setState.bind(this);
     }
 
     componentDidMount() {
@@ -130,16 +132,19 @@ class TopBar extends React.Component {
     }
 
     handleClick = () => {
-        const { isRunning, createNewEntry, userData, runningEntryDescription,
+        const { isRunning } = this.props;
+
+        return isRunning ? this.stopTimer() : this.startTimer();
+    }
+
+    startTimer = () => {
+        const { createNewEntry, userData, runningEntryDescription,
             currentProject, billable } = this.props;
 
-        if (!isRunning) {
-            const params = { description: runningEntryDescription, billable };
-            if (currentProject) params.project = currentProject.name;
+        const params = { description: runningEntryDescription, billable };
+        if (currentProject) params.project = currentProject.name;
 
-            createNewEntry(userData._id, params);
-        }
-        else this.stopTimer();
+        createNewEntry(userData._id, params);
     }
 
     stopTimer = () => {
@@ -147,8 +152,6 @@ class TopBar extends React.Component {
             setRunningEntryDescription, setWeekTimer, currentProject, setProject, billable } = this.props;
 
         toggleTimer(false);
-
-        setWeekTimer(getWeekTime(userData.entries));
         setRunningEntryDescription('');
         setProject(null);
         this.setState({ description: '' });
@@ -227,7 +230,7 @@ class TopBar extends React.Component {
                             <Icon name="folder" fill="#bbb" size="20px" />
                         </Item_link>}
                     <ProjectDropdown setProjectState={this.setProjectState} userData={userData} style={dropdownStyle}
-                        isOpen={this.state.isMenuOpen} setParentState={this.setState.bind(this)} />
+                        isOpen={this.state.isMenuOpen} setParentState={this.setStateBind} />
                 </Span_relative>
                 <Task_timing_inner>
                     <Item_link onClick={this.setBillable}>

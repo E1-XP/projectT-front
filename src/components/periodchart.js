@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import {
     BarChart, Bar, CartesianGrid, XAxis, YAxis, LabelList,
-    Cell, Text, ResponsiveContainer
+    Cell, Text, ResponsiveContainer, Tooltip
 } from 'recharts';
 
 import moment from 'moment';
@@ -65,7 +65,23 @@ const Spinner = styled.span`
     animation:${rotateAnim} .5s linear infinite;
 `;
 
+const Ttip = styled.div`
+    background-color:#fff;
+    border:1px solid #ddd;
+    padding:.3rem .6rem;
+    color:${props => props.hasValue ? '#45aaf2' : '#333'};
+`;
+
+const CustomTooltip = ({ active, payload, label }) =>
+    (active ? <Ttip hasValue={payload[0].payload.duration !== '0:00'}>
+        {payload[0].payload.duration}</Ttip> : null);
+
 export default class PeriodTimeChart extends React.Component {
+    shouldComponentUpdate(nextP) {
+        if (nextP.isOpen && !this.props.isOpen) return false;
+        return true;
+    }
+
     componentDidUpdate(prevP, prevS) {
         const { periodType, allEntriesFetched, getYearData, data, setIsLoading, isLoading, shouldUpdate } = this.props;
 
@@ -189,13 +205,12 @@ export default class PeriodTimeChart extends React.Component {
         const isPeriodCustomAndLong = isPeriodCustom && customPeriodLength > 31;
         const isPeriodTypeShort = ['months', 'years'].indexOf(periodType) === -1;
 
-        const highestValue = (dataSrc => dataSrc.concat().sort((a, b) => b.time - a.time)[0].time)
-            (isPeriodYears ? yearData : data);
-
-        const areSomeItemsEmpty = isPeriodYears ? yearData.some(itm => !itm.time) : data.some(itm => !itm.time);
-
         const todayReadable = moment().format('ddd, Do MMM');
         const checkedData = this.getCheckedData(!isPeriodYears, data, yearData, isPeriodCustomAndLong);
+
+        const highestValue = checkedData.concat().sort((a, b) => b.time - a.time)[0].time;
+
+        const areSomeItemsEmpty = isPeriodYears ? yearData.some(itm => !itm.time) : data.some(itm => !itm.time);
 
         const shouldShowLabelList = () => isPeriodCustomAndLong || isPeriodYears ||
             (isPeriodTypeShort && !isPeriodCustom) || (isPeriodCustom && customPeriodLength < 16);
@@ -206,7 +221,6 @@ export default class PeriodTimeChart extends React.Component {
 
         const formattedYticks = v => moment.duration(v).format("h[h]m[m]:s[s]", { largest: 1 });
 
-        console.log(isPeriodYears ? yearData : data);
         return (<Wrapper>
             <Overlay visible={isLoading || !isLoading && !highestValue || !highestValue}>
                 {isLoading ? (<Spinner />) : (highestValue ? '' : 'No data available')}
@@ -217,6 +231,7 @@ export default class PeriodTimeChart extends React.Component {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis interval={xAxisInterval(checkedData.length)} tickLine={false} dataKey="readable" height={60}
                         tick={this.getCustomTick} />
+                    {!shouldShowLabelList() && <Tooltip cursor={false} isAnimationActive={false} content={<CustomTooltip />} />}
                     <Bar dataKey="time" data={checkedData} isAnimationActive={false} maxBarSize={100} minPointSize={4}>
                         {shouldShowLabelList() && <LabelList dataKey="duration" position="top" content={this.getCustomLabel} />}
                         {checkedData.map((itm, i) => <Cell fill={itm.hasValue ? "#45aaf2" : '#999'} key={`${i}-${itm.time}`} />)}

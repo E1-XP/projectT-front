@@ -41,39 +41,37 @@ const List_item = styled.li`
 
 const ProjectsCounter = ({ userData }) => {
 
-    const projectsLengthSum = (projectStr) => {
-        const now = moment();
-        const total = userData.entries
-            .filter(item => item.stop !== undefined)
-            .filter(itm => itm.project === projectStr)
-            // .filter(item => now.diff(item.start, 'days') < 7)
-            .reduce((acc, item) =>
-                acc + moment.duration(moment(Number(item.stop)).diff(item.start)).valueOf(), 0);
+    const projectsLengthSum = projectStr => userData.entries
+        .reduce((acc, itm) => {
+            return (itm.stop !== undefined && itm.project === projectStr) ?
+                acc += itm.stop - itm.start :
+                acc;
+        }, 0);
 
-        return total;// moment(total);//.format('h:mm:ss', { stopTrim: "hh mm ss" });
-    };
+    const getReadableSum = total => moment.duration(total).format('h:mm:ss', { stopTrim: "hh mm ss" });
 
-    const getProjectTime = projectStr => {
-        const total = projectsLengthSum(projectStr);
-        return moment.duration(total).format('h:mm:ss', { stopTrim: "hh mm ss" });
-    };
+    const projectTimes = userData.projects.reduce((acc, itm) => {
+        acc[itm.name] = projectsLengthSum(itm.name);
+        return acc;
+    }, {});
 
-    return (
-        <Wrapper>
-            <Heading>Most Tracked</Heading>
-            <List>
-                {userData.projects.length ?
-                    userData.projects.map((itm, i) =>
+    return (<Wrapper>
+        <Heading>Most Tracked</Heading>
+        <List>
+            {userData.projects.length ?
+                userData.projects
+                    .map(itm => ({ ...itm, total: projectTimes[itm.name] }))
+                    .sort((a, b) => b.total - a.total)
+                    .map((itm, i) =>
                         (<List_item key={itm.name}>
                             <span>
                                 <Color_Indicator color={itm.color} />{itm.name}
                             </span>
-                            <span>{getProjectTime(itm.name)}</span>
+                            <span>{getReadableSum(itm.total)}</span>
                         </List_item>)) :
-                    <li>No projects</li>}
-            </List>
-        </Wrapper>
-    );
+                <List_item>No projects</List_item>}
+        </List>
+    </Wrapper>);
 }
 
 export default ProjectsCounter;

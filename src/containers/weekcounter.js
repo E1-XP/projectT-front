@@ -52,6 +52,13 @@ const Timer = styled.span`
     color:black;
 `;
 
+const TooltipContainer = styled.div`
+    display:flex;
+    justify-content:space-between;
+`;
+
+const overlayStyle = { fontSize: '14px', padding: '.5rem' };
+
 class WeekTimer extends React.Component {
     shouldComponentUpdate(nextProps) {
         if (this.props.isRunning && !nextProps.isRunning) return false;
@@ -63,24 +70,26 @@ class WeekTimer extends React.Component {
         const percent = `${~~((weekProjectsSum[itm] / total) * 100)}%`;
         const readable = moment.duration(weekProjectsSum[itm]).format('h:mm:ss', { stopTrim: "hh mm ss" });
 
-        return `${itm === 'noproject' ? '(No Project)' : itm}  ${readable}  ${percent}`;
+        return (<TooltipContainer>
+            <span>{itm === 'noproject' ? '(No Project)' : itm}</span><span>{readable}</span><span>{percent}</span>
+        </TooltipContainer>);
     }
 
     getBarParts = () => {
         const { weekProjectsSum, getProjectColor } = this.props;
+        const isDataAvailable = Object.keys(weekProjectsSum).length > 1 || weekProjectsSum['noproject'] !== 0;
 
-        if (Object.keys(weekProjectsSum).length <= 1) return null;
+        const dataSrc = isDataAvailable ? weekProjectsSum : { ['No data available']: 1 };
+        const totalSum = isDataAvailable ? Object.keys(weekProjectsSum).reduce((acc, itm) => acc + weekProjectsSum[itm], 0) : 1;
 
-        const totalSum = Object.keys(weekProjectsSum).reduce((acc, itm) => acc + weekProjectsSum[itm], 0);
-
-        return Object.keys(weekProjectsSum).map(itm => {
-            const width = (weekProjectsSum[itm] / totalSum) * 100;
+        return Object.keys(dataSrc).map(itm => {
+            const width = (dataSrc[itm] / totalSum) * 100;
 
             return (<Tooltip key={itm} overlay={this.showInfoOnHover(itm, totalSum)} placement="top"
-                mouseLeaveDelay={.2}>
-                <WeekBarPart key={itm} width={width} name={itm} color={getProjectColor(itm)} >
-                    {width > 3 && <Bar_text width={width} >{itm === 'noproject' ? '(NO PROJECT)' :
-                        itm.toUpperCase()}</Bar_text>}
+                overlayStyle={overlayStyle} mouseLeaveDelay={.2}>
+                <WeekBarPart key={itm} width={width} name={itm} color={itm === 'No data available' ? '#bbb' : getProjectColor(itm)}>
+                    {width > 3 && <Bar_text width={width}>
+                        {itm === 'noproject' ? '(NO PROJECT)' : itm.toUpperCase()}</Bar_text>}
                 </WeekBarPart>
             </Tooltip>)
         });
@@ -89,14 +98,12 @@ class WeekTimer extends React.Component {
     render() {
         const { weekTimer } = this.props;
 
-        return (
-            <Week_counter>
-                This week: <Timer>{weekTimer}</Timer>
-                <WeekBar>
-                    {this.getBarParts()}
-                </WeekBar>
-            </Week_counter>
-        );
+        return (<Week_counter>
+            This week: <Timer>{weekTimer}</Timer>
+            <WeekBar>
+                {this.getBarParts()}
+            </WeekBar>
+        </Week_counter>);
     }
 }
 

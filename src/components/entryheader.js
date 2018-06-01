@@ -22,6 +22,10 @@ const Input_task = styled.input`
     border: none;
     outline-color: transparent;
     background-color:transparent;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+    margin-right:3px;
 `;
 
 const Item_project = styled.span`
@@ -46,7 +50,6 @@ const Item_link_relative = styled.span`
 `;
 
 const Wrapper = styled.div`
-    position: relative;
     margin-left:1.5rem;
     white-space: nowrap;
 `;
@@ -59,7 +62,9 @@ export default class EntryHead extends React.Component {
             isMenuOpen: false
         }
 
-        this.dropdownStyle = { top: '25px', left: '50%' };
+        this.dropdownStyle = { top: '25px', left: '146px' };
+
+        this.setStateBind = this.setState.bind(this);
     }
 
     openMenu = () => {
@@ -80,12 +85,21 @@ export default class EntryHead extends React.Component {
     }
 
     onBlurDescriptionSaveProxy = e => {
-        const { currentItem, idx, onBlurDescriptionSave } = this.props;
-        onBlurDescriptionSave(e, currentItem, idx);
+        const { currentItem, idx, onBlurDescriptionSave, projectDescription } = this.props;
+
+        onBlurDescriptionSave(e.target.value, currentItem, idx, projectDescription);
+    }
+
+    componentDidUpdate() {
+        const { projectDescription } = this.props;
+
+        if (projectDescription !== this.input.value) {
+            this.input.value = projectDescription === '$empty#' ? '' : projectDescription;
+        }
     }
 
     render() {
-        const { filteredItem, idx, item, projectDescription, userData, currentItem, getProjectColor,
+        const { filteredItem, item, projectDescription, userData, currentItem, getProjectColor,
             projectName, Item_link_toggle } = this.props;
         const { isMenuOpen } = this.state;
 
@@ -96,7 +110,7 @@ export default class EntryHead extends React.Component {
                     onClick={this.toggleEntriesProxy} isOpen={filteredItem} >
                     {currentItem.length}
                 </GroupEntries_length>}
-            <Input_task type="text" placeholder="Add description"
+            <Input_task type="text" placeholder="Add description" innerRef={node => this.input = node}
                 defaultValue={projectDescription === '$empty#' ? '' : projectDescription}
                 onBlur={this.onBlurDescriptionSaveProxy} />
             {projectName &&
@@ -110,7 +124,7 @@ export default class EntryHead extends React.Component {
                 <Icon name="folder" size="20px" />
             </Item_link_toggle>}
             {<ProjectDropdown project={projectName} userData={userData} isOpen={this.state.isMenuOpen}
-                setProjectState={this.onProjectClick} style={this.dropdownStyle} setParentState={this.setState.bind(this)} />}
+                setProjectState={this.onProjectClick} style={this.dropdownStyle} setParentState={this.setStateBind} />}
         </Wrapper>);
     }
 }

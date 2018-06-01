@@ -1,102 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import styled from 'styled-components';
 import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
 import * as actions from '../actions';
-import getMappedItems from '../selectors/getmappeditems';
+import getFilteredMappedItems from '../selectors/getfilteredmappeditems';
 
-import Modal from 'react-modal';
-import Icon from '../components/icon';
-import ModalCalendar from '../components/modalcalendar';
-import PeriodTimeChart from '../components/periodchart';
-import ProjectChart from '../components/projectchart';
-import ProjectsCounter from '../components/projectscounter';
-
-const Wrapper = styled.div`
-    width:100%;
-    max-width:1200px;
-    margin:1rem auto;
-    display:flex;
-    justify-content:space-between;
-    padding:1rem;
-    padding-top:0;
-`;
-
-const Header = styled.header`
-    display:flex;
-    justify-content:space-between;
-`;
-
-const Heading = styled.h2`
-    font-size:34px;
-    font-weight:500;
-`;
-
-const Heading_section = styled.h3`
-    font-size:24px;
-    font-weight:700;
-    display:flex;
-    position:relative;
-`;
-
-const Chart_Section = styled.section`
-    flex-basis:72%;
-    width:0;
-    min-width:530px;
-    margin-right:1rem;
-`;
-
-const Item_link = styled.a`
-    color:#333;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-`;
-
-const Item_link_border = styled(Item_link) `
-    border-right:1px solid #ddd;
-    & > span {
-        width:1.5rem;
-        color:#bbb;
-    }
-    &:hover > span {
-        color:#333;
-    }
-`;
-
-const Item_link_hover = styled(Item_link) `
-    color:#bbb;
-    &:hover{
-     color:#333;  
-    }
-`;
-
-const Period_selection = styled.div`
-    display:flex;  
-`;
-
-const Screen_blocker = styled.div`
-     display: block;
-        position:fixed;
-        top:0;
-        left:0;
-        background-color:transparent;
-        width:100%;
-        height:100%;
-        z-index:50;
-`;
-
-const modalStyle = {
-    overlay: { backgroundColor: 'transparent' },
-    content: {
-        width: '600px', margin: '0 auto', height: '398px', padding: '0', position: 'absolute',
-        top: '50px', left: 'initial', right: '185px'
-    }
-};
+import DashboardComponent from '../components/dashboard';
 
 class Dashboard extends React.Component {
     constructor() {
@@ -130,6 +42,8 @@ class Dashboard extends React.Component {
 
         this.monthLabels = ['January', 'February', 'March', 'April', 'May', 'Juni', 'July',
             'August', 'September', 'October', 'November', 'December'];
+
+        this.setStateBind = this.setState.bind(this);
     }
 
     setStateProxy = state => {
@@ -305,34 +219,27 @@ class Dashboard extends React.Component {
         return periodReadable;
     }
 
-    openCalendar = () => {
-        this.setState({ isCalendarOpen: true }, () => document.addEventListener('click', this.closeCalendar));
-    }
-
-    closeCalendar = (e, stateObj = null) => {
-        const tmpState = stateObj || this.state.tmpState;
-
-        if (!e || !this.dropdown.contains(e.target)) {
-            const state = { isCalendarOpen: false, ...tmpState, tmpState: {} };
-            this.setState(state, () => document.removeEventListener('click', this.closeCalendar));
-        }
-    }
-
     appendEntries = () => {
-        const { userData, setAllEntriesFetched, fetchEntries } = this.props;
+        const { userData, fetchEntries, setDaysToShowLength, daysToShowLength } = this.props;
         const { periodStart, periodStop } = this.state;
 
         const startAt = moment(userData.entries[userData.entries.length - 1].start).dayOfYear();
         const endAt = moment(periodStart).dayOfYear();
 
         this.setState({ isLoading: true, shouldUpdate: false });
+        setDaysToShowLength(false);
 
+        console.log(startAt, endAt);
         return new Promise((res, rej) => {
-            if (startAt > endAt) fetchEntries(userData._id, startAt, endAt).then(() => {
-                this.setState({ isLoading: false, shouldUpdate: true });
+            if (startAt > endAt) fetchEntries(userData._id, startAt, endAt)
+                .then(() => {
+                    this.setState({ isLoading: false, shouldUpdate: true });
+                    res();
+                });
+            else {
                 res();
-            });
-            else res();
+                this.setIsLoading(false);
+            }
         });
     }
 
@@ -342,59 +249,31 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        const { userData, allEntriesFetched } = this.props;
-        const { mappedItems, periodReadable, periodStart, periodStop, periodType, isCalendarOpen,
-            customPeriodLength, isLoading, shouldUpdate } = this.state;
+        const { userData, allEntriesFetched, setItemsToShowLength, mappedItems } = this.props;
+        const { periodReadable, periodStart, periodStop, periodType, isCalendarOpen, customPeriodLength, isLoading,
+            shouldUpdate } = this.state;
 
-        if (!Object.keys(userData).length && !Object.keys(mappedItems).length) return (<p>Loading...</p>);
+        if (!userData.entries.length || !mappedItems) return (<p>Loading...</p>);
 
-        return (<Wrapper>
-            <Chart_Section>
-                <Header>
-                    <Heading>Dashboard</Heading>
-                    <Heading_section >
-                        <Item_link_border onClick={this.openCalendar}>
-                            {periodReadable}
-                            <Icon name={isCalendarOpen ? 'close' : 'arrow_drop_down'}
-                                fill={isCalendarOpen ? '#333' : '#bbb'}
-                                size={isCalendarOpen ? '18px' : '24px'} />
-                        </Item_link_border>
-                        <Period_selection>
-                            <Item_link_hover onClick={this.subtractPeriodState}>
-                                <Icon name="keyboard_arrow_left" />
-                            </Item_link_hover>
-                            <Item_link_hover onClick={this.addPeriodState}>
-                                <Icon name="keyboard_arrow_right" />
-                            </Item_link_hover>
-                        </Period_selection>
-
-                        {isCalendarOpen && <Screen_blocker />}
-                        <div ref={node => this.dropdown = node}>
-                            <ModalCalendar periodStart={periodStart} periodStop={periodStop} closeModal={this.closeCalendar}
-                                isOpen={isCalendarOpen} setReadableHeading={this.setReadableHeading} setState={this.setStateProxy} />
-                        </div>
-
-                    </Heading_section>
-                </Header>
-                <PeriodTimeChart data={this.getPeriodTimeArr()} getYearData={this.getYearMonthsArr} isLoading={isLoading}
-                    customPeriodLength={customPeriodLength} periodType={periodType} isOpen={isCalendarOpen} shouldUpdate={shouldUpdate}
-                    getMoreEntries={this.appendEntries} allEntriesFetched={allEntriesFetched} setIsLoading={this.setIsLoading} />
-                <ProjectChart userData={userData} totalWeekTime={this.getTotalWeekTime} isLoading={isLoading}
-                    periodStart={periodStart} periodStop={periodStop} isOpen={isCalendarOpen} />
-            </Chart_Section>
-            <ProjectsCounter userData={userData} />
-        </Wrapper>);
+        return (<DashboardComponent periodReadable={periodReadable} periodType={periodType} state={this.state} setState={this.setStateBind}
+            subtractPeriodState={this.subtractPeriodState} addPeriodState={this.addPeriodState} getTotalWeekTime={this.getTotalWeekTime}
+            isCalendarOpen={isCalendarOpen} periodStart={periodStart} periodStop={periodStop} getYearMonthsArr={this.getYearMonthsArr}
+            setReadableHeading={this.setReadableHeading} customPeriodLength={customPeriodLength} appendEntries={this.appendEntries}
+            setStateProxy={this.setStateProxy} getPeriodTimeArr={this.getPeriodTimeArr} allEntriesFetched={allEntriesFetched}
+            userData={userData} setIsLoading={this.setIsLoading} isLoading={isLoading} shouldUpdate={shouldUpdate} />);
     }
 }
 
 const mapStateToProps = ({ user, global }) => ({
     userData: user.userData,
-    mappedItems: getMappedItems(user.userData),
+    mappedItems: getFilteredMappedItems({ global, user }),
+    daysToShowLength: global.daysToShowLength,
     allEntriesFetched: global.allEntriesFetched
 });
 
 const mapDispatchToProps = dispatch => ({
-    fetchEntries: (uid, begin, end) => dispatch(actions.user.fetchEntries(uid, begin, end))
+    fetchEntries: (uid, begin, end) => dispatch(actions.user.fetchEntries(uid, begin, end)),
+    setDaysToShowLength: num => dispatch(actions.global.setDaysToShowLength(num))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
