@@ -1,9 +1,10 @@
 import React from 'react';
 import { withRouter, NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
-import * as actions from '../actions';
-
 import styled from 'styled-components';
+
+import * as actions from '../actions';
+import handleValidation from '../helpers/formvalidation';
 
 const Wrapper = styled.div`
     width:100%;
@@ -98,7 +99,7 @@ class Form extends React.Component {
         const { location, handleAuth } = this.props;
         const route = location.pathname.toLowerCase().slice(1);
 
-        if (this.handleValidation()) handleAuth(route, this.state);
+        if (handleValidation(this.state, this.setState.bind(this))) handleAuth(route, this.state);
     }
 
     toggleChecked = () => {
@@ -107,52 +108,6 @@ class Form extends React.Component {
 
     getHeading = isSignUpRoute => {
         return isSignUpRoute ? 'Sign Up to enter our App.' : 'Log in to get access to your account.';
-    }
-
-    handleValidation = () => {
-        const { email, username, password, password2 } = this.state;
-        const isSignUp = location.pathname.toLowerCase().slice(1) === 'signup';
-
-        const emailRegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        const usernameRegExp = /^([a-zA-Z0-9_-]){2,32}$/;
-        const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
-        const newAccountValidation = {
-            email: true,
-            usern: true,
-            pass: true,
-            pass2: true
-        };
-        let validationMessage = [];
-
-        ///reset state
-        this.setState({
-            validationMessage: ""
-        });
-
-        if (!isSignUp && email.length && password.length) return true;
-        else if (!isSignUp) return this.setState({ validationMessage: "fields can't be empty" });
-
-        if (!new RegExp(emailRegExp).test(email)) {
-            validationMessage.push("email adress is not valid");
-            newAccountValidation.email = false;
-        }
-        if (!new RegExp(usernameRegExp).test(username)) {
-            validationMessage.push("username must be between 2 and 32 alphanumeric or '_' and '-' characters long");
-            newAccountValidation.usern = false;
-        }
-
-        if (!new RegExp(passwordRegExp).test(password) || password !== password2) {
-            validationMessage.push("password must contain at least 8 characters, one upper and lowercase letters and one number");
-            newAccountValidation.pass = false;
-            newAccountValidation.pass2 = false;
-        }
-
-        this.setState({
-            validationMessage: validationMessage.join(", "),
-            newAccountValidation: { ...newAccountValidation }
-        });
-
-        return validationMessage.length ? false : true;
     }
 
     render() {

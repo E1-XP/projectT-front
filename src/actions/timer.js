@@ -45,8 +45,6 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
         const runningEntry = getState().entry.runningEntry;
         const dayStart = moment().startOf('day');
 
-        console.log(runningEntry);
-
         if (entryThatStillRuns && entryThatStillRuns.start < dayStart.valueOf()) {
             const state = getState().entry;
             const entryState = {
@@ -58,6 +56,8 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
 
         }
         else if (runningEntry) {
+            console.log('if runn entry this will fire :');
+
             const now = moment().valueOf();
             const state = getState().entry;
             const project = (state.currentProject && state.currentProject.name) ? state.currentProject.name : '';

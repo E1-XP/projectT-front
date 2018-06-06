@@ -111,6 +111,7 @@ class Profile extends React.Component {
     validatePasswordForm = () => {
         const { userData, setPassword } = this.props;
         const { modalPassword } = this.state;
+        const passwordRegExp = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
 
         this.setState({
             isPasswordFormInvalid: false,
@@ -125,6 +126,11 @@ class Profile extends React.Component {
         else if (modalPassword.newpass !== modalPassword.newpass2) this.setState({
             isPasswordFormInvalid: true,
             errorMessage: 'New passwords are not equal'
+        });
+
+        else if (!new RegExp(passwordRegExp).test(modalPassword.newpass)) this.setState({
+            isPasswordFormInvalid: true,
+            errorMessage: 'you must use: 8+ characters, number and upper/lowercase letters'
         });
 
         else {

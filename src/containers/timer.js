@@ -85,21 +85,23 @@ class Timer extends React.Component {
     }
 
     componentDidMount() {
-        const { userData, setWeekTimer, setAllEntriesFetched, allEntriesFetched, setDaysToShowLength } = this.props;
+        const { userData, setWeekTimer, setAllEntriesFetched, allEntriesFetched, daysToShowLength,
+            setDaysToShowLength } = this.props;
 
-        setDaysToShowLength(10);
+        if (daysToShowLength !== 10) setDaysToShowLength(10);
 
         if (allEntriesFetched) setAllEntriesFetched(false);
 
         if (userData.entries.length) setWeekTimer(this.getWeekTimeComposed(userData.entries));
+        //this.props.createNewEntry('5aed60ebf94ad304ec8fc130', { start: 1528030517000 });
     }
 
     shouldComponentUpdate(nextP, nextS) {
         const { mappedItems, daysToShowLength, allEntriesFetched, weekTimer } = this.props;
         const { isFetchingEntries } = this.state;
 
-        if (allEntriesFetched!==nextP.allEntriesFetched)  return true;
-        
+        if (allEntriesFetched !== nextP.allEntriesFetched) return true;
+
         if (isFetchingEntries === nextS.isFetchingEntries &&
             JSON.stringify(nextP.mappedItems) === JSON.stringify(mappedItems)) return false;
 
@@ -192,14 +194,11 @@ class Timer extends React.Component {
             <List>
                 {userData.entries.length ?
                     <EntriesTable
-                        userData={userData}
-                        mappedItems={mappedItems}
                         setTopbarDescription={this.passRefToChild}
                         createNewEntry={createNewEntry}
                         updateEntry={this.props.updateEntry}
                         handleRemove={this.handleRemove}
                         getProjectColor={this.getProjectColor}
-                        daysToShowLength={daysToShowLength}
                         isFetching={isFetchingEntries} /> :
                     <List_item>Add you first task to begin</List_item>}
             </List>

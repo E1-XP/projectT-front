@@ -33,17 +33,17 @@ export const createNewEntry = (userid, queryParams, ignoreIsRunning = false, mul
     (dispatch, getState) => {
         let queryStr = ``;
         Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
-        console.log(queryParams);
+        if (!multiDayMode) queryStr += `start=${Date.now()}`;
 
-        const url = `${baseUrl}/users/${userid}/entries?${queryStr}start=${Date.now()}`;
+        const url = `${baseUrl}/users/${userid}/entries?${queryStr}`;
         console.log(url, 'NEW');
+
+        const projects = getState().user.userData.projects;
+        const projectObj = projects[projects.map(itm => itm.name)
+            .findIndex(itm => itm === queryParams.project)];
 
         const createEntry = () => {
             !multiDayMode && dispatch(toggleTimer(true));
-
-            const projects = getState().user.userData.projects;
-            const projectObj = projects[projects.map(itm => itm.name)
-                .findIndex(itm => itm === queryParams.project)];
 
             if (!queryParams.stop) {
                 dispatch(setProject(projectObj));
@@ -52,41 +52,40 @@ export const createNewEntry = (userid, queryParams, ignoreIsRunning = false, mul
             }
 
             axios.post(url).then(resp => {
-                console.log(queryParams.stop, 'stop');
-                !queryParams.stop && dispatch(setRunningEntry(resp.data._id));
+
                 dispatch(editEntries(resp.data));
+                (!queryParams.stop) && dispatch(setRunningEntry(resp.data._id));
 
             }).catch(err => dispatch(loadingError(err)));
         }
 
-        if (!ignoreIsRunning && getState().global.isRunning) {
+        if (!ignoreIsRunning && getState().global.isRunning && !multiDayMode) {
             const state = getState();
             const params = { stop: Date.now() };
 
-            if (!multiDayMode) {
-                console.log('WILL DISPATCH UPDATE')
-                dispatch(toggleTimer(false));
-                dispatch(updateEntry(state.user.userData._id, state.entry.runningEntry, params));
-                createEntry();
-            }
+            dispatch(toggleTimer(false));
+            dispatch(updateEntry(state.user.userData._id, state.entry.runningEntry, params));
         }
-        else createEntry();
+        createEntry();
     }
 
-export const updateEntry = (userid, runningEntryId, queryParams) => dispatch => {
-    let queryStr = ``;
-    Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
+export const updateEntry = (userid, runningEntryId, queryParams) =>
+    (dispatch, getState) => {
+        let queryStr = ``;
+        Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
 
-    const url = `${baseUrl}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
-    console.log(url, 'updte');
+        const url = `${baseUrl}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
 
-    axios.put(url).then(resp => {
-        dispatch(editEntries(resp.data));
-        console.log('SETTING ID AS NULL', queryParams.stop)
-        if (queryParams.stop) dispatch(setRunningEntry(null));
+        axios.put(url).then(resp => {
+            dispatch(editEntries(resp.data));
 
-    }).catch(err => dispatch(loadingError(err)));
-}
+            if (getState().global.isRunning) return null;
+
+            if (queryParams.stop && getState().global.runningEntry === resp._id) {
+                dispatch(setRunningEntry(null));
+            }
+        }).catch(err => dispatch(loadingError(err)));
+    }
 
 export const removeEntry = (userid, entryid) => dispatch => {
     if (entryid.length !== 24) entryid = JSON.stringify(entryid);

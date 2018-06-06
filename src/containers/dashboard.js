@@ -40,7 +40,7 @@ class Dashboard extends React.Component {
         this.thisYearReadable = `${moment().format('YYYY')}`;
         this.lastYearReadable = `${moment().subtract(1, 'years').format('YYYY')}`;
 
-        this.monthLabels = ['January', 'February', 'March', 'April', 'May', 'Juni', 'July',
+        this.monthLabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
             'August', 'September', 'October', 'November', 'December'];
 
         this.setStateBind = this.setState.bind(this);
@@ -95,6 +95,7 @@ class Dashboard extends React.Component {
 
         const sortByMonth = (acc, itm) => {
             const itemMonth = moment(itm.start).format('MMMM');
+
             acc[itemMonth].push(itm);
             return acc;
         };
@@ -103,7 +104,7 @@ class Dashboard extends React.Component {
             .filter(itm => itm.stop !== undefined && itm.start > periodStart.valueOf() &&
                 itm.stop < moment(periodStop).valueOf())
             .reduce(sortByMonth, baseObj);
-
+        console.log(entriesByMonth);
         const getMonthSum = arrOfEntries => arrOfEntries.reduce((acc, itm) => acc += (itm.stop - itm.start), 0);
 
         const getDuration = name => {

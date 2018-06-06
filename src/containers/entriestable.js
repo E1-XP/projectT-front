@@ -4,6 +4,11 @@ import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
+import { connect } from 'react-redux';
+import * as actions from '../actions';
+
+import getFilteredMappedItems from '../selectors/getfilteredmappeditems';
+
 import EntryGroup from '../components/entrygroup';
 import EntryHeader from '../components/entryheader';
 import EntryTimer from '../components/entrytimer';
@@ -278,4 +283,10 @@ class EntriesTable extends React.Component {
     }
 }
 
-export default EntriesTable;
+const mapStateToProps = ({ user, global }) => ({
+    userData: user.userData,
+    mappedItems: getFilteredMappedItems({ global, user }),
+    daysToShowLength: global.daysToShowLength
+});
+
+export default connect(mapStateToProps, null)(EntriesTable);
