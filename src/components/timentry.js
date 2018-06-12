@@ -13,7 +13,7 @@ const Item_link = styled.a`
     cursor:pointer;
 `;
 
-const Item_link_toggle = styled(Item_link) `
+const Item_link_toggle = styled(Item_link)`
     opacity:${props => props.isOpen ? '1' : '0'};
     pointer-events:none;
     color:${props => props.isOpen ? '#999' : '#ccc'};
@@ -145,7 +145,7 @@ export default class TimeEntry extends React.Component {
     }
 
     getProjectColor = projectName => {
-        const { projects } = this.props.userData;
+        const { projects } = this.props;
         let color;
 
         projects.map(itm => itm.name === projectName ? color = itm.color : null);
@@ -184,7 +184,7 @@ export default class TimeEntry extends React.Component {
     }
 
     render() {
-        const { item, userData } = this.props;
+        const { item, projects } = this.props;
         const { isMenuOpen } = this.state;
 
         return (<Item_row key={item.id}>
@@ -200,7 +200,7 @@ export default class TimeEntry extends React.Component {
                 {!item.project && <Item_link_toggle isOpen={isMenuOpen} onClick={this.openMenu}>
                     <Icon name="folder" size="20px" />
                 </Item_link_toggle>}
-                <ProjectDropdown project={item.project} userData={userData} isOpen={isMenuOpen}
+                <ProjectDropdown project={item.project} projects={projects} isOpen={isMenuOpen}
                     setProjectState={this.onProjectClick} style={dropdownStyle}
                     setParentState={this.setStateBind} />
             </Info_container>

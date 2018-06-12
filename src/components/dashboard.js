@@ -49,7 +49,7 @@ const Item_link = styled.a`
     align-items:center;
 `;
 
-const Item_link_border = styled(Item_link) `
+const Item_link_border = styled(Item_link)`
     border-right:1px solid #ddd;
     & span {
         width:1.5rem;
@@ -60,7 +60,7 @@ const Item_link_border = styled(Item_link) `
     }
 `;
 
-const Item_link_hover = styled(Item_link) `
+const Item_link_hover = styled(Item_link)`
     color:#bbb;
     &:hover{
      color:#333;  
@@ -106,8 +106,8 @@ class DashboardComponent extends React.Component {
 
     render() {
         const { periodReadable, subtractPeriodState, addPeriodState, isCalendarOpen, periodStart, periodStop, setReadableHeading,
-            periodType, setStateProxy, getPeriodTimeArr, appendEntries, customPeriodLength, getTotalWeekTime,
-            allEntriesFetched, userData, getYearMonthsArr, isLoading, setIsLoading, shouldUpdate } = this.props;
+            periodType, setStateProxy, getPeriodTimeArr, appendEntries, customPeriodLength, getTotalWeekTime, entries,
+            allEntriesFetched, projects, getYearMonthsArr, isLoading, setIsLoading, shouldUpdate } = this.props;
 
         return (<Wrapper>
             <Chart_Section>
@@ -140,10 +140,10 @@ class DashboardComponent extends React.Component {
                 <PeriodTimeChart data={getPeriodTimeArr()} getYearData={getYearMonthsArr} isLoading={isLoading}
                     customPeriodLength={customPeriodLength} periodType={periodType} isOpen={isCalendarOpen} shouldUpdate={shouldUpdate}
                     getMoreEntries={appendEntries} allEntriesFetched={allEntriesFetched} setIsLoading={setIsLoading} />
-                <ProjectChart userData={userData} totalWeekTime={getTotalWeekTime} isLoading={isLoading}
+                <ProjectChart projects={projects} entries={entries} totalWeekTime={getTotalWeekTime} isLoading={isLoading}
                     periodStart={periodStart} periodStop={periodStop} isOpen={isCalendarOpen} />
             </Chart_Section>
-            <ProjectsCounter userData={userData} />
+            <ProjectsCounter projects={projects} entries={entries} />
         </Wrapper>);
     }
 }

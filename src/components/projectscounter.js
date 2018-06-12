@@ -39,9 +39,9 @@ const List_item = styled.li`
     font-size: 14px;
 `;
 
-const ProjectsCounter = ({ userData }) => {
+const ProjectsCounter = ({ projects, entries }) => {
 
-    const projectsLengthSum = projectStr => userData.entries
+    const projectsLengthSum = projectStr => entries
         .reduce((acc, itm) => {
             return (itm.stop !== undefined && itm.project === projectStr) ?
                 acc += itm.stop - itm.start :
@@ -50,7 +50,7 @@ const ProjectsCounter = ({ userData }) => {
 
     const getReadableSum = total => moment.duration(total).format('h:mm:ss', { stopTrim: "hh mm ss" });
 
-    const projectTimes = userData.projects.reduce((acc, itm) => {
+    const projectTimes = projects.reduce((acc, itm) => {
         acc[itm.name] = projectsLengthSum(itm.name);
         return acc;
     }, {});
@@ -58,17 +58,16 @@ const ProjectsCounter = ({ userData }) => {
     return (<Wrapper>
         <Heading>Most Tracked</Heading>
         <List>
-            {userData.projects.length ?
-                userData.projects
-                    .map(itm => ({ ...itm, total: projectTimes[itm.name] }))
-                    .sort((a, b) => b.total - a.total)
-                    .map((itm, i) =>
-                        (<List_item key={itm.name}>
-                            <span>
-                                <Color_Indicator color={itm.color} />{itm.name}
-                            </span>
-                            <span>{getReadableSum(itm.total)}</span>
-                        </List_item>)) :
+            {projects.length ? projects
+                .map(itm => ({ ...itm, total: projectTimes[itm.name] }))
+                .sort((a, b) => b.total - a.total)
+                .map((itm, i) =>
+                    (<List_item key={itm.name}>
+                        <span>
+                            <Color_Indicator color={itm.color} />{itm.name}
+                        </span>
+                        <span>{getReadableSum(itm.total)}</span>
+                    </List_item>)) :
                 <List_item>No projects</List_item>}
         </List>
     </Wrapper>);

@@ -1,12 +1,12 @@
+import { batchActions } from 'redux-batched-actions';
 import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
-
 //const baseUrl = `http://localhost:3001`;
 const baseUrl = `https://project--t.herokuapp.com`;
 
 import { toggleTimer } from './timer';
-import { setEntries, editEntries, removeEntries, setUserData } from './user';
+import { editEntries, removeEntries, setUserData } from './user';
 import { loadingError } from './global';
 
 export const setBillable = bool => ({
@@ -38,7 +38,7 @@ export const createNewEntry = (userid, queryParams, ignoreIsRunning = false, mul
         const url = `${baseUrl}/users/${userid}/entries?${queryStr}`;
         console.log(url, 'NEW');
 
-        const projects = getState().user.userData.projects;
+        const projects = getState().user.projects;
         const projectObj = projects[projects.map(itm => itm.name)
             .findIndex(itm => itm === queryParams.project)];
 
@@ -46,14 +46,16 @@ export const createNewEntry = (userid, queryParams, ignoreIsRunning = false, mul
             !multiDayMode && dispatch(toggleTimer(true));
 
             if (!queryParams.stop) {
-                dispatch(setProject(projectObj));
-                dispatch(setRunningEntryDescription(queryParams.description || ""));
-                dispatch(setBillable(queryParams.billable));
+                dispatch(batchActions([
+                    setProject(projectObj),
+                    setRunningEntryDescription(queryParams.description || ""),
+                    setBillable(queryParams.billable)
+                ]));
             }
 
             axios.post(url).then(resp => {
 
-                dispatch(editEntries(resp.data));
+                //dispatch(editEntries(resp.data));
                 (!queryParams.stop) && dispatch(setRunningEntry(resp.data._id));
 
             }).catch(err => dispatch(loadingError(err)));
@@ -78,12 +80,10 @@ export const updateEntry = (userid, runningEntryId, queryParams) =>
 
         axios.put(url).then(resp => {
             dispatch(editEntries(resp.data));
+            const state = getState().global;
 
-            if (getState().global.isRunning) return null;
+            !state.isRunning && queryParams.stop && state.runningEntry === resp._id && dispatch(setRunningEntry(null));
 
-            if (queryParams.stop && getState().global.runningEntry === resp._id) {
-                dispatch(setRunningEntry(null));
-            }
         }).catch(err => dispatch(loadingError(err)));
     }
 

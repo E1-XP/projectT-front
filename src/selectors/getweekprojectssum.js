@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import moment from 'moment';
 
-const getEntries = userData => userData.entries;
+const getEntries = user => user.entries;
 
 const getWeekProjectsSum = entries => {
     const startOfWeek = moment().startOf('isoWeek').valueOf();

@@ -104,6 +104,8 @@ export default class PeriodTimeChart extends React.Component {
     }
 
     getCheckedData = (isPeriodNotYears, data, yearData, isPeriodCustomAndLong) => {
+        console.log(data,'data');
+
         const checkForDataValue = itm => itm.time ? Object.assign({}, itm, { hasValue: true }) :
             Object.assign({}, itm, { hasValue: false });
 
@@ -113,6 +115,7 @@ export default class PeriodTimeChart extends React.Component {
     }
 
     getTotalDayCount = array => {
+        console.log(array, 'arr');
         const toSeconds = array.reduce((acc, item) =>
             acc += moment.duration(Number(item.stop) - item.start).asSeconds(), 0);
 
@@ -120,6 +123,7 @@ export default class PeriodTimeChart extends React.Component {
     }
 
     getWeeksFromDays = data => {
+        console.log(data,'data');
         const reducedData = data.reduce((acc, itm) => {
             acc[itm.week] ?
                 acc[itm.week] = {
@@ -205,17 +209,12 @@ export default class PeriodTimeChart extends React.Component {
         const isPeriodCustomAndLong = isPeriodCustom && customPeriodLength > 31;
         const isPeriodTypeShort = ['months', 'years'].indexOf(periodType) === -1;
 
-        const todayReadable = moment().format('ddd, Do MMM');
         const checkedData = this.getCheckedData(!isPeriodYears, data, yearData, isPeriodCustomAndLong);
 
         const highestValue = checkedData.concat().sort((a, b) => b.time - a.time)[0].time;
 
-        const areSomeItemsEmpty = isPeriodYears ? yearData.some(itm => !itm.time) : data.some(itm => !itm.time);
-
         const shouldShowLabelList = () => isPeriodCustomAndLong || isPeriodYears ||
             (isPeriodTypeShort && !isPeriodCustom) || (isPeriodCustom && customPeriodLength < 16);
-
-        const getCustomInterval = () => customPeriodLength > 8 ? 3 : 0;
 
         const xAxisInterval = length => length > 7 ? (isPeriodYears ? 1 : (length > 14 ? 4 : (length % 7) + 1)) : 0;
 

@@ -88,7 +88,7 @@ class ProjectsChart extends React.Component {
     }
 
     getProjectsLengthSum = projectStr => {
-        const { periodStart, periodStop, userData } = this.props;
+        const { periodStart, periodStop, entries } = this.props;
 
         const condition = itm => projectStr === undefined ?
             (itm.project === projectStr || itm.project === '') :
@@ -97,7 +97,7 @@ class ProjectsChart extends React.Component {
         const filterCondition = itm => itm.stop !== undefined && condition(itm) &&
             itm.start >= periodStart.valueOf() && itm.stop <= moment(periodStop).valueOf();
 
-        const total = userData.entries
+        const total = entries
             .reduce((acc, item) => {
                 return filterCondition(item) ?
                     acc + moment.duration(moment(Number(item.stop)).diff(item.start)).valueOf() :
@@ -143,12 +143,12 @@ class ProjectsChart extends React.Component {
 
     render() {
         const { hoveredItem, activeIdx } = this.state;
-        const { userData, totalWeekTime, isLoading } = this.props;
+        const { entries, projects, totalWeekTime, isLoading } = this.props;
 
         const LegendFormatted = (props) =>
             (<ul>{props.payload.map((itm, i) => (<li key={i}>{itm.value}</li>))}</ul>);
 
-        const data = userData.projects.map(itm =>
+        const data = projects.map(itm =>
             Object.assign({}, itm, { v: this.getProjectsLengthSum(itm.name), fill: `#${itm.color}` }));
 
         data.push({ name: 'Without Project', fill: '#bbb', v: this.getProjectsLengthSum(undefined) });
@@ -157,7 +157,7 @@ class ProjectsChart extends React.Component {
         const handleMouseLeave = (payload) => this.setState({ hoveredItem: null });
 
         const labelValue = hoveredItem ? (hoveredItem === 'Without Project' ? this.getProjectTime(undefined) :
-            this.getProjectTime(hoveredItem)) : totalWeekTime(userData.entries);
+            this.getProjectTime(hoveredItem)) : totalWeekTime(entries);
 
         const periodContainsData = data.some(itm => !!itm.v);
 

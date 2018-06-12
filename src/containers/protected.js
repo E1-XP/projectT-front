@@ -10,25 +10,30 @@ import * as actions from '../actions';
 
 class Protected_container extends React.Component {
     componentDidMount() {
-        const { location, history, isUserLoggedIn, userData } = this.props;
+        const { location, history, isUserLoggedIn, userData, entries } = this.props;
 
         if (!isUserLoggedIn && location.pathname.slice(1).toLowerCase() !== 'signup') history.push('/login');
-        else this.setPreviouslyRunningTimer(userData);
+        this.setPreviouslyRunningTimer();
     }
 
-    setPreviouslyRunningTimer = userData => {
-        const { setRunningEntry, setIsRunning, setTimer, setRunningEntryDescription,
+    shouldComponentUpdate(nextP, nextS) {
+        if (this.props.entries !== nextP.entries) return false;
+        return true;
+    }
+
+    setPreviouslyRunningTimer = () => {
+        const { userData, entries, projects, setRunningEntry, setIsRunning, setTimer, setRunningEntryDescription,
             setProject, toggleTimer, setBillable } = this.props;
 
-        if (!userData.entries || !userData.entries.length) return null;
+        if (!entries || !entries.length) return null;
 
-        const entryThatStillRuns = userData.entries.find(itm => !itm.stop);
+        const entryThatStillRuns = entries.find(itm => !itm.stop);
 
         if (entryThatStillRuns) {
             const start = moment(entryThatStillRuns.start).format();
 
             setRunningEntry(entryThatStillRuns._id);
-            setProject(userData.projects.filter(itm => itm.name === entryThatStillRuns.project)[0]);
+            setProject(projects.filter(itm => itm.name === entryThatStillRuns.project)[0]);
             toggleTimer(true, start);
             setRunningEntryDescription(entryThatStillRuns.description || '');
             entryThatStillRuns.billable && setBillable(true);
@@ -36,17 +41,20 @@ class Protected_container extends React.Component {
     }
 
     render() {
-        const { isUserLoggedIn, children } = this.props;
+        const { isUserLoggedIn, hasErrored, children } = this.props;
         const path = this.props.location.pathname.toLowerCase();
 
         return (isUserLoggedIn) ? children :
-            ((path === '/login' || path === '/signup') ? null : <Redirect to="/login" />);
+            ((hasErrored || path === '/login' || path === '/signup') ? null : <Redirect to="/login" />);
     }
 }
 
 const mapStateToProps = ({ global, user }) => ({
     isUserLoggedIn: global.isUserLoggedIn,
-    userData: user.userData
+    hasErrored: global.hasErrored,
+    userData: user.userData,
+    entries: user.entries,
+    projects: user.projects
 });
 
 const mapDispatchToProps = dispatch => ({

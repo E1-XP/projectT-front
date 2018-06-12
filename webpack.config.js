@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const htmlWebpackPlugin = require('html-webpack-plugin');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 module.exports = {
     entry: ["react-hot-loader/patch", "babel-polyfill", "./src/index.js"],
@@ -30,6 +31,7 @@ module.exports = {
         ]
     },
     plugins: [
+        new HardSourceWebpackPlugin(),
         new htmlWebpackPlugin({
             template: "./public/index.html",
             filename: "./index.html"

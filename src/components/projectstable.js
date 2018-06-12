@@ -111,7 +111,7 @@ class ProjectsTable extends React.Component {
     }
 
     componentDidMount() {
-        const { projects } = this.props.data;
+        const { projects } = this.props;
 
         if (projects.length) {
             this.handlePropsChange();
@@ -119,15 +119,15 @@ class ProjectsTable extends React.Component {
     }
 
     componentDidUpdate(prevP, prevS) {
-        const { projects } = this.props.data;
+        const { projects } = this.props;
 
-        if (projects.length && projects.length !== prevP.data.projects.length) {
+        if (projects.length && projects.length !== prevP.projects.length) {
             this.handlePropsChange();
         }
     }
 
     handlePropsChange = () => {
-        const { projects } = this.props.data;
+        const { projects } = this.props;
 
         const reduceFn = (acc, itm) => {
             acc[itm.name] = false;
@@ -159,7 +159,7 @@ class ProjectsTable extends React.Component {
     }
 
     projectsLengthSum = projectStr => {
-        const { entries } = this.props.data;
+        const { entries } = this.props;
         const now = moment();
         const condition = itm => itm.stop !== undefined && itm.project === projectStr;
 
@@ -178,7 +178,7 @@ class ProjectsTable extends React.Component {
 
     setSortState = (sortOrder, sortBy) => {
         const { state } = this;
-        const { projects } = this.props.data;
+        const { projects } = this.props;
 
         const newState = { sortOrder, sortBy };
 
@@ -232,7 +232,7 @@ class ProjectsTable extends React.Component {
     }
 
     render() {
-        const { projects, entries } = this.props.data;
+        const { projects } = this.props;
         const { sortBy, checkedProjects, sortedProjects } = this.state;
 
         if (!projects.length || !sortedProjects.length) return (<p>Loading...</p>);

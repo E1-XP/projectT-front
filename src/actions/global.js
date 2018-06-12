@@ -39,10 +39,14 @@ export const setAllEntriesFetched = bool => ({
     payload: bool
 });
 
-export const loadingError = err => ({
-    type: consts.LOADING_ERROR,
-    payload: err
-});
+export const loadingError = err => dispatch => {
+
+    dispatch({
+        type: consts.PAGE_ERROR,
+        payload: err
+    });
+    dispatch(push('/500'));
+};
 
 export const handleAuth = (type, formData) => (dispatch, getState) => {
     const url = `${baseUrl}/auth/${type}`;
@@ -69,8 +73,8 @@ export const handleAuth = (type, formData) => (dispatch, getState) => {
         }
         else dispatch(setIsLoading(false));
     }).catch(err => {
+        err.response && err.response.status !== 401 && dispatch(loadingError(err));
         dispatch(setIsLoading(false));
-        dispatch(loadingError(err));
     });
 }
 
@@ -98,8 +102,8 @@ export const handleReAuth = () => (dispatch, getState) => {
             dispatch(setIsLoading(false));
         }
     }).catch(err => {
+        err.response && err.response.status !== 401 && dispatch(loadingError(err));
         dispatch(setIsLoading(false));
-        dispatch(loadingError(err));
     });
 }
 
@@ -123,5 +127,8 @@ export const handleLogout = () => dispatch => {
         dispatch(setUserData(null));
         // dispatch(push('/login'));        
 
-    }).catch(err => dispatch(loadingError(err)));
+    }).catch(err => {
+        err.response && err.response.status !== 401 && dispatch(loadingError(err));
+        dispatch(setIsLoading(false));
+    });
 }

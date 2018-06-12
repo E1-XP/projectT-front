@@ -7,25 +7,36 @@ const baseUrl = `https://project--t.herokuapp.com`;
 
 import { loadingError, setAllEntriesFetched } from './global';
 
-export const setUserData = data => ({
-    type: consts.SET_USER_DATA,
-    payload: data
-});
+export const setUserData = data => (dispatch, getState) => {
+
+    const payload = {
+        data,
+        daysToShowLength: getState().global.daysToShowLength
+    }
+
+    return dispatch({
+        type: consts.SET_USER_DATA,
+        payload
+    });
+};
 
 export const setSettings = data => ({
     type: consts.SET_SETTINGS,
     payload: data
 });
 
-export const setEntries = data => ({
-    type: consts.SET_ENTRIES,
-    payload: data
-});
+export const addEntries = data => (dispatch, getState) => {
 
-export const addEntries = data => ({
-    type: consts.ADD_ENTRIES,
-    payload: data
-});
+    const payload = {
+        data,
+        daysToShowLength: getState().global.daysToShowLength + 10
+    }
+
+    return dispatch({
+        type: consts.ADD_ENTRIES,
+        payload
+    });
+};
 
 export const editEntries = data => ({
     type: consts.EDIT_ENTRIES,

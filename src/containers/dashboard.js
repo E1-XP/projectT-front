@@ -6,7 +6,6 @@ import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
 import * as actions from '../actions';
-import getFilteredMappedItems from '../selectors/getfilteredmappeditems';
 
 import DashboardComponent from '../components/dashboard';
 
@@ -50,9 +49,10 @@ class Dashboard extends React.Component {
         this.setState({ tmpState: state });
     }
 
-    getTotalDayCount = array => {
-        const toSeconds = array.reduce((acc, item) =>
-            acc += moment.duration(Number(item.stop) - item.start).asSeconds(), 0);
+    getTotalDayCount = object => {
+        const reduceInner = (acc, itm) => acc += moment.duration(itm.stop - itm.start).asSeconds();
+
+        const toSeconds = Object.keys(object).reduce((acc, itm) => acc += object[itm].reduce(reduceInner, 0), 0);
 
         return moment.duration(toSeconds, 'seconds').format('h:mm', { stopTrim: "hh mm" });
     }
@@ -72,7 +72,9 @@ class Dashboard extends React.Component {
                 readable: moment(periodStart).add(i, 'd').format('ddd, Do MMM')
             }));
 
-        const getDayTimeSum = itm => mappedItems[itm].reduce((acc, itm) => acc += (itm.stop - itm.start), 0);
+        const reduceInner = (acc, itm) => acc += itm.stop - itm.start;
+        const getDayTimeSum = key => Object.keys(mappedItems[key])
+            .reduce((acc, itm) => acc += mappedItems[key][itm].reduce(reduceInner, 0), 0);
 
         const getDayObj = (itm, dataFlag = false) => ({
             readable: itm.readable,
@@ -85,7 +87,7 @@ class Dashboard extends React.Component {
     }
 
     getYearMonthsArr = () => {
-        const { entries } = this.props.userData;
+        const { entries } = this.props;
         const { periodStart, periodStop } = this.state;
 
         const baseObj = this.monthLabels.reduce((acc, itm) => {
@@ -221,10 +223,10 @@ class Dashboard extends React.Component {
     }
 
     appendEntries = () => {
-        const { userData, fetchEntries, setDaysToShowLength, daysToShowLength } = this.props;
+        const { userData, entries, fetchEntries, setDaysToShowLength, daysToShowLength } = this.props;
         const { periodStart, periodStop } = this.state;
 
-        const startAt = moment(userData.entries[userData.entries.length - 1].start).dayOfYear();
+        const startAt = moment(entries[entries.length - 1].start).dayOfYear();
         const endAt = moment(periodStart).dayOfYear();
 
         this.setState({ isLoading: true, shouldUpdate: false });
@@ -250,24 +252,26 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        const { userData, allEntriesFetched, setItemsToShowLength, mappedItems } = this.props;
+        const { userData, entries, projects, allEntriesFetched, setItemsToShowLength, mappedItems } = this.props;
         const { periodReadable, periodStart, periodStop, periodType, isCalendarOpen, customPeriodLength, isLoading,
             shouldUpdate } = this.state;
 
-        if (!userData.entries.length || !mappedItems) return (<p>Loading...</p>);
+        if (!entries.length || !mappedItems) return (<p>Loading...</p>);
 
         return (<DashboardComponent periodReadable={periodReadable} periodType={periodType} state={this.state} setState={this.setStateBind}
             subtractPeriodState={this.subtractPeriodState} addPeriodState={this.addPeriodState} getTotalWeekTime={this.getTotalWeekTime}
             isCalendarOpen={isCalendarOpen} periodStart={periodStart} periodStop={periodStop} getYearMonthsArr={this.getYearMonthsArr}
             setReadableHeading={this.setReadableHeading} customPeriodLength={customPeriodLength} appendEntries={this.appendEntries}
-            setStateProxy={this.setStateProxy} getPeriodTimeArr={this.getPeriodTimeArr} allEntriesFetched={allEntriesFetched}
-            userData={userData} setIsLoading={this.setIsLoading} isLoading={isLoading} shouldUpdate={shouldUpdate} />);
+            setStateProxy={this.setStateProxy} getPeriodTimeArr={this.getPeriodTimeArr} allEntriesFetched={allEntriesFetched} projects={projects}
+            userData={userData} entries={entries} setIsLoading={this.setIsLoading} isLoading={isLoading} shouldUpdate={shouldUpdate} />);
     }
 }
 
 const mapStateToProps = ({ user, global }) => ({
     userData: user.userData,
-    mappedItems: getFilteredMappedItems({ global, user }),
+    entries: user.entries,
+    projects: user.projects,
+    mappedItems: user.mappedItems,
     daysToShowLength: global.daysToShowLength,
     allEntriesFetched: global.allEntriesFetched
 });

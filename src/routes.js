@@ -44,13 +44,13 @@ const routes = (<App_container>
                         <Route path="/dashboard" component={Dashboard} />
                         <Route path="/projects" component={Projects} />
                         <Route path="/profile" component={Profile} />
-                        <Route path="/500" component={ErrorPage} />
                         <Route component={NotFound} />
                     </Switch>
                 </Main_content>
             </Scrollbar>
             <StatusBar />
         </Protected_container>
+        <Route path="/500" component={ErrorPage} />
     </Preloader>
 </App_container>);
 

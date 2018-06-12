@@ -17,7 +17,7 @@ const constants = {
     SET_PROJECT: 'SET_PROJECT',
     SET_WEEK_TIMER: 'SET_WEEK_TIMER',
     ALL_ENTRIES_FETCHED: `ALL_ENTRIES_FETCHED`,
-    LOADING_ERROR: 'LOADING_ERROR'
+    PAGE_ERROR: 'PAGE_ERROR'
 }
 
 export default constants;

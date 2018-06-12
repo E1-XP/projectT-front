@@ -4,18 +4,8 @@ import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
-import { connect } from 'react-redux';
-import * as actions from '../actions';
-
-import getFilteredMappedItems from '../selectors/getfilteredmappeditems';
-
 import EntryGroup from '../components/entrygroup';
-import EntryHeader from '../components/entryheader';
-import EntryTimer from '../components/entrytimer';
 import TimeEntry from '../components/timentry';
-import ProjectDropdown from '../components/projectdropdown';
-import EntryDropdown from '../components/entrydropdown';
-import Icon from '../components/icon';
 
 const List_item = styled.li`
     background-color:white;
@@ -52,48 +42,55 @@ class EntriesTable extends React.Component {
         super(props);
 
         this.state = {
-            filteredItems: {},
-            mappedTasks: {},
-            isUpdating: false
+            // filteredItems: {},
+            // mappedTasks: {},
+            // isUpdating: false
         }
 
         this.today = moment().format('ddd, Do MMM');
         this.yesterday = moment().add(-1, 'days').format('ddd, Do MMM');
     }
 
-    componentDidMount() {
-        const { mappedItems } = this.props;
-        const filteredItems = this.getFilteredItems(mappedItems);
-        const mappedTasks = this.getMappedTasks(mappedItems);
-        this.setState({ filteredItems, mappedTasks });
-    }
+    // static getDerivedStateFromProps(nextP, prevS) {
+    //     const { mappedItems, isFetching } = this.props;
+    //     console.log('run gdsfp');
 
-    componentWillReceiveProps(nextP) {
-        const { mappedItems, isFetching } = this.props;
+    //     if (isFetching && nextP.mappedItems === mappedItems) return null;
 
-        if (isFetching && JSON.stringify(nextP.mappedItems) === JSON.stringify(mappedItems)) return null;
+    //     if (nextP.mappedItems !== mappedItems) {
+    //         const filteredItems = Object.assign({}, this.getFilteredItems(nextP.mappedItems), this.state.filteredItems);
+    //         const mappedTasks = this.getMappedTasks(nextP.mappedItems);
+    //         console.log('CALLED STATE UPD')
+    //         return { ...prevS, filteredItems, mappedTasks };
+    //     }
 
-        if (nextP.mappedItems !== mappedItems) {
-            const filteredItems = Object.assign({}, this.getFilteredItems(nextP.mappedItems), this.state.filteredItems);
-            const mappedTasks = this.getMappedTasks(nextP.mappedItems);
+    //     return null;
+    // }
 
-            this.setState({ filteredItems, mappedTasks });
-        }
-    }
-    shouldComponentUpdate(nxtP, nxtS) {
-        if (this.state.isUpdating) return false;
+    shouldComponentUpdate(nextP, nextS) {
+        const { isUpdating, isRunning, mappedItems, filteredItems } = this.props;
+
+        if (isUpdating) return false;
+        if (isRunning !== nextP.isRunning) return false;
+        if (mappedItems == nextP.mappedItems && filteredItems === nextP.filteredItems) return false;
         return true;
     }
 
+    UNSAFE_componentWillUpdate(nextProps) {
+        Object.keys(nextProps)
+            .map(key => nextProps[key] !== this.props[key] && console.log(key + ' changed in et'));
+    }
+
     componentDidUpdate() {
-        if (this.state.isUpdating) this.setState({ isUpdating: false });
+        if (this.props.isUpdating) this.props.setState({ isUpdating: false });
+        console.log('e table updated');
     }
 
     toggleEntries = (day, item) => {
-        const { filteredItems } = this.state;
+        const { filteredItems } = this.props;
 
         filteredItems[day][item] = !filteredItems[day][item];
-        this.setState({ filteredItems });
+        this.props.setState({ filteredItems: Object.assign({}, filteredItems) });
     }
 
     startNewEntry = item => {
@@ -108,9 +105,12 @@ class EntriesTable extends React.Component {
         setTopbarDescription(item.description);
     }
 
-    getTotalDayCount = array => {
-        const total = array
-            .reduce((acc, item) => acc + moment.duration(item.stop - item.start), 0);
+    getTotalDayCount = dayOfItems => {
+        const reduceInner = (acc, itm) => acc += moment.duration(itm.stop - itm.start);
+
+        const total = (Array.isArray(dayOfItems)) ? dayOfItems.reduce(reduceInner, 0) :
+            Object.keys(dayOfItems)
+                .reduce((acc, itm) => acc += dayOfItems[itm].reduce(reduceInner, 0), 0);
 
         return moment.duration(total).format('h:mm:ss', { stopTrim: "hh mm ss" });
     }
@@ -134,7 +134,6 @@ class EntriesTable extends React.Component {
     }
 
     changeDescriptionMultiple = (desc, array, idx) => {
-        const { mappedItems } = this.props;
         const arrId = array.map(itm => itm.id);
 
         this.changeDescription(desc, JSON.stringify(arrId), null);
@@ -179,8 +178,7 @@ class EntriesTable extends React.Component {
     }
 
     onBlurDescriptionSave = (value, currentItem, key, previousVal) => {
-        const { mappedItems } = this.props;
-        const { filteredItems } = this.state;
+        const { mappedItems, filteredItems } = this.props;
 
         if (currentItem[0].description === value) return null;
 
@@ -200,11 +198,11 @@ class EntriesTable extends React.Component {
     }
 
     getSingleEntries = (entries, key) => {
-
         return Object.keys(entries).map((item, i) =>
             <TimeEntry key={item} item={entries[i]}
                 idx={key}
                 userData={this.props.userData}
+                projects={this.props.projects}
                 setTopbarDescription={this.props.setTopbarDescription}
                 startNewEntry={this.startNewEntry}
                 changeDescription={this.onBlurDescriptionSave}
@@ -214,63 +212,31 @@ class EntriesTable extends React.Component {
             />);
     }
 
-    getMappedTasks = mappedItems => {
-        const reduceInner = (acc, itm) => {
-            const keyStr = `${itm.project} \n${itm.description || '$empty#'} `;
-
-            if (!acc[keyStr]) acc[keyStr] = [];
-            acc[keyStr].push(itm);
-            return acc;
-        }
-
-        return Object.keys(mappedItems)
-            .reduce((acc, itm) => {
-                acc[itm] = mappedItems[itm].reduce(reduceInner, {});
-                return acc;
-            }, {});
-    }
-
-    getFilteredItems = mappedItems => {
-        console.log('call getfiltereditems');
-        const reduceInner = (acc, itm) => {
-            const keyStr = `${itm.project} \n${itm.description || '$empty#'} `;
-
-            if (!acc[keyStr]) acc[keyStr] = false;
-            return acc;
-        };
-
-        return Object.keys(mappedItems).reduce((acc, itm) => {
-            acc[itm] = mappedItems[itm].reduce(reduceInner, {});
-            return acc;
-        }, {});
-    }
-
     getTaskEntries = idx => {
-        const { handleRemove, userData, getProjectColor } = this.props;
-        const { filteredItems, mappedTasks } = this.state;
+        const { handleRemove, userData, projects, getProjectColor, filteredItems,
+            mappedItems } = this.props;
 
-        return Object.keys(mappedTasks[idx])
-            .sort((a, b) => mappedTasks[idx][b][0].stop - mappedTasks[idx][a][0].stop)
+        return Object.keys(mappedItems[idx])
+            .sort((a, b) => mappedItems[idx][b][0].stop - mappedItems[idx][a][0].stop)
             .map((item, i, arr) => {
                 const projectName = item.split('\n')[0].trim();
                 const projectDescription = item.split('\n')[1].trim();
-                const currentItem = mappedTasks[idx][item];
+                const currentItem = mappedItems[idx][item];
 
                 return <EntryGroup key={currentItem[0].id} currentItem={currentItem} projectDescription={projectDescription}
                     filteredItem={filteredItems[idx][item]} item={item} projectName={projectName} getSingleEntries={this.getSingleEntries}
                     toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
-                    getProjectColor={getProjectColor} userData={userData} changeProject={this.changeProjectMultiple}
+                    getProjectColor={getProjectColor} userData={userData} changeProject={this.changeProjectMultiple} projects={projects}
                     setBillableMulti={this.setBillableMulti} handleRemove={handleRemove} getTotalDayCount={this.getTotalDayCount}
                     isEveryItemBillable={this.isEveryItemBillable} startNewEntry={this.startNewEntry} />
             });
     }
 
     render() {
-        const { mappedItems } = this.props;
-        const { filteredItems } = this.state;
+        const { mappedItems, filteredItems } = this.props;
 
         if (!Object.keys(filteredItems).length) return (<p>Loading...</p>);
-
+        console.log(mappedItems, 'mi');
         return Object.keys(mappedItems)
             .map((itm, idx) =>
                 <List_item key={itm}>
@@ -283,10 +249,4 @@ class EntriesTable extends React.Component {
     }
 }
 
-const mapStateToProps = ({ user, global }) => ({
-    userData: user.userData,
-    mappedItems: getFilteredMappedItems({ global, user }),
-    daysToShowLength: global.daysToShowLength
-});
-
-export default connect(mapStateToProps, null)(EntriesTable);
+export default EntriesTable;

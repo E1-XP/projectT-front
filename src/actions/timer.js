@@ -1,3 +1,4 @@
+import { batchActions } from 'redux-batched-actions';
 import consts from './types';
 
 import moment from 'moment';
@@ -24,6 +25,8 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
         let initialWeekTime = getState().timer.weekTimer;
         const shouldShowTimerOnTitle = getState().user.settings.shouldShowTimerOnTitle;
 
+        window.interval && clearInterval(window.interval);
+
         if (previousTime) start = previousTime;
         dispatch(setIsRunning(true));
 
@@ -35,13 +38,18 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
             const weekTime = moment.duration(initialWeekTime).add(moment().diff(moment(start)))
                 .format('h:mm:ss', { stopTrim: "hh mm ss" });
 
-            state.timer !== time && dispatch(setTimer(time));
-            state.weekTimer !== weekTime && dispatch(setWeekTimer(weekTime));
-            if (shouldShowTimerOnTitle) document.title = `${time} - ProjectT`;
+            if (state.timer !== time) {
+                dispatch(batchActions([
+                    setTimer(time),
+                    setWeekTimer(weekTime)
+                ]));
+
+                if (shouldShowTimerOnTitle) document.title = `${time} - ProjectT`;
+            }
         }, 350);
     }
     else {
-        const entryThatStillRuns = getState().user.userData.entries.find(itm => !itm.stop);
+        const entryThatStillRuns = getState().user.entries.find(itm => !itm.stop);
         const runningEntry = getState().entry.runningEntry;
         const dayStart = moment().startOf('day');
 
@@ -56,8 +64,6 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
 
         }
         else if (runningEntry) {
-            console.log('if runn entry this will fire :');
-
             const now = moment().valueOf();
             const state = getState().entry;
             const project = (state.currentProject && state.currentProject.name) ? state.currentProject.name : '';
@@ -73,9 +79,12 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
         }
 
         clearInterval(window.interval);
-        dispatch(setIsRunning(false));
-        dispatch(setTimer('0:00:00'));
-        dispatch(setBillable(false));
+        dispatch(batchActions([
+            setIsRunning(false),
+            setTimer('0:00:00'),
+            setBillable(false)
+        ]));
+
         document.title = 'ProjectT';
     }
 };

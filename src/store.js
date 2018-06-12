@@ -1,9 +1,9 @@
 import { applyMiddleware, createStore, compose } from 'redux';
 import { routerMiddleware } from 'react-router-redux'
+import { enableBatching } from 'redux-batched-actions';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers';
 import history from './history';
-import { createNewEntry } from './actions/entry';
 
 const initialState = {
     global: {
@@ -23,6 +23,9 @@ const initialState = {
     },
     user: {
         userData: {},
+        entries: [],
+        mappedItems: {},
+        projects: [],
         settings: {
             shouldShowTimerOnTitle: true
         }
@@ -35,7 +38,7 @@ const initialState = {
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-const store = createStore(rootReducer, initialState,
+const store = createStore(enableBatching(rootReducer), initialState,
     composeEnhancers(applyMiddleware(thunk, routerMiddleware(history))));
 
 //store.subscribe(() => console.log('STORE UPDATED.', store.getState()));

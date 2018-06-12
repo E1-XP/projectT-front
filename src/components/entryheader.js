@@ -99,7 +99,7 @@ export default class EntryHead extends React.Component {
     }
 
     render() {
-        const { filteredItem, item, projectDescription, userData, currentItem, getProjectColor,
+        const { filteredItem, item, projectDescription, projects, currentItem, getProjectColor,
             projectName, Item_link_toggle } = this.props;
         const { isMenuOpen } = this.state;
 
@@ -123,7 +123,7 @@ export default class EntryHead extends React.Component {
             {!projectName && <Item_link_toggle isOpen={isMenuOpen} onClick={this.openMenu}>
                 <Icon name="folder" size="20px" />
             </Item_link_toggle>}
-            {<ProjectDropdown project={projectName} userData={userData} isOpen={this.state.isMenuOpen}
+            {<ProjectDropdown project={projectName} projects={projects} isOpen={this.state.isMenuOpen}
                 setProjectState={this.onProjectClick} style={this.dropdownStyle} setParentState={this.setStateBind} />}
         </Wrapper>);
     }

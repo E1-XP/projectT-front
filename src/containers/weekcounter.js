@@ -109,8 +109,8 @@ class WeekTimer extends React.Component {
 
 const mapStateToProps = ({ timer, user }) => ({
     weekTimer: timer.weekTimer,
-    projects: user.userData.projects,
-    weekProjectsSum: getWeekProjectsSum(user.userData)
+    projects: user.projects,
+    weekProjectsSum: getWeekProjectsSum(user)
 });
 
 export default connect(mapStateToProps, null)(WeekTimer);

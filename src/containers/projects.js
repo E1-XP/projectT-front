@@ -58,14 +58,14 @@ const Button = styled.button`
     color:#fff;    
 `;
 
-const Button_Create = styled(Button) `
+const Button_Create = styled(Button)`
     background-color:#4bc800;
     &:hover{
         background-color:#3fa900;
     }
 `;
 
-const Button_Remove = styled(Button) `
+const Button_Remove = styled(Button)`
     background-color:red;
     &:hover{
         background-color:#c20000;
@@ -88,7 +88,7 @@ const Icon_Link = styled.a`
     padding:.3rem;
 `;
 
-const Icon_Link_Modal = styled(Icon_Link) `
+const Icon_Link_Modal = styled(Icon_Link)`
     border:1px solid #ccc;
     position:relative;
     padding:.5rem;
@@ -172,7 +172,7 @@ class Projects extends React.Component {
     }
 
     render() {
-        const { userData, removeProject } = this.props;
+        const { userData, entries, projects, removeProject } = this.props;
 
         return (<Wrapper>
             <Header>
@@ -180,7 +180,7 @@ class Projects extends React.Component {
                 <Button_Create onClick={this.openModal}>Create Project</Button_Create>
             </Header>
             <section>
-                <ProjectsTable ref={node => this.refTable = node} data={userData} />
+                <ProjectsTable ref={node => this.refTable = node}  entries={entries} projects={projects} />
             </section>
             <Footer>
                 <Button_Remove onClick={this.handleProjectRemove}>
@@ -224,7 +224,11 @@ class Projects extends React.Component {
     }
 }
 
-const mapStateToProps = ({ user }) => ({ userData: user.userData });
+const mapStateToProps = ({ user }) => ({
+    userData: user.userData,
+    projects: user.projects,
+    entries: user.entries
+});
 
 const mapDispatchToProps = dispatch => ({
     createProject: (userid, name, color, client) => dispatch(actions.entry.createProject(userid, name, color, client)),

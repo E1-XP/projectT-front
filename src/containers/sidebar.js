@@ -44,7 +44,7 @@ const Navigation_item = styled.li`
     margin:.1rem;
 `;
 
-const Navigation_link = styled(NavLink) `
+const Navigation_link = styled(NavLink)`
     color:#ddd;
     display:flex;
     align-items: center;
@@ -59,7 +59,7 @@ const Navigation_link = styled(NavLink) `
 }
 `;
 
-const Header_link = styled(Link) `
+const Header_link = styled(Link)`
     color:#ddd;
     display:flex;
     align-items: center;
@@ -79,6 +79,15 @@ const Link_label = styled.span`
 }`;
 
 class SideBar extends React.Component {
+    shouldComponentUpdate(nextP, nextS) {
+        const { userData, isRunning, location } = this.props;
+
+        const should = nextP.isRunning || (isRunning && !nextP.isRunning) || location.pathname !== nextP.location.pathname ||
+            userData.avatar !== nextP.userData.avatar || userData.username !== nextP.userData.username;
+
+        return should ? true : false;
+    }
+
     render() {
         const { handleLogout, userData, isRunning, timer, shouldShowTimerOnTitle } = this.props;
 

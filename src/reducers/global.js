@@ -8,7 +8,10 @@ export default (state = {}, action) => {
         case types.IS_AUTHENTICATED: return Object.assign({}, state, { isUserLoggedIn: action.payload });
         case types.SET_DAYS_TO_SHOW_LENGTH: return Object.assign({}, state, { daysToShowLength: action.payload });
         case types.ALL_ENTRIES_FETCHED: return Object.assign({}, state, { allEntriesFetched: action.payload });
-        case types.LOADING_ERROR: { console.log('LOADING ERROR', action.payload); return state };
+        case types.PAGE_ERROR: {
+            console.log('ERROR', action.payload);
+            return Object.assign({}, state, { hasErrored: true });
+        };
         default: return state;
     }
 };

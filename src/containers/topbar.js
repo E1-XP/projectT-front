@@ -120,7 +120,9 @@ class TopBar extends React.Component {
     componentWillReceiveProps(nextP) {
         const { runningEntryDescription } = this.props;
 
-        if (nextP.runningEntryDescription !== runningEntryDescription) this.setState({ description: nextP.runningEntryDescription });
+        if (nextP.runningEntryDescription !== runningEntryDescription) {
+            this.setState({ description: nextP.runningEntryDescription });
+        }
     }
 
     componentWillUnmount() {
@@ -209,8 +211,8 @@ class TopBar extends React.Component {
     }
 
     render() {
-        const { isRunning, timer, setRunningEntryDescription, userData, currentProject, billable } = this.props;
-        const { description, isTimerModeManual } = this.state;
+        const { isRunning, timer, projects, currentProject, billable } = this.props;
+        const { description } = this.state;
 
         return (<Task_controller>
             <Task_description
@@ -229,7 +231,7 @@ class TopBar extends React.Component {
                         <Item_link>
                             <Icon name="folder" fill="#bbb" size="20px" />
                         </Item_link>}
-                    <ProjectDropdown setProjectState={this.setProjectState} userData={userData} style={dropdownStyle}
+                    <ProjectDropdown setProjectState={this.setProjectState} projects={projects} style={dropdownStyle}
                         isOpen={this.state.isMenuOpen} setParentState={this.setStateBind} />
                 </Span_relative>
                 <Task_timing_inner>
@@ -254,6 +256,7 @@ class TopBar extends React.Component {
 const mapStateToProps = ({ global, entry, timer, user }) => ({
     isRunning: global.isRunning,
     userData: user.userData,
+    projects: user.projects,
     runningEntry: entry.runningEntry,
     timer: timer.timer,
     billable: entry.billable,

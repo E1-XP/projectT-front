@@ -116,11 +116,11 @@ class ProjectDropdown extends React.Component {
     }
 
     generateItemArray = () => {
-        const { project, setProjectState, userData } = this.props;
+        const { project, setProjectState, projects } = this.props;
         let counter = 0;
         let shouldShowEmptyItem;
 
-        const listItems = userData.projects.map((itm, i, arr) => {
+        const listItems = projects.map((itm, i, arr) => {
             if ((i === arr.length - 1) && !counter) shouldShowEmptyItem = true;
 
             if (this.shouldShowItem(itm.name)) {
