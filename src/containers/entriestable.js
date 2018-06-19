@@ -15,11 +15,6 @@ const List_item = styled.li`
     color:#333;
 `;
 
-const Item_link = styled.a`
-    color:#ccc;
-    cursor:pointer;
-`;
-
 const Item_header = styled.header`
     display:flex;
     justify-content:space-between;
@@ -37,53 +32,35 @@ const DayCount_span = styled.span`
     font-weight:700;
 `;
 
-class EntriesTable extends React.Component {
-    constructor(props) {
-        super(props);
+const Load_p = styled.p`
+    text-align:center;
+`;
 
-        this.state = {
-            // filteredItems: {},
-            // mappedTasks: {},
-            // isUpdating: false
-        }
+class EntriesTable extends React.Component {
+    constructor() {
+        super();
 
         this.today = moment().format('ddd, Do MMM');
         this.yesterday = moment().add(-1, 'days').format('ddd, Do MMM');
     }
 
-    // static getDerivedStateFromProps(nextP, prevS) {
-    //     const { mappedItems, isFetching } = this.props;
-    //     console.log('run gdsfp');
+    shouldComponentUpdate(nextP) {
+        const { isUpdating, isRunning, mappedItems, filteredItems, daysToShowLength } = this.props;
+        //return true;
+        if (nextP.daysToShowLength !== daysToShowLength) return true;
 
-    //     if (isFetching && nextP.mappedItems === mappedItems) return null;
+        if (!isUpdating && nextP.isUpdating) return false;
 
-    //     if (nextP.mappedItems !== mappedItems) {
-    //         const filteredItems = Object.assign({}, this.getFilteredItems(nextP.mappedItems), this.state.filteredItems);
-    //         const mappedTasks = this.getMappedTasks(nextP.mappedItems);
-    //         console.log('CALLED STATE UPD')
-    //         return { ...prevS, filteredItems, mappedTasks };
-    //     }
+        if (isRunning && isRunning !== nextP.isRunning) return false;
 
-    //     return null;
-    // }
+        if (mappedItems === nextP.mappedItems && filteredItems === nextP.filteredItems) return false;
 
-    shouldComponentUpdate(nextP, nextS) {
-        const { isUpdating, isRunning, mappedItems, filteredItems } = this.props;
-
-        if (isUpdating) return false;
-        if (isRunning !== nextP.isRunning) return false;
-        if (mappedItems == nextP.mappedItems && filteredItems === nextP.filteredItems) return false;
         return true;
-    }
-
-    UNSAFE_componentWillUpdate(nextProps) {
-        Object.keys(nextProps)
-            .map(key => nextProps[key] !== this.props[key] && console.log(key + ' changed in et'));
     }
 
     componentDidUpdate() {
         if (this.props.isUpdating) this.props.setState({ isUpdating: false });
-        console.log('e table updated');
+        if (this.props.isUpdating) console.log('set isupdating to false')
     }
 
     toggleEntries = (day, item) => {
@@ -146,26 +123,26 @@ class EntriesTable extends React.Component {
     }
 
     changeProjectMultiple = (project, array) => {
-        const { userData, updateEntry, mappedItems } = this.props;
+        const { userData, updateEntry, mappedItems, getFilteredItems } = this.props;
         const arrId = array.map(itm => itm.id);
 
         updateEntry(userData._id, JSON.stringify(arrId), { project });
 
         const readable = moment(array[0].start).format('ddd, Do MMM');
-        const dayObj = this.getFilteredItems({ [readable]: mappedItems[readable] });
-
+        const dayObj = getFilteredItems({ [readable]: mappedItems[readable] });
+        console.log(dayObj, 'DOBJ')
         const key = array[0].readable;
         const keyStr = `${project} \n${array[0].description || '$empty#'} `;
         const keyStrPrevVal = `${array[0].project} \n${array[0].description || '$empty#'} `;
-        const getBoolVal = this.state.filteredItems[key][keyStrPrevVal];
-
-        const filteredItems = { ...this.state.filteredItems, [key]: { ...dayObj, [keyStr]: getBoolVal } };
-        this.setState(() => ({ isUpdating: true }), () => this.setState({ filteredItems }));
+        const getBoolVal = this.props.filteredItems[key][keyStrPrevVal];
+        console.log(keyStr, getBoolVal, 'val,key')
+        const filteredItems = { ...this.props.filteredItems, [key]: { ...dayObj, [keyStr]: getBoolVal } };
+        console.log('WILL CALL SETSTATE TO UPDATE FI')
+        this.props.setState(() => ({ isUpdating: true, filteredItems }));
     }
 
     isEveryItemBillable = array => {
-        if (array[0].billable && array.every(itm => itm.billable === array[0].billable)) return true;
-        else return false;
+        return (array[0].billable && array.every(itm => itm.billable === array[0].billable)) ? true : false;
     }
 
     setBillableMulti = array => {
@@ -178,7 +155,7 @@ class EntriesTable extends React.Component {
     }
 
     onBlurDescriptionSave = (value, currentItem, key, previousVal) => {
-        const { mappedItems, filteredItems } = this.props;
+        const { filteredItems } = this.props;
 
         if (currentItem[0].description === value) return null;
 
@@ -193,7 +170,7 @@ class EntriesTable extends React.Component {
             const getBoolVal = previousVal !== undefined ? filteredItems[key][keyStrPrevVal] : false;
             const singleDayMod = { ...filteredItems[key], [keyStr]: getBoolVal };
 
-            this.setState({ filteredItems: Object.assign({}, filteredItems, { [key]: singleDayMod }) });
+            this.props.setState({ filteredItems: Object.assign({}, filteredItems, { [key]: singleDayMod }) });
         }
     }
 
@@ -213,39 +190,40 @@ class EntriesTable extends React.Component {
     }
 
     getTaskEntries = idx => {
-        const { handleRemove, userData, projects, getProjectColor, filteredItems,
-            mappedItems } = this.props;
+        const { handleRemove, userData, projects, getProjectColor, filteredItems, mappedItems, isFetching } = this.props;
 
         return Object.keys(mappedItems[idx])
-            .sort((a, b) => mappedItems[idx][b][0].stop - mappedItems[idx][a][0].stop)
-            .map((item, i, arr) => {
+            .sort((a, b) => mappedItems[idx][b][mappedItems[idx][b].length - 1].stop -
+                mappedItems[idx][a][mappedItems[idx][a].length - 1].stop)
+            .map(item => {
                 const projectName = item.split('\n')[0].trim();
                 const projectDescription = item.split('\n')[1].trim();
                 const currentItem = mappedItems[idx][item];
 
-                return <EntryGroup key={currentItem[0].id} currentItem={currentItem} projectDescription={projectDescription}
+                return (<EntryGroup key={currentItem[0].id} currentItem={currentItem} projectDescription={projectDescription}
                     filteredItem={filteredItems[idx][item]} item={item} projectName={projectName} getSingleEntries={this.getSingleEntries}
                     toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
                     getProjectColor={getProjectColor} userData={userData} changeProject={this.changeProjectMultiple} projects={projects}
                     setBillableMulti={this.setBillableMulti} handleRemove={handleRemove} getTotalDayCount={this.getTotalDayCount}
-                    isEveryItemBillable={this.isEveryItemBillable} startNewEntry={this.startNewEntry} />
+                    isEveryItemBillable={this.isEveryItemBillable} startNewEntry={this.startNewEntry} isFetching={isFetching} />)
             });
     }
 
     render() {
-        const { mappedItems, filteredItems } = this.props;
+        const { mappedItems, filteredItems, daysToShowLength } = this.props;
 
-        if (!Object.keys(filteredItems).length) return (<p>Loading...</p>);
-        console.log(mappedItems, 'mi');
+        if (!Object.keys(filteredItems).length) return (<Load_p>Loading...</Load_p>);
+        console.log('current items to show:', daysToShowLength);
+
         return Object.keys(mappedItems)
             .map((itm, idx) =>
-                <List_item key={itm}>
+                idx < daysToShowLength ? (<List_item key={itm}>
                     <Item_header>
                         <Item_day>{this.getDayField(itm)}</Item_day>
                         <DayCount_span>{this.getTotalDayCount(mappedItems[itm])}</DayCount_span>
                     </Item_header>
                     {this.getTaskEntries(itm)}
-                </List_item >);
+                </List_item>) : null);
     }
 }
 

@@ -13,7 +13,6 @@ const Time_container_inner = styled.div`
     flex-direction:column;
     align-items:flex-end;
     justify-content:center;
-    width:12rem;
 `;
 
 const Time_container_outer = styled.div`
@@ -25,7 +24,6 @@ const Item_link = styled.a`
     color:#ccc;
     cursor:pointer;
 `;
-
 
 export default class EntryTimer extends React.Component {
     shouldComponentUpdate(nextProps, nextState) {
@@ -45,8 +43,8 @@ export default class EntryTimer extends React.Component {
     }
 
     getStopStartTime = items => {
-        const startFormat = moment(items[items.length - 1].start).format('hh:mm A');
-        const stopFormat = moment(items[0].stop).format('hh:mm A');
+        const startFormat = moment(items[0].start).format('hh:mm A');
+        const stopFormat = moment(items[items.length - 1].stop).format('hh:mm A');
 
         return `${startFormat} - ${stopFormat} `;
     }

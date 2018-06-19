@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect, Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import Scrollbar from './components/scrollbar';
 import Preloader from './containers/preloader';
 import Protected_container from './containers/protected';
 import Sidebar from './containers/sidebar';
@@ -36,8 +35,7 @@ const routes = (<App_container>
         <Route path="/login" component={Form} />
         <Protected_container>
             <Sidebar />
-            <Scrollbar>
-                <Main_content>
+            <Main_content>
                     <Switch>
                         <Route exact path="/" render={() => (<Redirect to="/timer" />)} />
                         <Route path="/timer" component={Timer} />
@@ -46,8 +44,7 @@ const routes = (<App_container>
                         <Route path="/profile" component={Profile} />
                         <Route component={NotFound} />
                     </Switch>
-                </Main_content>
-            </Scrollbar>
+            </Main_content>
             <StatusBar />
         </Protected_container>
         <Route path="/500" component={ErrorPage} />

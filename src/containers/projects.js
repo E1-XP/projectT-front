@@ -29,6 +29,11 @@ const Heading = styled.h2`
     font-weight:500;
 `;
 
+const Section_heading = styled.h3`
+    display: flex;
+    align-items: center;
+`;
+
 const Modal_Header = styled.header`
     display:flex;
     justify-content:space-between;
@@ -40,6 +45,9 @@ const Modal_Section = styled.section`
     display:flex;
     justify-content:center;
     padding:1.5rem;
+    &:last-of-type ${Button} :last-child{
+        margin-left:.5rem;
+    }
 `;
 
 const Modal_Footer = styled.footer`
@@ -56,6 +64,7 @@ const Button = styled.button`
     font-size:14px;
     transition:all .2s ease-in;        
     color:#fff;    
+    min-width:8rem;
 `;
 
 const Button_Create = styled(Button)`
@@ -109,6 +118,11 @@ const modalStyle = {
     content: { width: '550px', margin: '0 auto', height: '270px', padding: '0', boxShadow: `0 5px 15px rgba(128,128,128,0.5)` }
 };
 
+const modalConfirmStyle = {
+    overlay: {},
+    content: { width: '450px', margin: '50px auto', height: '200px', padding: '0', boxShadow: `0 5px 15px rgba(128,128,128,0.5)` }
+};
+
 const colors = [`#1abc9c`, `#3498db`, '#34495e', `#e74c3c`, `#d35400`, `#f1c40f`, `#95a5a6`, `#8e44ad`];
 
 class Projects extends React.Component {
@@ -117,9 +131,11 @@ class Projects extends React.Component {
 
         this.state = {
             isModalOpen: false,
+            isConfirmDialogOpen: false,
             isColorSelectorOpen: false,
             projectInput: "",
             clientInput: "",
+            checkedProjects: [],
             selectedColor: null,
             colors: shuffle(colors)
         }
@@ -146,6 +162,15 @@ class Projects extends React.Component {
         this.setState({ isModalOpen: false });
     }
 
+    openDialog = () => {
+
+        this.setState({ isConfirmDialogOpen: true });
+    }
+
+    closeDialog = () => {
+        this.setState({ isConfirmDialogOpen: false });
+    }
+
     openColorSelector = () => {
         this.setState({ isColorSelectorOpen: true });
     }
@@ -164,15 +189,19 @@ class Projects extends React.Component {
 
     handleProjectRemove = () => {
         const { userData, removeProject } = this.props;
-        const { checkedProjects } = this.refTable.state;
-
+        const { checkedProjects } = this.state;
         const names = Object.keys(checkedProjects).filter(itm => checkedProjects[itm]);
 
-        if (names.length) removeProject(userData._id, names);
+        if (names.length) {
+            removeProject(userData._id, names);
+            this.closeDialog();
+        }
     }
 
     render() {
-        const { userData, entries, projects, removeProject } = this.props;
+        const { entries, projects } = this.props;
+        const { checkedProjects } = this.state;
+        const areSomeProjectsChecked = Object.keys(checkedProjects).some(key => checkedProjects[key]);
 
         return (<Wrapper>
             <Header>
@@ -180,19 +209,21 @@ class Projects extends React.Component {
                 <Button_Create onClick={this.openModal}>Create Project</Button_Create>
             </Header>
             <section>
-                <ProjectsTable ref={node => this.refTable = node}  entries={entries} projects={projects} />
+                <ProjectsTable ref={node => this.refTable = node} setState={this.setStateBind} state={this.state}
+                    entries={entries} projects={projects} />
             </section>
             <Footer>
-                <Button_Remove onClick={this.handleProjectRemove}>
+                {!!projects.length && <Button_Remove onClick={this.openDialog} className={areSomeProjectsChecked ? null : 'btn-disabled'}
+                    disabled={areSomeProjectsChecked ? false : true}>
                     Remove Selected
-                    </Button_Remove>
+                    </Button_Remove>}
             </Footer>
 
             <Modal isOpen={this.state.isModalOpen} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true}
                 overlayRef={node => this.overlayRef = node} onRequestClose={this.closeModal} closeTimeoutMS={200}
                 style={modalStyle}>
                 <Modal_Header>
-                    <h3>Create Project</h3>
+                    <Section_heading>Create Project</Section_heading>
                     <Icon_Link onClick={this.closeModal}>
                         <Icon name="close" />
                     </Icon_Link>
@@ -218,6 +249,21 @@ class Projects extends React.Component {
                 <Modal_Footer>
                     <Button_Create onClick={this.handleProjectCreate}>Create Project</Button_Create>
                 </Modal_Footer>
+            </Modal>
+
+            <Modal isOpen={this.state.isConfirmDialogOpen} shouldCloseOnEsc={true} shouldCloseOnOverlayClick={true}
+                overlayRef={node => this.overlayRef2 = node} onRequestClose={this.closeDialog} closeTimeoutMS={200}
+                style={modalConfirmStyle} >
+                <Modal_Header>
+                    <Section_heading>Are your sure?</Section_heading>
+                    <Icon_Link onClick={this.closeDialog}>
+                        <Icon name="close" />
+                    </Icon_Link>
+                </Modal_Header>
+                <Modal_Section>
+                    <Button_Create onClick={this.handleProjectRemove}>Yes</Button_Create>
+                    <Button_Remove onClick={this.closeDialog}>No</Button_Remove>
+                </Modal_Section>
             </Modal>
 
         </Wrapper>);

@@ -1,5 +1,5 @@
 import { applyMiddleware, createStore, compose } from 'redux';
-import { routerMiddleware } from 'react-router-redux'
+import { routerMiddleware, connectRouter } from 'connected-react-router';
 import { enableBatching } from 'redux-batched-actions';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers';
@@ -9,6 +9,7 @@ const initialState = {
     global: {
         isLoading: true,
         isRunning: false,
+        isFetching: false,
         isUserLoggedIn: false,
         hasErrored: false,
         daysToShowLength: 10,
@@ -38,7 +39,7 @@ const initialState = {
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-const store = createStore(enableBatching(rootReducer), initialState,
+const store = createStore(enableBatching(connectRouter(history)(rootReducer)), initialState,
     composeEnhancers(applyMiddleware(thunk, routerMiddleware(history))));
 
 //store.subscribe(() => console.log('STORE UPDATED.', store.getState()));

@@ -104,7 +104,7 @@ export default class PeriodTimeChart extends React.Component {
     }
 
     getCheckedData = (isPeriodNotYears, data, yearData, isPeriodCustomAndLong) => {
-        console.log(data,'data');
+        console.log(data, 'data');
 
         const checkForDataValue = itm => itm.time ? Object.assign({}, itm, { hasValue: true }) :
             Object.assign({}, itm, { hasValue: false });
@@ -123,7 +123,7 @@ export default class PeriodTimeChart extends React.Component {
     }
 
     getWeeksFromDays = data => {
-        console.log(data,'data');
+        console.log(data, 'data');
         const reducedData = data.reduce((acc, itm) => {
             acc[itm.week] ?
                 acc[itm.week] = {

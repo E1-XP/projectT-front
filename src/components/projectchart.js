@@ -168,7 +168,7 @@ class ProjectsChart extends React.Component {
                 </Overlay>
                 <ResponsiveContainer >
                     <PieChart width={700} height={300}>
-                        <Pie isAnimationActive={false} data={data} innerRadius={70}
+                        <Pie isAnimationActive={false} data={data} innerRadius={70} cx={'55%'}
                             outerRadius={140} dataKey="v" onMouseEnter={handleMouseEnter}
                             onMouseLeave={handleMouseLeave} activeIndex={activeIdx} >
                             {data.map((itm, idx) => (<Cell key={`cell-${idx}`}

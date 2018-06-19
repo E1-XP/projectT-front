@@ -36,11 +36,11 @@ const Screen_blocker = styled.div`
     height:100%;
 `;
 
-const Dropdown_item_border = styled(Dropdown_item) `
+const Dropdown_item_border = styled(Dropdown_item)`
     border-top:1px solid #ddd;
 `;
 
-const Dropdown_item_noclick = styled(Dropdown_item) `
+const Dropdown_item_noclick = styled(Dropdown_item)`
     cursor:default;
     &:hover{
         background-color:initial;
@@ -49,7 +49,7 @@ const Dropdown_item_noclick = styled(Dropdown_item) `
 
 const IconProfile = styled.span`
     display:flex;
-    background-color:red;
+    background-color:#e20505;
     background-image:url(${props => props.url || 'none'});
     background-size:cover;
     width:1.7rem;

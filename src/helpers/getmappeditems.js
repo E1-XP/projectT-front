@@ -4,7 +4,7 @@ momentDFPlugin(moment);
 
 const getMappedItems = entries => {
     const getReadable = item => moment(item.start).format('ddd, Do MMM');
-    const getDuration = item => moment.duration(moment(item.stop).diff(item.start)).format('h:mm:ss', { stopTrim: "hh mm ss" });
+    const getDuration = item => moment(item.stop - item.start).format('h:mm:ss', { stopTrim: "hh mm ss" });
 
     const reduceItems = (acc, itm) => {
         if (itm.stop !== undefined) {
@@ -25,15 +25,12 @@ const getMappedItems = entries => {
             if (!acc[mapped.readable]) acc[mapped.readable] = {};
             if (!acc[mapped.readable][keyStr]) acc[mapped.readable][keyStr] = [];
 
-            acc[mapped.readable][keyStr].push(mapped);
+            acc[mapped.readable][keyStr].unshift(mapped);
         }
         return acc;
     }
 
-    return entries
-        .sort((a, b) => b.start - a.start)
-        .reduce(reduceItems, {});
+    return entries.reduce(reduceItems, {});
 }
-
 
 export default getMappedItems;

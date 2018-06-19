@@ -19,6 +19,7 @@ const Task_controller = styled.section`
     justify-content:space-between;
     align-items:center;
     position:fixed;
+    top:0;
     z-index:50;
     background-color:#fff;
     width:95%;
@@ -150,8 +151,7 @@ class TopBar extends React.Component {
     }
 
     stopTimer = () => {
-        const { userData, toggleTimer, runningEntry, updateEntry, runningEntryDescription, getWeekTime,
-            setRunningEntryDescription, setWeekTimer, currentProject, setProject, billable } = this.props;
+        const { userData, toggleTimer, setRunningEntryDescription, setProject } = this.props;
 
         toggleTimer(false);
         setRunningEntryDescription('');

@@ -33,18 +33,19 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
         window.interval = setInterval(() => {
             if (previousTime && initialWeekTime === '0:00:00') initialWeekTime = getState().timer.weekTimer;
 
-            const state = getState().timer;
+            const state = getState();
             const time = moment.duration(moment().diff(start)).format('h:mm:ss', { stopTrim: "hh mm ss" });
             const weekTime = moment.duration(initialWeekTime).add(moment().diff(moment(start)))
                 .format('h:mm:ss', { stopTrim: "hh mm ss" });
 
-            if (state.timer !== time) {
+            if (state.timer.timer !== time) {
                 dispatch(batchActions([
                     setTimer(time),
                     setWeekTimer(weekTime)
                 ]));
 
-                if (shouldShowTimerOnTitle) document.title = `${time} - ProjectT`;
+                if (state.user.settings.shouldShowTimerOnTitle) document.title = `${time} - ProjectT`;
+                else if (document.title !== 'ProjectT') document.title = 'ProjectT';
             }
         }, 350);
     }

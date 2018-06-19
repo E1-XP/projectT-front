@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import Icon from './icon';
-import Scrollbar from './scrollbar';
 
 const Color_indicator = styled.span`
     display:inline-block;
@@ -31,7 +30,7 @@ const Item = styled.li`
 
 const List = styled.ul`
     max-height:12rem;
-    /* overflow-y:auto; */
+    overflow-y:auto;
 `;
 
 const Input = styled.input`
@@ -160,9 +159,7 @@ class ProjectDropdown extends React.Component {
                             <Input placeholder="Find project..." className="input-standard"
                                 value={inputValue} onChange={this.setInputState} />
                         </Searchbar>
-                        <Scrollbar>
-                            {this.generateItemArray()}
-                        </Scrollbar>
+                        {this.generateItemArray()}
                     </div>}
                 </Pos_absolute>
             </React.Fragment>);

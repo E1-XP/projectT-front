@@ -7,7 +7,7 @@ const baseUrl = `https://project--t.herokuapp.com`;
 
 import { toggleTimer } from './timer';
 import { editEntries, removeEntries, setUserData } from './user';
-import { loadingError } from './global';
+import { loadingError, setIsFetching } from './global';
 
 export const setBillable = bool => ({
     type: consts.SET_BILLABLE,
@@ -53,10 +53,12 @@ export const createNewEntry = (userid, queryParams, ignoreIsRunning = false, mul
                 ]));
             }
 
+            dispatch(setIsFetching(true));
             axios.post(url).then(resp => {
 
                 //dispatch(editEntries(resp.data));
                 (!queryParams.stop) && dispatch(setRunningEntry(resp.data._id));
+                dispatch(setIsFetching(false));
 
             }).catch(err => dispatch(loadingError(err)));
         }
@@ -71,26 +73,28 @@ export const createNewEntry = (userid, queryParams, ignoreIsRunning = false, mul
         createEntry();
     }
 
-export const updateEntry = (userid, runningEntryId, queryParams) =>
-    (dispatch, getState) => {
-        let queryStr = ``;
-        Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
+export const updateEntry = (userid, runningEntryId, queryParams) => (dispatch, getState) => {
+    let queryStr = ``;
+    Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
 
-        const url = `${baseUrl}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
+    const url = `${baseUrl}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
+    dispatch(setIsFetching(true));
 
-        axios.put(url).then(resp => {
-            dispatch(editEntries(resp.data));
-            const state = getState().global;
+    axios.put(url).then(resp => {
+        dispatch(editEntries(resp.data));
+        dispatch(setIsFetching(false));
+        const state = getState().global;
 
-            !state.isRunning && queryParams.stop && state.runningEntry === resp._id && dispatch(setRunningEntry(null));
+        !state.isRunning && queryParams.stop && state.runningEntry === resp._id && dispatch(setRunningEntry(null));
 
-        }).catch(err => dispatch(loadingError(err)));
-    }
+    }).catch(err => dispatch(loadingError(err)));
+}
 
 export const removeEntry = (userid, entryid) => dispatch => {
     if (entryid.length !== 24) entryid = JSON.stringify(entryid);
 
     const url = `${baseUrl}/users/${userid}/entries/${entryid}/`;
+    dispatch(setIsFetching(true));
 
     axios.delete(url).then(res => {
         let response;
@@ -98,6 +102,8 @@ export const removeEntry = (userid, entryid) => dispatch => {
         else response = res.data;
 
         dispatch(removeEntries(response));
+        dispatch(setIsFetching(false));
+
     }).catch(err => dispatch(loadingError(err)));
 }
 
@@ -107,9 +113,11 @@ export const createProject = (userid, name, color, client) => dispatch => {
 
     const url = `${baseUrl}/users/${userid}/projects/?name=${name}&color=${color}&client=${client}`;
     console.log(url);
+    dispatch(setIsFetching(true));
 
     axios.post(url).then(res => {
         dispatch(setUserData(res.data));
+        dispatch(setIsFetching(false));
     }).catch(err => dispatch(loadingError(err)));
 }
 
@@ -118,8 +126,10 @@ export const removeProject = (userid, name) => dispatch => {
 
     const url = `${baseUrl}/users/${userid}/projects/?name=${name}`;
     console.log(url);
+    dispatch(setIsFetching(true));
 
     axios.delete(url).then(res => {
         dispatch(setUserData(res.data));
+        dispatch(setIsFetching(false));
     }).catch(err => dispatch(loadingError(err)));
 }

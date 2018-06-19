@@ -49,7 +49,7 @@ const Button = styled.button`
     }
 `;
 
-const Button_done = styled(Button) `
+const Button_done = styled(Button)`
     background-color:#47be00;
     margin-left: auto;
     display: flex;
@@ -59,7 +59,7 @@ const Button_done = styled(Button) `
     }
 `;
 
-const Button_password = styled(Button) `
+const Button_password = styled(Button)`
     background-color:#323232;
     margin-right:.7rem;
     &:hover{
@@ -188,7 +188,7 @@ const Label_check = styled.label`
 const placeholderImg = 'https://lh6.googleusercontent.com/-ph4JkGJ7wdY/AAAAAAAAAAI/AAAAAAAAAYw/g2wqnP4pMhM/photo.jpg';
 
 const Profile = props => {
-    const { userData, state, data, isPasswordFormInvalid, modalPassword, isUploading, setState,
+    const { userData, state, data, isPasswordFormInvalid, modalPassword, setState,
         sendFile, openModal, closeModal, setUserInfo, resetAvatar, setUsernameInputState,
         setEmailInputState, setShouldShowTimerOnTitle, validatePasswordForm, Icon_button } = props;
 
@@ -208,7 +208,7 @@ const Profile = props => {
             <Side>
                 <Avatar_section>
                     <Avatar_img src={userData.avatar || placeholderImg} />
-                    {isUploading && <Avatar_inProgress><span></span></Avatar_inProgress>}
+                    {state.isUploading && <Avatar_inProgress><span></span></Avatar_inProgress>}
                     <Avatar_settings>
                         <Icon name="settings" />
                         <form encType="multipart/form-data" name="formAv" id="formAvatar">

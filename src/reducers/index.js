@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { routerReducer } from 'react-router-redux';
+import { routerReducer } from 'connected-react-router';
 
 import entryReducer from './entry';
 import globalReducer from './global';
@@ -10,8 +10,7 @@ const rootReducer = combineReducers({
     global: globalReducer,
     entry: entryReducer,
     user: userReducer,
-    timer: timerReducer,
-    router: routerReducer
+    timer: timerReducer
 });
 
 export default rootReducer;

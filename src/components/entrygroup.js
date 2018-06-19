@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import delayHOC from '../HOCs/renderdelay';
 import EntryHeader from './entryheader';
 import EntryTimer from './entrytimer';
 
@@ -62,7 +63,7 @@ const Item_link_relative = styled.span`
         }
 `;
 
-const Item_link_toggle = styled(Item_link) `
+const Item_link_toggle = styled(Item_link)`
     opacity:${props => props.isOpen ? '1' : '0'};
     pointer-events:none;
     color:${props => props.isOpen ? '#999' : '#ccc'};
@@ -103,9 +104,9 @@ const Itembody_header = styled.header`
 
 export default class EntryGroup extends React.Component {
     shouldComponentUpdate(nextProps) {
-        const { currentItem } = this.props;
+        const { currentItem, filteredItem } = this.props;
 
-        if (this.props.filteredItem !== nextProps.filteredItem) return true;
+        if (filteredItem !== nextProps.filteredItem || currentItem !== nextProps.currentItem) return true;
         if (currentItem.length !== nextProps.currentItem.length) return true;
 
         return nextProps.currentItem.some((itm, i) =>
@@ -114,18 +115,22 @@ export default class EntryGroup extends React.Component {
     }
 
     render() {
-        const { currentItem, filteredItem, item, getSingleEntries, idx } = this.props;
+        const { currentItem, filteredItem, item, getSingleEntries, idx, isFetching } = this.props;
+        console.log('will update entry')
 
-        return (
-            <Entry_section key={currentItem[0].id}>
-                <Itembody_header>
-                    <EntryHeader {...this.props} Item_link_toggle={Item_link_toggle} />
-                    <EntryTimer {...this.props} Item_link_toggle={Item_link_toggle}
-                        Item_toggle={Item_toggle} Item_link_relative={Item_link_relative} />
-                </Itembody_header>
-                <Itembody_body>
-                    {(filteredItem && currentItem.length > 1) && getSingleEntries(currentItem, idx)}
-                </Itembody_body>
-            </Entry_section>);
+        const Markup = props => (<Entry_section key={currentItem[0].id}>
+            <Itembody_header>
+                <EntryHeader {...this.props} Item_link_toggle={Item_link_toggle} />
+                <EntryTimer {...this.props} Item_link_toggle={Item_link_toggle}
+                    Item_toggle={Item_toggle} Item_link_relative={Item_link_relative} />
+            </Itembody_header>
+            <Itembody_body>
+                {(filteredItem && currentItem.length > 1) && getSingleEntries(currentItem, idx)}
+            </Itembody_body>
+        </Entry_section>);
+
+        const WithDelay = delayHOC(Markup);
+
+        return isFetching ? <WithDelay /> : <Markup />;
     }
 }

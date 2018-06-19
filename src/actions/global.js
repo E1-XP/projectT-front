@@ -1,3 +1,4 @@
+import { batchActions } from 'redux-batched-actions';
 import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
@@ -5,9 +6,11 @@ axios.defaults.withCredentials = true;
 //const baseUrl = `http://localhost:3001`;
 const baseUrl = `https://project--t.herokuapp.com`;
 
-import { push } from 'react-router-redux'
-import { setUserData, setSettings } from './user';
+import { push } from 'connected-react-router';
+import { setUserData, setSettings, setMappedItems } from './user';
 import { setTimer } from './timer';
+import getFilteredMappedItems from '../helpers/getfilteredmappeditems';
+import getMappedItems from '../helpers/getmappeditems';
 
 export const setIsLoading = bool => ({
     type: consts.IS_LOADING,
@@ -16,6 +19,11 @@ export const setIsLoading = bool => ({
 
 export const setIsRunning = bool => ({
     type: consts.IS_RUNNING,
+    payload: bool
+});
+
+export const setIsFetching = bool => ({
+    type: consts.IS_FETCHING,
     payload: bool
 });
 
@@ -98,8 +106,10 @@ export const handleReAuth = () => (dispatch, getState) => {
             dispatch(setIsLoading(false));
         }
         else {
-            dispatch(push('/login'));
-            dispatch(setIsLoading(false));
+            batchActions([
+                push('/login'),
+                setIsLoading(false)
+            ]);
         }
     }).catch(err => {
         err.response && err.response.status !== 401 && dispatch(loadingError(err));
@@ -120,8 +130,11 @@ export const handleLogout = () => dispatch => {
         setTimeout(() => dispatch(setIsLoading(false)), 1000);
         if (window.interval) {
             clearInterval(window.interval);
-            dispatch(setIsRunning(false));
-            dispatch(setTimer('0:00:00'));
+
+            batchActions([
+                setIsRunning(false),
+                setTimer('0:00:00')
+            ]);
             document.title = 'ProjectT';
         }
         dispatch(setUserData(null));

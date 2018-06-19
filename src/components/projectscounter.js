@@ -9,6 +9,9 @@ const Wrapper = styled.section`
     margin-top:.5rem;
     width:25%;
     min-width:205px;
+    @media only screen and (max-width:900px) {
+        display:none;
+    }
 `;
 
 const Heading = styled.h3`

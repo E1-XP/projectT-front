@@ -1,26 +1,22 @@
-// import React from 'react';
+import React from 'react';
 
-// const DelayRendering = Component =>
-//     class DelayRender extends React.Component {
-//         constructor() {
-//             super();
+const DelayRendering = Component =>
+    class DelayRender extends React.Component {
+        constructor() {
+            super();
 
-//             this.state = {
-//                 shouldRender: true
-//             }
-//         }
+            this.state = {
+                shouldRender: false
+            }
+        }
 
-//         componentDidMount() {
-//             setTimeout(() => this.setState({ shouldRender: false }), 1000);
-//         }
+        componentDidMount() {
+            requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ shouldRender: true })));
+        }
 
-//         componentDidUpdate() {
-//             requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ shouldRender: true })));
-//         }
+        render() {
+            return this.state.shouldRender ? (<Component {...this.props} />) : null;
+        }
+    }
 
-//         render() {
-//             return this.state.shouldRender ? (<Component {...this.props} />) : null;
-//         }
-//     }
-
-// export default DelayRendering;
+export default DelayRendering;

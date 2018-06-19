@@ -74,6 +74,15 @@ const Color_Indicator = styled.span`
     margin-left:.5rem;
 `;
 
+const Paragraph = styled.p`
+    text-align:center;
+    padding:2rem;
+    color:#999;
+    margin-top:150px;
+    font-weight: 700;
+    font-size: 20px;
+`;
+
 const CheckBox = ({ name, state, handleChecks }) => {
     const syntheticTarget = { target: { checked: name !== 'maincheck' ? state[name] : state } };
 
@@ -102,7 +111,6 @@ class ProjectsTable extends React.Component {
         super();
 
         this.state = {
-            checkedProjects: [],
             sortedProjects: [],
             MainCheckBox: false,
             sortOrder: 'desc',
@@ -127,7 +135,7 @@ class ProjectsTable extends React.Component {
     }
 
     handlePropsChange = () => {
-        const { projects } = this.props;
+        const { projects, setState } = this.props;
 
         const reduceFn = (acc, itm) => {
             acc[itm.name] = false;
@@ -136,17 +144,19 @@ class ProjectsTable extends React.Component {
         const checkedProjects = projects.reduce(reduceFn, {});
         const sortedProjects = projects.sort(this.sortFn(this.state.sortBy));
 
-        this.setState({ checkedProjects, sortedProjects });
+        this.setState({ sortedProjects });
+        setState({ checkedProjects })
     }
 
     handleChecks = (e, name = null) => {
-        const checkedProjects = Object.assign({}, this.state.checkedProjects);
+        const checkedProjects = Object.assign({}, this.props.state.checkedProjects);
         const { checked } = e.target;
 
         if (!name) {
             //handle main checkbox             
             Object.keys(checkedProjects).forEach(key => checkedProjects[key] = checked);
-            this.setState({ checkedProjects, MainCheckBox: checked });
+            this.setState({ MainCheckBox: checked });
+            this.props.setState({ checkedProjects })
         }
         else {
             checkedProjects[name] = checked;
@@ -154,7 +164,8 @@ class ProjectsTable extends React.Component {
                 .every(itm => checkedProjects[itm] === checked);
 
             const MainCheckBox = isEveryItemEqualChecked && checked ? true : false;
-            this.setState({ checkedProjects, MainCheckBox });
+            this.setState({ MainCheckBox });
+            this.props.setState({ checkedProjects });
         }
     }
 
@@ -214,7 +225,8 @@ class ProjectsTable extends React.Component {
     }
 
     generateItems = () => {
-        const { sortBy, checkedProjects, sortedProjects } = this.state;
+        const { sortBy, sortedProjects } = this.state;
+        const { checkedProjects } = this.props.state;
 
         return sortedProjects.map((itm, i) =>
             (<Table_Row key={itm.name}>
@@ -233,9 +245,10 @@ class ProjectsTable extends React.Component {
 
     render() {
         const { projects } = this.props;
-        const { sortBy, checkedProjects, sortedProjects } = this.state;
+        const { checkedProjects } = this.props.state;
+        const { sortBy, sortedProjects } = this.state;
 
-        if (!projects.length || !sortedProjects.length) return (<p>Loading...</p>);
+        if (!projects.length || !sortedProjects.length) return (<Paragraph>No projects found. Press the green button to create one.</Paragraph>);
 
         return (
             <Table>

@@ -41,7 +41,6 @@ const Time_container_inner = styled.div`
     flex-direction:column;
     align-items:flex-end;
     justify-content:center;
-    width:12rem;
 `;
 
 const Time_container_outer = styled.div`
@@ -89,6 +88,9 @@ const Input_task = styled.input`
 
 const Item_project = styled.span`
     color:${({ color }) => color === 'white' ? 'black' : color};
+    @media only screen and (max-width:638px) {
+        display:none;
+    }
 `;
 
 const Color_indicator = styled.span`

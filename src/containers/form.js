@@ -16,6 +16,9 @@ const Container = styled.section`
     width:50%;
     max-width:450px;
     margin:5rem auto;
+    @media only screen and (max-width:768px) {
+        width:80%;
+    }
 `;
 
 const Header = styled.header`
@@ -37,7 +40,8 @@ const Form_section = styled.form`
 `;
 
 const Form_item = styled.input`
-    padding:.5rem;
+    padding:.8rem;
+    margin:.5rem 0;
     border:1.5px solid ${props => props.state !== false ? '#eee' : 'red'};
 `;
 
@@ -46,7 +50,7 @@ const Heading = styled.h2`
 `;
 
 const Button = styled.button`
-    padding:.5rem;
+    padding:.8rem .5rem;
     background-color:red;
     border:none;
     margin:none;
@@ -119,7 +123,7 @@ class Form extends React.Component {
         return (
             <Wrapper>
                 <Header>
-                    <h2>ProjectT</h2>
+                    <h2><NavLink to="/">ProjectT</NavLink></h2>
                     <Nav>
                         <NavLink to="/signup">SignUp</NavLink>
                         <NavLink to="/login">LogIn</NavLink>

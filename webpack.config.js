@@ -2,9 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = {
-    entry: ["react-hot-loader/patch", "babel-polyfill", "./src/index.js"],
+    entry: ["react-hot-loader/patch", "./src/index.js"],
     output: {
         path: path.resolve(__dirname, "/public"),
         filename: "bundle.js"
@@ -19,8 +20,7 @@ module.exports = {
                 query: {
                     presets: ['env', 'react'],
                     plugins: ["transform-runtime", "transform-class-properties",
-                        "transform-object-rest-spread",
-                        "react-hot-loader/babel"]
+                        "transform-object-rest-spread", "react-hot-loader/babel"]
                 }
             }, {
                 test: /\.html$/,
@@ -36,7 +36,11 @@ module.exports = {
             template: "./public/index.html",
             filename: "./index.html"
         }),
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify('production')
+        }),
+        new CompressionPlugin()
     ],
     devServer: {
         contentBase: './public',

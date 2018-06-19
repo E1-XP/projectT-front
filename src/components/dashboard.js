@@ -38,8 +38,11 @@ const Heading_section = styled.h3`
 const Chart_Section = styled.section`
     flex-basis:72%;
     width:0;
-    min-width:530px;
+    min-width:590px;
     margin-right:1rem;
+    @media only screen and (max-width:900px) {
+        flex-basis:100%;
+    }
 `;
 
 const Item_link = styled.a`

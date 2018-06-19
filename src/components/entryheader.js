@@ -30,6 +30,9 @@ const Input_task = styled.input`
 
 const Item_project = styled.span`
     color:${({ color }) => color === 'white' ? 'black' : color};
+    @media only screen and (max-width:638px) {
+        display:none;
+    }
 `;
 
 const GroupEntries_length = styled.span`

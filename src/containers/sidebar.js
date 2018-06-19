@@ -40,10 +40,6 @@ const Sidebar_profile = styled.section`
 const Navigation_list = styled.ul`
 `;
 
-const Navigation_item = styled.li`
-    margin:.1rem;
-`;
-
 const Navigation_link = styled(NavLink)`
     color:#ddd;
     display:flex;
@@ -51,11 +47,21 @@ const Navigation_link = styled(NavLink)`
     justify-content: center;
     padding: 0.3rem;
     border-radius: 7px;
+    position:relative;
     @media only screen and (min-width:1024px){
          justify-content:initial;
 }
 &:hover{
     color:white;
+}
+`;
+
+const Navigation_item = styled.li`
+    margin:.1rem;
+&:first-of-type ${Navigation_link}  {
+    border-style:solid;
+    border-width:1px;
+    border-color:${props => props.isFetching ? '#e20505' : 'rgb(50, 50, 50)'};
 }
 `;
 
@@ -80,16 +86,18 @@ const Link_label = styled.span`
 
 class SideBar extends React.Component {
     shouldComponentUpdate(nextP, nextS) {
-        const { userData, isRunning, location } = this.props;
+        const { userData, isRunning, location, isFetching } = this.props;
 
         const should = nextP.isRunning || (isRunning && !nextP.isRunning) || location.pathname !== nextP.location.pathname ||
-            userData.avatar !== nextP.userData.avatar || userData.username !== nextP.userData.username;
+            nextP.isFetching !== isFetching || userData.avatar !== nextP.userData.avatar ||
+            userData.username !== nextP.userData.username;
 
         return should ? true : false;
     }
 
     render() {
-        const { handleLogout, userData, isRunning, timer, shouldShowTimerOnTitle } = this.props;
+        const { handleLogout, userData, isRunning, timer, shouldShowTimerOnTitle, isFetching, location } = this.props;
+        const route = location.pathname.toLowerCase();
 
         return (
             <Sidebar>
@@ -100,7 +108,7 @@ class SideBar extends React.Component {
                 </Sidebar_header>
                 <Sidebar_navigation>
                     <Navigation_list>
-                        <Navigation_item>
+                        <Navigation_item isFetching={route === '/timer' && isFetching}>
                             <Navigation_link to="/timer">
                                 <Icon name="access_time" />
                                 <Link_label>{isRunning && shouldShowTimerOnTitle ? timer : 'Timer'}</Link_label>
@@ -132,6 +140,7 @@ const mapStateToProps = ({ user, timer, global }) => ({
     userData: user.userData,
     timer: timer.timer,
     isRunning: global.isRunning,
+    isFetching: global.isFetching,
     shouldShowTimerOnTitle: user.settings.shouldShowTimerOnTitle
 
 });

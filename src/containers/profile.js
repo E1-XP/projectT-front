@@ -162,7 +162,7 @@ class Profile extends React.Component {
 
         return (<ProfileComponent state={this.state} setState={this.setStateBind} userData={userData}
             sendFile={this.sendFile} openModal={this.openModal} setUserInfo={this.setUserInfo}
-            resetAvatar={this.resetAvatar} setUsernameInputState={this.setEmailInputState} closeModal={this.closeModal}
+            resetAvatar={this.resetAvatar} setUsernameInputState={this.setUsernameInputState} closeModal={this.closeModal}
             setEmailInputState={this.setEmailInputState} setShouldShowTimerOnTitle={this.setShouldShowTimerOnTitle}
             Icon_button={Icon_button} validatePasswordForm={this.validatePasswordForm} />);
     }

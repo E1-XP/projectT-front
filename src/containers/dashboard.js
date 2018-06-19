@@ -106,7 +106,7 @@ class Dashboard extends React.Component {
             .filter(itm => itm.stop !== undefined && itm.start > periodStart.valueOf() &&
                 itm.stop < moment(periodStop).valueOf())
             .reduce(sortByMonth, baseObj);
-        console.log(entriesByMonth);
+       
         const getMonthSum = arrOfEntries => arrOfEntries.reduce((acc, itm) => acc += (itm.stop - itm.start), 0);
 
         const getDuration = name => {
@@ -223,8 +223,10 @@ class Dashboard extends React.Component {
     }
 
     appendEntries = () => {
-        const { userData, entries, fetchEntries, setDaysToShowLength, daysToShowLength } = this.props;
+        const { userData, entries, fetchEntries, setDaysToShowLength } = this.props;
         const { periodStart, periodStop } = this.state;
+
+        if (!entries.length) return this.setIsLoading(false);
 
         const startAt = moment(entries[entries.length - 1].start).dayOfYear();
         const endAt = moment(periodStart).dayOfYear();
@@ -252,11 +254,9 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        const { userData, entries, projects, allEntriesFetched, setItemsToShowLength, mappedItems } = this.props;
+        const { userData, entries, projects, allEntriesFetched, mappedItems } = this.props;
         const { periodReadable, periodStart, periodStop, periodType, isCalendarOpen, customPeriodLength, isLoading,
             shouldUpdate } = this.state;
-
-        if (!entries.length || !mappedItems) return (<p>Loading...</p>);
 
         return (<DashboardComponent periodReadable={periodReadable} periodType={periodType} state={this.state} setState={this.setStateBind}
             subtractPeriodState={this.subtractPeriodState} addPeriodState={this.addPeriodState} getTotalWeekTime={this.getTotalWeekTime}

@@ -5,7 +5,7 @@ axios.defaults.withCredentials = true;
 //const baseUrl = `http://localhost:3001`;
 const baseUrl = `https://project--t.herokuapp.com`;
 
-import { loadingError, setAllEntriesFetched } from './global';
+import { loadingError, setAllEntriesFetched, setIsFetching } from './global';
 
 export const setUserData = data => (dispatch, getState) => {
 
@@ -25,12 +25,19 @@ export const setSettings = data => ({
     payload: data
 });
 
+export const setMappedItems = data => ({
+    type: consts.SET_MAPPED_ITEMS,
+    payload: data
+});
+
 export const addEntries = data => (dispatch, getState) => {
+    const stateDaysLength = getState().global.daysToShowLength;
 
     const payload = {
         data,
-        daysToShowLength: getState().global.daysToShowLength + 10
+        daysToShowLength: stateDaysLength ? stateDaysLength + 10 : stateDaysLength
     }
+    console.log(payload.daysToShowLength, 'ACTUAL VAL');
 
     return dispatch({
         type: consts.ADD_ENTRIES,
@@ -50,23 +57,30 @@ export const removeEntries = data => ({
 
 export const setPassword = (userid, data) => dispatch => {
     const url = `${baseUrl}/users/${userid}/passwordedit`;
+    dispatch(setIsFetching(true));
 
     return new Promise((res, rej) => {
         axios.put(url, data)
-            .then(resp => res(resp.data.result))
+            .then(resp => {
+                dispatch(setIsFetching(false));
+                res(resp.data.result);
+            })
             .catch(err => console.log(err));
     });
 };
 
 export const setUserInfo = (userid, data) => (dispatch, getState) => {
     const url = `${baseUrl}/users/${userid}/`;
+    dispatch(setIsFetching(true));
 
     axios.put(url, data)
         .then(resp => {
             console.log(resp.data);
+            dispatch(setIsFetching(false));
+
             const newSettings = resp.data.settings;
             const filteredData = Object.keys(resp.data).reduce((acc, itm) => {
-                if (itm !== 'settings') acc[itm] = resp.data[itm];
+                if (!['settings', 'entries', 'projects'].includes(itm)) acc[itm] = resp.data[itm];
                 return acc;
             }, {});
             const newData = Object.assign({}, getState().user.userData, filteredData);
@@ -84,8 +98,18 @@ export const sendAvatar = (userid, data) => dispatch => {
     //const config = { headers: { 'Content-Type': 'multipart/form-data' } };
     return new Promise((res, rej) => {
         console.log(url, data);
+        dispatch(setIsFetching(true));
+
         axios.put(url, data, config).then(resp => {
-            dispatch(setUserData(resp.data));
+            console.log(resp.data, 'RESP');
+            dispatch(setIsFetching(false));
+
+            const filteredData = Object.keys(resp.data).reduce((acc, itm) => {
+                if (!['settings', 'entries', 'projects'].includes(itm)) acc[itm] = resp.data[itm];
+                return acc;
+            }, {});
+
+            dispatch(setUserData(filteredData));
             res();
         });
     });
@@ -97,10 +121,14 @@ export const fetchEntries = (userid, beginat, endat) => dispatch => {
     if (endat) url += `&end=${endat}`;
     console.log(url);
 
+    dispatch(setIsFetching(true));
+
     return new Promise((res, rej) => {
 
         axios.get(url).then(resp => {
             console.log(resp.data);
+            dispatch(setIsFetching(false));
+
             if (resp.data.length) {
                 dispatch(addEntries(resp.data));
                 res(1);
