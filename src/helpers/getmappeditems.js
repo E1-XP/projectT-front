@@ -4,7 +4,7 @@ momentDFPlugin(moment);
 
 const getMappedItems = entries => {
     const getReadable = item => moment(item.start).format('ddd, Do MMM');
-    const getDuration = item => moment(item.stop - item.start).format('h:mm:ss', { stopTrim: "hh mm ss" });
+    const getDuration = item => moment.duration(item.stop - item.start).format('h:mm:ss', { stopTrim: "hh mm ss" });
 
     const reduceItems = (acc, itm) => {
         if (itm.stop !== undefined) {

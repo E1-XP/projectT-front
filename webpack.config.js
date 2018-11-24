@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const CompressionPlugin = require("compression-webpack-plugin");
+const uglifyJSPlugin = require("uglifyjs-webpack-plugin");
 
 module.exports = {
     entry: ["react-hot-loader/patch", "./src/index.js"],
@@ -42,6 +43,20 @@ module.exports = {
         }),
         new CompressionPlugin()
     ],
+    optimization: {
+        minimizer: [
+            new uglifyJSPlugin({
+                uglifyOptions: {
+                    compress: {
+                        drop_console: true
+                    },
+                    output: {
+                        comments: false
+                    }
+                }
+            })
+        ]
+    },
     devServer: {
         contentBase: './public',
         hot: true

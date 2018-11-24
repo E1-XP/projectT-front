@@ -45,9 +45,6 @@ const Modal_Section = styled.section`
     display:flex;
     justify-content:center;
     padding:1.5rem;
-    &:last-of-type ${Button} :last-child{
-        margin-left:.5rem;
-    }
 `;
 
 const Modal_Footer = styled.footer`

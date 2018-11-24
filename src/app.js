@@ -18,10 +18,6 @@ const baseCSS = () => injectGlobal`
 `;
 
 class App extends React.Component {
-    shouldComponentUpdate(nextProps) {
-        return false;
-    }
-
     render() {
         baseCSS();
         return (

@@ -18,7 +18,7 @@ const Color_Indicator = styled.div`
     background-color:${props => props.color};
 `;
 
-const Color_Indicator_Multi = styled(Color_Indicator) `
+const Color_Indicator_Multi = styled(Color_Indicator)`
     margin:.2rem;
     height:1.5rem;
     position:relative;
@@ -34,6 +34,7 @@ const Color_Indicator_Inner = styled.span`
     left:0;
     justify-content:center;
     align-items:center;
+    margin:0;
     &:hover{
         background-color:rgba(0,0,0,.3);
     }
@@ -59,12 +60,15 @@ class ColorPickerDropdown extends React.Component {
         const { colors, selectedColor } = this.props.state;
         const setActive = (itm) => this.props.setState({ selectedColor: itm, isColorSelectorOpen: false });
 
-        return colors.map(itm =>
-            (<Color_Indicator_Multi key={itm} color={itm} onClick={() => setActive(itm)}>
+        return colors.map(itm => {
+            const setActiveFn = () => setActive(itm);
+
+            return (<Color_Indicator_Multi key={itm} color={itm} onClick={setActiveFn}>
                 <Color_Indicator_Inner>
                     {itm === selectedColor && <Icon name="done" fill='#fff' size="16px" />}
                 </Color_Indicator_Inner>
-            </Color_Indicator_Multi>));
+            </Color_Indicator_Multi>)
+        });
     }
 
     render() {
