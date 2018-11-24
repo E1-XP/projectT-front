@@ -17,6 +17,7 @@ import StatusBar from './containers/connectstatusbar';
 const App_container = styled.div`
     display:flex;
     height:100vh;
+    min-width:590px;
 `
 const Main_content = styled.main`
     display:flex;

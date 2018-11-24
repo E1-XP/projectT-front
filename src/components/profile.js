@@ -88,6 +88,7 @@ const Avatar_settings = styled.label`
     top:0;
     right:0;
     padding:.7rem;
+    box-shadow: -1px 1px 12px rgba(0,0,0,.2);
     &:hover{
         background-color:#eee;
     }
@@ -99,7 +100,7 @@ const Avatar_section = styled.figure`
 
 const Avatar_img = styled.img`
     max-width:180px;
-    padding:3px;
+    padding:0px;
     border:1px solid #ddd;    
     position:relative;
 `;
@@ -185,12 +186,10 @@ const Label_check = styled.label`
     margin-left:1rem;
 `;
 
-const placeholderImg = 'https://lh6.googleusercontent.com/-ph4JkGJ7wdY/AAAAAAAAAAI/AAAAAAAAAYw/g2wqnP4pMhM/photo.jpg';
-
 const Profile = props => {
-    const { userData, state, data, isPasswordFormInvalid, modalPassword, setState,
-        sendFile, openModal, closeModal, setUserInfo, resetAvatar, setUsernameInputState,
-        setEmailInputState, setShouldShowTimerOnTitle, validatePasswordForm, Icon_button } = props;
+    const { userData, state, setState, sendFile, openModal, closeModal, setUserInfo, resetAvatar,
+        setUsernameInputState, setEmailInputState, setShouldShowTimerOnTitle, validatePasswordForm,
+        Icon_button } = props;
 
     return (<Wrapper>
         <Header>
@@ -207,7 +206,7 @@ const Profile = props => {
         <Main_content>
             <Side>
                 <Avatar_section>
-                    <Avatar_img src={userData.avatar || placeholderImg} />
+                    <Avatar_img src={userData.avatar || './assets/avatar-placeholder.gif'} />
                     {state.isUploading && <Avatar_inProgress><span></span></Avatar_inProgress>}
                     <Avatar_settings>
                         <Icon name="settings" />

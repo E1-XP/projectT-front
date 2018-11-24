@@ -10,7 +10,7 @@ import * as actions from '../actions';
 
 class Protected_container extends React.Component {
     componentDidMount() {
-        const { location, history, isUserLoggedIn, userData, entries } = this.props;
+        const { location, history, isUserLoggedIn } = this.props;
 
         if (!isUserLoggedIn && location.pathname.slice(1).toLowerCase() !== 'signup') history.push('/login');
         this.setPreviouslyRunningTimer();
@@ -22,7 +22,7 @@ class Protected_container extends React.Component {
     }
 
     setPreviouslyRunningTimer = () => {
-        const { userData, entries, projects, setRunningEntry, setIsRunning, setTimer, setRunningEntryDescription,
+        const { entries, projects, setRunningEntry, setRunningEntryDescription,
             setProject, toggleTimer, setBillable } = this.props;
 
         if (!entries || !entries.length) return null;

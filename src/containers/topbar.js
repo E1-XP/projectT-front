@@ -24,6 +24,7 @@ const Task_controller = styled.section`
     background-color:#fff;
     width:95%;
     height:75px;
+    min-width: 558px;
 @media only screen and (min-width:1024px){
     width:calc(100% - 170px);
 }
