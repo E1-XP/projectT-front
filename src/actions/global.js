@@ -3,14 +3,12 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-//const baseUrl = `http://localhost:3001`;
+// const baseUrl = `http://localhost:3001`;
 const baseUrl = `https://project--t.herokuapp.com`;
 
 import { push } from 'connected-react-router';
-import { setUserData, setSettings, setMappedItems } from './user';
+import { setUserData, setSettings } from './user';
 import { setTimer } from './timer';
-import getFilteredMappedItems from '../helpers/getfilteredmappeditems';
-import getMappedItems from '../helpers/getmappeditems';
 
 export const setIsLoading = bool => ({
     type: consts.IS_LOADING,

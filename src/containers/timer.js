@@ -129,23 +129,27 @@ class Timer extends React.Component {
     }
 
     componentWillReceiveProps(nextP) {
-        const { entries, setWeekTimer, isRunning, setAllEntriesFetched, allEntriesFetched, mappedItems, daysToShowLength } = this.props;
+        const { setWeekTimer, isRunning, setAllEntriesFetched, allEntriesFetched,
+            mappedItems } = this.props;
         const { isFetchingEntries, filteredItems } = this.state;
         const newState = {};
         const mappedItemsLength = Object.keys(mappedItems).length;
 
-        if (allEntriesFetched && (mappedItemsLength > nextP.daysToShowLength || nextP.daysToShowLength - mappedItemsLength <= 10)) {
+        if (allEntriesFetched && (mappedItemsLength > nextP.daysToShowLength ||
+            nextP.daysToShowLength - mappedItemsLength <= 10)) {
             setAllEntriesFetched(false);
         }
 
-        if ((isRunning && !nextP.isRunning && nextP.mappedItems !== mappedItems) || (!nextP.isRunning && nextP.mappedItems !== mappedItems)) {
+        if ((isRunning && !nextP.isRunning && nextP.mappedItems !== mappedItems) ||
+            (!nextP.isRunning && nextP.mappedItems !== mappedItems)) {
             setWeekTimer(this.getWeekTimeComposed(nextP.entries));
         }
 
         if (isFetchingEntries) newState.isFetchingEntries = false;
 
         if (nextP.mappedItems !== mappedItems) {
-            newState.filteredItems = Object.assign({}, this.getFilteredItems(nextP.mappedItems), filteredItems);
+            newState.filteredItems = Object.assign({},
+                this.getFilteredItems(nextP.mappedItems), filteredItems);
         }
 
         Object.keys(newState).length && this.setState(newState);
@@ -211,15 +215,39 @@ class Timer extends React.Component {
     }
 
     appendEntries = () => {
-        const { userData, entries, setDaysToShowLength, daysToShowLength, fetchEntries, mappedItems } = this.props;
+        const { userData, setDaysToShowLength, daysToShowLength, fetchEntries,
+            mappedItems } = this.props;
+
         const entriesToKeys = Object.keys(mappedItems);
-        const dayThatEnds = mappedItems[entriesToKeys[entriesToKeys.length - 1]];
-        const keysFromThatDay = Object.keys(dayThatEnds);
-        const startAt = moment(dayThatEnds[keysFromThatDay[0]][0].start).dayOfYear();
-        console.log(startAt);
-        //16th not correct
-        this.setState({ isFetchingEntries: true });
-        fetchEntries(userData._id, startAt).then(() => setDaysToShowLength(daysToShowLength + 10));
+        const lastShowedItem = mappedItems[entriesToKeys[daysToShowLength - 1]];
+        const areTenNextItemsInStore = !!entriesToKeys[daysToShowLength - 1 + 10];
+        console.log(entriesToKeys[daysToShowLength - 1 + 10]);
+
+        if (!areTenNextItemsInStore) { //  less than ten next items in store, fetch remaining
+            const dayThatEnds = mappedItems[entriesToKeys[entriesToKeys.length - 1]];
+            const keysFromThatDay = Object.keys(dayThatEnds);
+            const existingItemsCount = entriesToKeys.length - entriesToKeys
+                .findIndex(key => mappedItems[key] === lastShowedItem) - 1;
+
+            console.log(existingItemsCount);
+            const dayDifference = 10 - existingItemsCount;
+            console.log(dayDifference);
+
+            const startAt = moment(dayThatEnds[keysFromThatDay[0]][0].start).startOf('day').valueOf();
+            // const endAt = moment(startAt).add(dayDifference, 'days').endOf('day').valueOf();
+            console.log(startAt);
+
+            this.setState({ isFetchingEntries: true });
+            fetchEntries(userData._id, startAt, undefined, dayDifference)
+                .then(() => setDaysToShowLength(daysToShowLength + 10));
+        }
+        else {
+            this.setState({ isFetchingEntries: true });
+            setTimeout(() => {
+                setDaysToShowLength(daysToShowLength + 10);
+                this.setState({ isFetchingEntries: false })
+            }, 300);
+        }
     }
 
     render() {
@@ -273,7 +301,7 @@ const mapStateToProps = ({ user, global, timer }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    fetchEntries: (uid, begin, end) => dispatch(actions.user.fetchEntries(uid, begin, end)),
+    fetchEntries: (uid, begin, end, dCount) => dispatch(actions.user.fetchEntries(uid, begin, end, dCount)),
     createNewEntry: (uid, obj) => dispatch(actions.entry.createNewEntry(uid, obj)),
     removeEntry: (v, v2) => dispatch(actions.entry.removeEntry(v, v2)),
     updateEntry: (userid, runningEntry, obj) => dispatch(actions.entry.updateEntry(userid, runningEntry, obj)),

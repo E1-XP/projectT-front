@@ -61,13 +61,8 @@ class Dashboard extends React.Component {
         const { mappedItems } = this.props;
         const { periodStart, periodStop } = this.state;
 
-        const getReadable = itm => moment(itm.start).format('ddd, Do MMM');
-        const getDuration = itm => moment(itm).format('h:mm:ss', { stopTrim: "hh mm ss" });
-
-        const getUnix = itm => moment.duration(moment(itm.stop).diff(itm.start)).valueOf();
-
         const generateDayLabels = () => Array(periodStop.diff(periodStart, 'days') + 1).fill(null)
-            .map((itm, i) => ({
+            .map((_, i) => ({
                 unix: moment(periodStart).add(i, 'd').valueOf(),
                 readable: moment(periodStart).add(i, 'd').format('ddd, Do MMM')
             }));
@@ -106,7 +101,7 @@ class Dashboard extends React.Component {
             .filter(itm => itm.stop !== undefined && itm.start > periodStart.valueOf() &&
                 itm.stop < moment(periodStop).valueOf())
             .reduce(sortByMonth, baseObj);
-       
+
         const getMonthSum = arrOfEntries => arrOfEntries.reduce((acc, itm) => acc += (itm.stop - itm.start), 0);
 
         const getDuration = name => {
@@ -228,22 +223,27 @@ class Dashboard extends React.Component {
 
         if (!entries.length) return this.setIsLoading(false);
 
-        const startAt = moment(entries[entries.length - 1].start).dayOfYear();
-        const endAt = moment(periodStart).dayOfYear();
+        const startAt = moment(entries[entries.length - 1].start).startOf('day').valueOf();
+        const endAt = moment(periodStart).clone().startOf('day').valueOf();
+
+        console.log(periodStart.valueOf(), 'periodstart');
+        const shouldGetMoreData = startAt > endAt // if data not in store
 
         this.setState({ isLoading: true, shouldUpdate: false });
         setDaysToShowLength(false);
 
-        console.log(startAt, endAt);
+        console.log('start,end', startAt, endAt);
         return new Promise((res, rej) => {
-            if (startAt > endAt) fetchEntries(userData._id, startAt, endAt)
+            if (shouldGetMoreData) fetchEntries(userData._id, startAt, endAt)
                 .then(() => {
                     this.setState({ isLoading: false, shouldUpdate: true });
                     res();
                 });
             else {
-                res();
-                this.setIsLoading(false);
+                setTimeout(() => {
+                    res();
+                    this.setIsLoading(false);
+                }, 300);
             }
         });
     }

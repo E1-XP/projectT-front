@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import * as actions from '../actions';
-import handleValidation from '../helpers/formvalidation';
+
+import handleValidation from '../services/formValidation';
 
 const Wrapper = styled.div`
     width:100%;
@@ -23,8 +24,8 @@ const Container = styled.section`
 
 const Header = styled.header`
     display:flex;
-    justify-content:space-between;
-    padding:1rem;
+    justify-content:space-betwee n;
+    padding:1rem; 
 `;
 
 const Nav = styled.nav`
