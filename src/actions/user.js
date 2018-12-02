@@ -2,7 +2,7 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-//const baseUrl = `http://localhost:3001`;
+// const baseUrl = `http://localhost:3001`;
 const baseUrl = `https://project--t.herokuapp.com`;
 
 import { loadingError, setAllEntriesFetched, setIsFetching } from './global';
@@ -37,7 +37,7 @@ export const addEntries = data => (dispatch, getState) => {
         data,
         daysToShowLength: stateDaysLength ? stateDaysLength + 10 : stateDaysLength
     }
-    console.log(payload.daysToShowLength, 'ACTUAL VAL');
+    console.log(payload, 'ACTUAL VAL');
 
     return dispatch({
         type: consts.ADD_ENTRIES,
@@ -56,7 +56,7 @@ export const removeEntries = data => ({
 });
 
 export const setPassword = (userid, data) => dispatch => {
-    const url = `${baseUrl}/users/${userid}/passwordedit`;
+    const url = `${baseUrl}/users/${userid}/password`;
     dispatch(setIsFetching(true));
 
     return new Promise((res, rej) => {
@@ -115,10 +115,11 @@ export const sendAvatar = (userid, data) => dispatch => {
     });
 };
 
-export const fetchEntries = (userid, beginat, endat) => dispatch => {
-    let url = `${baseUrl}/users/${userid}/entries?`;
-    if (beginat) url += `begin=${beginat}`;
-    if (endat) url += `&end=${endat}`;
+export const fetchEntries = (userId, beginAt, endAt, dayCount) => dispatch => {
+    let url = `${baseUrl}/users/${userId}/entries?`;
+    if (beginAt) url += `begin=${beginAt}`;
+    if (endAt) url += `&end=${endAt}`;
+    if (dayCount) url += `&days=${dayCount}`;
     console.log(url);
 
     dispatch(setIsFetching(true));
@@ -126,10 +127,11 @@ export const fetchEntries = (userid, beginat, endat) => dispatch => {
     return new Promise((res, rej) => {
 
         axios.get(url).then(resp => {
-            console.log(resp.data);
+            console.log(resp.data, 'new entries');
             dispatch(setIsFetching(false));
 
             if (resp.data.length) {
+                console.log('should dispatch')
                 dispatch(addEntries(resp.data));
                 res(1);
             }

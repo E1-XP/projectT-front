@@ -3,8 +3,8 @@ import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
 import types from '../actions/types';
-import getFilteredMappedItems from '../helpers/getfilteredmappeditems';
-import getMappedItems from '../helpers/getmappeditems';
+
+import getMappedItems from '../services/getMappedItems';
 
 export default (state = {}, action) => {
     switch (action.type) {
@@ -16,7 +16,8 @@ export default (state = {}, action) => {
                 return Object.assign({}, state, { projects: action.payload.data.projects });
             }
 
-            if (Object.keys(action.payload.data).every(key => !['settings', 'entries', 'projects'].includes(key))) {
+            if (Object.keys(action.payload.data)
+                .every(key => !['settings', 'entries', 'projects'].includes(key))) {
                 return Object.assign({}, state, { userData: action.payload.data });
             }
 
@@ -26,7 +27,7 @@ export default (state = {}, action) => {
             };
             const userData = Object.keys(action.payload.data).reduce(omitEntries, {});
             const entries = action.payload.data.entries;
-            const mappedItems = getFilteredMappedItems(getMappedItems(entries), action.payload.daysToShowLength);
+            const mappedItems = getMappedItems(entries);
             const projects = action.payload.data.projects;
 
             return Object.assign({}, state,
@@ -40,10 +41,12 @@ export default (state = {}, action) => {
         };
 
         case types.ADD_ENTRIES: {
-            const payload = action.payload.data.filter(itm => state.entries.findIndex(el => el._id === itm._id) < 0);
+            const payload = action.payload.data
+                .filter(itm => state.entries.findIndex(el => el._id === itm._id) < 0);
             const entries = state.entries.concat(payload);
-            const mappedEntriesCombined = Object.assign({}, state.mappedItems, getMappedItems(action.payload.data));
-            const mappedItems = getFilteredMappedItems(mappedEntriesCombined, action.payload.daysToShowLength);
+            const mappedEntriesCombined = Object.assign({},
+                state.mappedItems, getMappedItems(action.payload.data));
+            const mappedItems = mappedEntriesCombined;
 
             console.log(action.payload.daysToShowLength, 'added itms');
             return Object.assign({}, state, { entries, mappedItems });
@@ -57,9 +60,12 @@ export default (state = {}, action) => {
             if (!Array.isArray(action.payload) && !action.payload.stop) return state;
 
             let found = false;
-            const dayToModify = Array.isArray(action.payload) ? getDayStr(action.payload[0].start) : getDayStr(action.payload.start);
-            const unixDayStart = getDayStart(Array.isArray(action.payload) ? action.payload[0].start : action.payload.start);
-            const unixDayEnd = getDayEnd(Array.isArray(action.payload) ? action.payload[0].start : action.payload.start);
+            const dayToModify = Array.isArray(action.payload) ? getDayStr(action.payload[0].start) :
+                getDayStr(action.payload.start);
+            const unixDayStart = getDayStart(Array.isArray(action.payload) ? action.payload[0].start :
+                action.payload.start);
+            const unixDayEnd = getDayEnd(Array.isArray(action.payload) ? action.payload[0].start :
+                action.payload.start);
             const prevMappedItems = Object.assign({}, state.mappedItems);
 
             //replace modified items in entries array
@@ -81,11 +87,14 @@ export default (state = {}, action) => {
             });
 
             //if modified entry is not found in store push it here 
-            if (found) prevMappedItems[dayToModify] = (dayStr => {
-                const itemsFromThisDay = entriesCpy.filter(itm => itm.start >= unixDayStart && itm.stop <= unixDayEnd);
-                return getMappedItems(itemsFromThisDay)[dayStr];
-            })(dayToModify);
-            else {
+            if (found) {
+                prevMappedItems[dayToModify] = (dayStr => {
+                    const itemsFromThisDay = entriesCpy
+                        .filter(itm => itm.start >= unixDayStart && itm.stop <= unixDayEnd);
+
+                    return getMappedItems(itemsFromThisDay)[dayStr];
+                })(dayToModify);
+            } else {
                 const keyStr = `${action.payload.project} \n${action.payload.description || '$empty#'} `;
                 console.log('actio prep', action.payload, getMappedItems([action.payload]))
                 const prepEntry = getMappedItems([action.payload])[dayToModify][keyStr][0];
@@ -94,11 +103,12 @@ export default (state = {}, action) => {
                 if (!prevMappedItems[dayToModify]) prevMappedItems[dayToModify] = {};
 
                 prevMappedItems[dayToModify][keyStr] ?
-                    prevMappedItems[dayToModify][keyStr] = prevMappedItems[dayToModify][keyStr].concat([prepEntry]) :
+                    prevMappedItems[dayToModify][keyStr] = prevMappedItems[dayToModify][keyStr]
+                        .concat([prepEntry]) :
                     prevMappedItems[dayToModify][keyStr] = [prepEntry];
             }
 
-            const mappedItems = Object.assign({}, getFilteredMappedItems(prevMappedItems, action.payload.daysToShowLength));
+            const mappedItems = Object.assign({}, prevMappedItems);
 
             return Object.assign({}, state, { entries: entriesCpy, mappedItems });
         };

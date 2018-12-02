@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Modal from 'react-modal';
 import Icon from './icon';
 import ModalCalendar from './modalcalendar';
 import PeriodTimeChart from './periodchart';
@@ -84,14 +83,6 @@ const Screen_blocker = styled.div`
         height:100%;
         z-index:50;
 `;
-
-const modalStyle = {
-    overlay: { backgroundColor: 'transparent' },
-    content: {
-        width: '600px', margin: '0 auto', height: '398px', padding: '0', position: 'absolute',
-        top: '50px', left: 'initial', right: '185px'
-    }
-};
 
 class DashboardComponent extends React.Component {
     openCalendar = () => {
