@@ -3,8 +3,8 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-const baseUrl = `http://localhost:3001`;
-//const baseUrl = `https://project--t.herokuapp.com`;
+//const baseUrl = `http://localhost:3001`;
+const baseUrl = `https://project--t.herokuapp.com`;
 
 import { push } from 'connected-react-router';
 import { setUserData, setSettings } from './user';
