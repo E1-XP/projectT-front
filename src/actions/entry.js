@@ -3,8 +3,8 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-// const baseUrl = `http://localhost:3001`;
-const baseUrl = `https://project--t.herokuapp.com`;
+const baseUrl = `http://localhost:3001`;
+// const baseUrl = `https://project--t.herokuapp.com`;
 
 import { toggleTimer } from './timer';
 import { editEntries, removeEntries, setUserData } from './user';
@@ -78,15 +78,17 @@ export const updateEntry = (userid, runningEntryId, queryParams) => (dispatch, g
     let queryStr = ``;
     Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
 
-    const url = `${baseUrl}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
+    const URL = `${baseUrl}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
     dispatch(setIsFetching(true));
 
-    axios.put(url).then(resp => {
+    axios.put(URL).then(resp => {
         dispatch(editEntries(resp.data));
         dispatch(setIsFetching(false));
         const state = getState().global;
 
-        !state.isRunning && queryParams.stop && state.runningEntry === resp._id && dispatch(setRunningEntry(null));
+        if (!state.isRunning && queryParams.stop && state.runningEntry === resp._id) {
+            dispatch(setRunningEntry(null));
+        }
 
     }).catch(err => dispatch(loadingError(err)));
 }

@@ -5,6 +5,7 @@ import * as actions from '../actions/global';
 
 const Wrapper = styled.aside`
     position:fixed;
+    z-index:150;
     bottom:0;
     width:calc(100% - 50px);
     display:flex;
