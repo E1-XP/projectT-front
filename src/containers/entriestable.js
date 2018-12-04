@@ -53,7 +53,9 @@ class EntriesTable extends React.Component {
 
         if (isRunning && isRunning !== nextP.isRunning) return false;
 
-        if (mappedItems === nextP.mappedItems && filteredItems === nextP.filteredItems) return false;
+        if (mappedItems === nextP.mappedItems && filteredItems === nextP.filteredItems) {
+            return false;
+        }
 
         return true;
     }
@@ -93,7 +95,8 @@ class EntriesTable extends React.Component {
     }
 
     getDayField = item => {
-        const cut2nd = (itm, i) => i === 1 ? (itm.length === 3 ? itm.slice(0, 1) : itm.slice(0, 2)) : itm;
+        const cut2nd = (itm, i) => i === 1 ?
+            (itm.length === 3 ? itm.slice(0, 1) : itm.slice(0, 2)) : itm;
 
         return (this.today === item) ? 'Today' :
             ((item === this.yesterday) ? 'Yesterday' : item.split(' ').map(cut2nd).join(' '));
@@ -137,12 +140,13 @@ class EntriesTable extends React.Component {
         const getBoolVal = this.props.filteredItems[key][keyStrPrevVal];
         console.log(keyStr, getBoolVal, 'val,key')
         const filteredItems = { ...this.props.filteredItems, [key]: { ...dayObj, [keyStr]: getBoolVal } };
-        console.log('WILL CALL SETSTATE TO UPDATE FI')
+
         this.props.setState(() => ({ isUpdating: true, filteredItems }));
     }
 
     isEveryItemBillable = array => {
-        return (array[0].billable && array.every(itm => itm.billable === array[0].billable)) ? true : false;
+        return (array[0].billable &&
+            array.every(itm => itm.billable === array[0].billable)) ? true : false;
     }
 
     setBillableMulti = array => {
@@ -190,7 +194,8 @@ class EntriesTable extends React.Component {
     }
 
     getTaskEntries = idx => {
-        const { handleRemove, userData, projects, getProjectColor, filteredItems, mappedItems, isFetching } = this.props;
+        const { handleRemove, userData, projects, getProjectColor, filteredItems, mappedItems,
+            isFetching } = this.props;
 
         return Object.keys(mappedItems[idx])
             .sort((a, b) => mappedItems[idx][b][mappedItems[idx][b].length - 1].stop -
@@ -200,12 +205,14 @@ class EntriesTable extends React.Component {
                 const projectDescription = item.split('\n')[1].trim();
                 const currentItem = mappedItems[idx][item];
 
-                return (<EntryGroup key={currentItem[0].id} currentItem={currentItem} projectDescription={projectDescription}
-                    filteredItem={filteredItems[idx][item]} item={item} projectName={projectName} getSingleEntries={this.getSingleEntries}
+                return (<EntryGroup key={currentItem[0].id} currentItem={currentItem}
+                    projectDescription={projectDescription} filteredItem={filteredItems[idx][item]}
+                    item={item} projectName={projectName} getSingleEntries={this.getSingleEntries}
                     toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
-                    getProjectColor={getProjectColor} userData={userData} changeProject={this.changeProjectMultiple} projects={projects}
-                    setBillableMulti={this.setBillableMulti} handleRemove={handleRemove} getTotalDayCount={this.getTotalDayCount}
-                    isEveryItemBillable={this.isEveryItemBillable} startNewEntry={this.startNewEntry} isFetching={isFetching} />)
+                    getProjectColor={getProjectColor} userData={userData} changeProject={this.changeProjectMultiple}
+                    projects={projects} setBillableMulti={this.setBillableMulti} handleRemove={handleRemove}
+                    getTotalDayCount={this.getTotalDayCount} isEveryItemBillable={this.isEveryItemBillable}
+                    startNewEntry={this.startNewEntry} isFetching={isFetching} />)
             });
     }
 

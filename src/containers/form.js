@@ -10,7 +10,7 @@ import handleValidation from '../services/formValidation';
 const Wrapper = styled.div`
     width:100%;
     max-width:1200px;
-    margin:00 auto;
+    margin:0 auto;
 `;
 
 const Container = styled.section`
@@ -24,7 +24,7 @@ const Container = styled.section`
 
 const Header = styled.header`
     display:flex;
-    justify-content:space-betwee n;
+    justify-content:space-between;
     padding:1rem; 
 `;
 
@@ -104,7 +104,13 @@ class Form extends React.Component {
         const { location, handleAuth } = this.props;
         const route = location.pathname.toLowerCase().slice(1);
 
-        if (handleValidation(this.state, this.setState.bind(this))) handleAuth(route, this.state);
+        if (handleValidation(this.state, this.setState.bind(this))) {
+            handleAuth(route, this.state).then(res => {
+                if (res.status && res.status !== 200) {
+                    this.setState({ validationMessage: 'incorrect login data' });
+                }
+            });
+        }
     }
 
     toggleChecked = () => {
@@ -115,11 +121,15 @@ class Form extends React.Component {
         return isSignUpRoute ? 'Sign Up to enter our App.' : 'Log in to get access to your account.';
     }
 
-    render() {
-        const { location } = this.props;
-        const { email, username, password, password2, checked, validationMessage, newAccountValidation } = this.state;
+    isSignUpRoute = () => {
+        return this.props.location.pathname.toLowerCase().slice(1) === 'signup';
+    }
 
-        const isSignUp = location.pathname.toLowerCase().slice(1) === 'signup';
+    render() {
+        const { email, username, password, password2, checked, validationMessage,
+            newAccountValidation } = this.state;
+
+        const isSignUp = this.isSignUpRoute();
 
         return (
             <Wrapper>
@@ -138,16 +148,23 @@ class Form extends React.Component {
                             placeholder="email" state={isSignUp ? newAccountValidation.email : null} name="email" />
                         {isSignUp &&
                             (<label htmlFor="username" hidden>username</label>) &&
-                            (<Form_item value={username} onChange={(e) => this.setState({ username: e.target.value })}
-                                name="username" placeholder="username" state={isSignUp ? newAccountValidation.usern : null} />)}
+                            (<Form_item value={username}
+                                onChange={(e) => this.setState({ username: e.target.value })}
+                                name="username" placeholder="username"
+                                state={isSignUp ? newAccountValidation.usern : null} />)}
                         <label htmlFor="password" hidden>password</label>
-                        <Form_item value={password} onChange={(e) => this.setState({ password: e.target.value })}
-                            name="password" type="password" placeholder="password" state={isSignUp ? newAccountValidation.pass : null} />
+                        <Form_item value={password}
+                            onChange={(e) => this.setState({ password: e.target.value })}
+                            name="password" type="password" placeholder="password"
+                            state={isSignUp ? newAccountValidation.pass : null} />
                         {isSignUp && <label htmlFor="password2" hidden>password again</label> &&
-                            <Form_item value={password2} onChange={(e) => this.setState({ password2: e.target.value })} type="password"
-                                name="password2" placeholder="confirm password" state={isSignUp ? newAccountValidation.pass2 : null} />}
+                            <Form_item value={password2}
+                                onChange={(e) => this.setState({ password2: e.target.value })} type="password"
+                                name="password2" placeholder="confirm password"
+                                state={isSignUp ? newAccountValidation.pass2 : null} />}
                         {!isSignUp && <StaySigned_section>
-                            <Check type="checkbox" checked={checked} name="staysigned" onChange={this.toggleChecked} />
+                            <Check type="checkbox" checked={checked} name="staysigned"
+                                onChange={this.toggleChecked} />
                             <label htmlFor="staysigned"><span></span>Stay logged in</label>
                         </StaySigned_section>}
                         <Button>Submit</Button>

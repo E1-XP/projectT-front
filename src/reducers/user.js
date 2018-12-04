@@ -23,7 +23,7 @@ export default (state = {}, action) => {
 
             const omitEntries = (acc, key) => {
                 if (key !== 'entries' && key !== 'projects') acc[key] = action.payload.data[key]
-                return acc
+                return acc;
             };
             const userData = Object.keys(action.payload.data).reduce(omitEntries, {});
             const entries = action.payload.data.entries;
