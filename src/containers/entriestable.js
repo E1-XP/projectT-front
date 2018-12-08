@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import throttle from 'lodash.throttle';
 import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
@@ -42,10 +43,15 @@ class EntriesTable extends React.Component {
 
         this.today = moment().format('ddd, Do MMM');
         this.yesterday = moment().add(-1, 'days').format('ddd, Do MMM');
+
+        this.actionsQueue = [];
+
+        this.startNewEntry = throttle(this.startNewEntry, 1500);
     }
 
     shouldComponentUpdate(nextP) {
-        const { isUpdating, isRunning, mappedItems, filteredItems, daysToShowLength } = this.props;
+        const { isUpdating, isRunning, mappedItems, filteredItems,
+            daysToShowLength } = this.props;
         //return true;
         if (nextP.daysToShowLength !== daysToShowLength) return true;
 
@@ -58,6 +64,15 @@ class EntriesTable extends React.Component {
         }
 
         return true;
+    }
+
+    componentWillReceiveProps(nextP) {
+        console.log(this.actionsQueue.length);
+
+        while (!nextP.isFetching && this.actionsQueue.length) {
+            const fn = this.actionsQueue.shift();
+            fn && fn();
+        }
     }
 
     componentDidUpdate() {
@@ -73,15 +88,20 @@ class EntriesTable extends React.Component {
     }
 
     startNewEntry = item => {
-        const { setTopbarDescription, userData, createNewEntry } = this.props;
+        const { setTopbarDescription, userData, createNewEntry,
+            isFetching } = this.props;
 
-        const paramsObj = {};
-        paramsObj.billable = item.billable;
-        if (item.description) paramsObj.description = item.description;
-        if (item.project) paramsObj.project = item.project;
+        const innerFn = () => {
+            const paramsObj = {};
+            paramsObj.billable = item.billable;
+            if (item.description) paramsObj.description = item.description;
+            if (item.project) paramsObj.project = item.project;
 
-        createNewEntry(userData._id, paramsObj);
-        setTopbarDescription(item.description);
+            createNewEntry(userData._id, paramsObj);
+            setTopbarDescription(item.description);
+        }
+
+        isFetching ? this.actionsQueue.push(innerFn) : innerFn();
     }
 
     getTotalDayCount = dayOfItems => {
@@ -99,7 +119,8 @@ class EntriesTable extends React.Component {
             (itm.length === 3 ? itm.slice(0, 1) : itm.slice(0, 2)) : itm;
 
         return (this.today === item) ? 'Today' :
-            ((item === this.yesterday) ? 'Yesterday' : item.split(' ').map(cut2nd).join(' '));
+            ((item === this.yesterday) ? 'Yesterday' : item.split(' ')
+                .map(cut2nd).join(' '));
     }
 
     changeDescription = (description, runningEntry, previousDescription) => {
@@ -136,10 +157,14 @@ class EntriesTable extends React.Component {
         console.log(dayObj, 'DOBJ')
         const key = array[0].readable;
         const keyStr = `${project} \n${array[0].description || '$empty#'} `;
-        const keyStrPrevVal = `${array[0].project} \n${array[0].description || '$empty#'} `;
+        const keyStrPrevVal =
+            `${array[0].project} \n${array[0].description || '$empty#'} `;
         const getBoolVal = this.props.filteredItems[key][keyStrPrevVal];
         console.log(keyStr, getBoolVal, 'val,key')
-        const filteredItems = { ...this.props.filteredItems, [key]: { ...dayObj, [keyStr]: getBoolVal } };
+        const filteredItems = {
+            ...this.props.filteredItems,
+            [key]: { ...dayObj, [keyStr]: getBoolVal }
+        };
 
         this.props.setState(() => ({ isUpdating: true, filteredItems }));
     }
@@ -169,12 +194,17 @@ class EntriesTable extends React.Component {
 
         if (previousVal !== undefined) {
             const keyStr = `${currentItem[0].project} \n${value || '$empty#'} `;
-            const keyStrPrevVal = `${currentItem[0].project} \n${previousVal || '$empty#'} `;
+            const keyStrPrevVal =
+                `${currentItem[0].project} \n${previousVal || '$empty#'} `;
 
-            const getBoolVal = previousVal !== undefined ? filteredItems[key][keyStrPrevVal] : false;
+            const getBoolVal = previousVal !== undefined ?
+                filteredItems[key][keyStrPrevVal] : false;
             const singleDayMod = { ...filteredItems[key], [keyStr]: getBoolVal };
 
-            this.props.setState({ filteredItems: Object.assign({}, filteredItems, { [key]: singleDayMod }) });
+            this.props.setState({
+                filteredItems: Object.assign({},
+                    filteredItems, { [key]: singleDayMod })
+            });
         }
     }
 
@@ -194,8 +224,8 @@ class EntriesTable extends React.Component {
     }
 
     getTaskEntries = idx => {
-        const { handleRemove, userData, projects, getProjectColor, filteredItems, mappedItems,
-            isFetching } = this.props;
+        const { handleRemove, userData, projects, getProjectColor, filteredItems,
+            mappedItems, isFetching } = this.props;
 
         return Object.keys(mappedItems[idx])
             .sort((a, b) => mappedItems[idx][b][mappedItems[idx][b].length - 1].stop -
@@ -208,10 +238,13 @@ class EntriesTable extends React.Component {
                 return (<EntryGroup key={currentItem[0].id} currentItem={currentItem}
                     projectDescription={projectDescription} filteredItem={filteredItems[idx][item]}
                     item={item} projectName={projectName} getSingleEntries={this.getSingleEntries}
-                    toggleEntries={this.toggleEntries} idx={idx} onBlurDescriptionSave={this.onBlurDescriptionSave}
-                    getProjectColor={getProjectColor} userData={userData} changeProject={this.changeProjectMultiple}
-                    projects={projects} setBillableMulti={this.setBillableMulti} handleRemove={handleRemove}
-                    getTotalDayCount={this.getTotalDayCount} isEveryItemBillable={this.isEveryItemBillable}
+                    toggleEntries={this.toggleEntries} idx={idx}
+                    onBlurDescriptionSave={this.onBlurDescriptionSave}
+                    getProjectColor={getProjectColor} userData={userData}
+                    changeProject={this.changeProjectMultiple}
+                    projects={projects} setBillableMulti={this.setBillableMulti}
+                    handleRemove={handleRemove} getTotalDayCount={this.getTotalDayCount}
+                    isEveryItemBillable={this.isEveryItemBillable}
                     startNewEntry={this.startNewEntry} isFetching={isFetching} />)
             });
     }

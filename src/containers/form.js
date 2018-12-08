@@ -53,6 +53,7 @@ const Heading = styled.h2`
 const Button = styled.button`
     padding:.8rem .5rem;
     background-color:red;
+    cursor:pointer;
     border:none;
     margin:none;
     color:white;

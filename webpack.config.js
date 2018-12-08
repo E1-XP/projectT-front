@@ -32,7 +32,7 @@ module.exports = {
         ]
     },
     plugins: [
-        new HardSourceWebpackPlugin(),
+        // new HardSourceWebpackPlugin(),
         new htmlWebpackPlugin({
             template: "./public/index.html",
             filename: "./index.html"

@@ -56,22 +56,32 @@ export default (state = {}, action) => {
             const getDayStr = itm => moment(itm).format('ddd, Do MMM');
             const getDayStart = itm => moment(itm).startOf('day').valueOf();
             const getDayEnd = itm => moment(itm).endOf('day').valueOf();
-
-            if (!Array.isArray(action.payload) && !action.payload.stop) return state;
+            const isArray = Array.isArray(action.payload);
+            console.log(action.payload);
+            if (!isArray && !action.payload.stop) return state;
 
             let found = false;
-            const dayToModify = Array.isArray(action.payload) ? getDayStr(action.payload[0].start) :
+            const dayToModify = isArray ? getDayStr(action.payload[0].start) :
                 getDayStr(action.payload.start);
-            const unixDayStart = getDayStart(Array.isArray(action.payload) ? action.payload[0].start :
-                action.payload.start);
-            const unixDayEnd = getDayEnd(Array.isArray(action.payload) ? action.payload[0].start :
-                action.payload.start);
+            const unixDayStart = getDayStart(isArray ? action.payload[0].start : action.payload.start);
+            const unixDayEnd = getDayEnd(isArray ? action.payload[0].start : action.payload.start);
             const prevMappedItems = Object.assign({}, state.mappedItems);
+
+            const sortMappeditems = obj => Object.keys(obj)
+                .sort((a, b) => {
+                    const keyA = Object.keys(obj[a])[0];
+                    const keyB = Object.keys(obj[b])[0];
+
+                    return obj[b][keyB][0].start - obj[a][keyA][0].start;
+                }).reduce((acc, key) => {
+                    acc[key] = obj[key];
+                    return acc;
+                }, {});
 
             //replace modified items in entries array
             const entriesCpy = state.entries.map(itm => {
 
-                if (Array.isArray(action.payload)) {
+                if (isArray) {
                     if (action.payload.findIndex(elem => elem._id === itm._id) !== -1) {
                         found = true;
                         return action.payload[action.payload.findIndex(elem => elem._id === itm._id)]
@@ -99,7 +109,7 @@ export default (state = {}, action) => {
                 console.log('actio prep', action.payload, getMappedItems([action.payload]))
                 const prepEntry = getMappedItems([action.payload])[dayToModify][keyStr][0];
 
-                entriesCpy.push(action.payload);
+                entriesCpy.unshift(action.payload);
                 if (!prevMappedItems[dayToModify]) prevMappedItems[dayToModify] = {};
 
                 prevMappedItems[dayToModify][keyStr] ?
@@ -108,7 +118,7 @@ export default (state = {}, action) => {
                     prevMappedItems[dayToModify][keyStr] = [prepEntry];
             }
 
-            const mappedItems = Object.assign({}, prevMappedItems);
+            const mappedItems = sortMappeditems(prevMappedItems);
 
             return Object.assign({}, state, { entries: entriesCpy, mappedItems });
         };

@@ -9,16 +9,36 @@ momentDFPlugin(moment);
 import * as actions from '../actions';
 
 class Protected_container extends React.Component {
+    constructor() {
+        super();
+        this.handleVisibility = this.handleVisibility.bind(this);
+    }
+
     componentDidMount() {
         const { location, history, isUserLoggedIn } = this.props;
+
+        document.addEventListener('visibilitychange', this.handleVisibility);
 
         if (!isUserLoggedIn && location.pathname.slice(1).toLowerCase() !== 'signup') history.push('/login');
         this.setPreviouslyRunningTimer();
     }
 
+    componentWillUnmount() {
+        document.removeEventListener('visibilitychange', this.handleVisibility);
+    }
+
     shouldComponentUpdate(nextP, nextS) {
         if (this.props.entries !== nextP.entries) return false;
         return true;
+    }
+
+    handleVisibility = () => {
+        if (document.hidden) {
+            this.props.setIsTabActive(false);
+        }
+        else {
+            this.props.setIsTabActive(true);
+        }
     }
 
     setPreviouslyRunningTimer = () => {
@@ -30,7 +50,7 @@ class Protected_container extends React.Component {
         const entryThatStillRuns = entries.find(itm => !itm.stop);
 
         if (entryThatStillRuns) {
-            const start = moment(entryThatStillRuns.start).format();
+            const start = entryThatStillRuns.start;
 
             setRunningEntry(entryThatStillRuns._id);
             setProject(projects.filter(itm => itm.name === entryThatStillRuns.project)[0]);
@@ -64,6 +84,7 @@ const mapDispatchToProps = dispatch => ({
     toggleTimer: (bool, val) => dispatch(actions.timer.toggleTimer(bool, val)),
     setProject: obj => dispatch(actions.entry.setProject(obj)),
     setBillable: v => dispatch(actions.entry.setBillable(v)),
+    setIsTabActive: v => dispatch(actions.global.setIsTabActive(v)),
     setRunningEntry: v => dispatch(actions.entry.setRunningEntry(v)),
     setRunningEntryDescription: v => dispatch(actions.entry.setRunningEntryDescription(v))
 });

@@ -8,7 +8,7 @@ import moment from 'moment';
 import momentDFPlugin from 'moment-duration-format';
 momentDFPlugin(moment);
 
-import getWeekProjectsSum from '../selectors/getweekprojectssum';
+import getWeekProjectsSum from '../selectors/getWeekProjectsSum';
 
 const Week_counter = styled.div`
     text-transform:uppercase;
@@ -59,6 +59,8 @@ const TooltipContainer = styled.div`
 
 const overlayStyle = { fontSize: '14px', padding: '.5rem' };
 
+const WeekTime = connect(({ timer }) => ({ weekTimer: timer.weekTimer }))(({ weekTimer }) => weekTimer);
+
 class WeekTimer extends React.Component {
     shouldComponentUpdate(nextProps) {
         if (this.props.isRunning && !nextProps.isRunning) return false;
@@ -98,10 +100,10 @@ class WeekTimer extends React.Component {
     }
 
     render() {
-        const { weekTimer } = this.props;
+
 
         return (<Week_counter>
-            This week: <Timer>{weekTimer}</Timer>
+            This week: <Timer><WeekTime /></Timer>
             <WeekBar>
                 {this.getBarParts()}
             </WeekBar>
@@ -109,8 +111,7 @@ class WeekTimer extends React.Component {
     }
 }
 
-const mapStateToProps = ({ timer, user }) => ({
-    weekTimer: timer.weekTimer,
+const mapStateToProps = ({ user }) => ({
     projects: user.projects,
     weekProjectsSum: getWeekProjectsSum(user)
 });

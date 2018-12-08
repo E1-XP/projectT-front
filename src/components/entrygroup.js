@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import delayHOC from '../HOCs/renderdelay';
 import EntryHeader from './entryheader';
 import EntryTimer from './entrytimer';
 
@@ -9,42 +8,6 @@ const Entry_section = styled.section`
 `;
 
 const Itembody_body = styled.ul`
-`;
-
-const Item_project = styled.span`
-    color:${({ color }) => color === 'white' ? 'black' : color};
-`;
-
-const Item_table = styled.table`
-    width:100%;
-`;
-
-const Time_container_inner = styled.div`
-    display:flex;
-    flex-direction:column;
-    align-items:flex-end;
-    justify-content:center;
-    width:12rem;
-`;
-
-const Time_container_outer = styled.div`
-    display:flex;
-    align-items:center;
-`;
-
-const Color_indicator = styled.span`
-    display: inline-block;
-    width:.6rem;
-    height:.6rem;
-    background-color: ${props => props.color};
-    border-radius: 50%;
-    margin-right: .5rem;
-`;
-
-const GroupEntries_length = styled.span`
-    cursor:pointer;
-    margin-right: .5rem;
-    color: ${({ color }) => color};
 `;
 
 const Item_link = styled.a`
@@ -115,10 +78,10 @@ export default class EntryGroup extends React.Component {
     }
 
     render() {
-        const { currentItem, filteredItem, item, getSingleEntries, idx, isFetching } = this.props;
-        console.log('will update entry')
+        const { currentItem, filteredItem, getSingleEntries, idx, isFetching } = this.props;
+        console.log('will update entry');
 
-        const Markup = props => (<Entry_section key={currentItem[0].id}>
+        return <Entry_section key={currentItem[0].id}>
             <Itembody_header>
                 <EntryHeader {...this.props} Item_link_toggle={Item_link_toggle} />
                 <EntryTimer {...this.props} Item_link_toggle={Item_link_toggle}
@@ -127,10 +90,6 @@ export default class EntryGroup extends React.Component {
             <Itembody_body>
                 {(filteredItem && currentItem.length > 1) && getSingleEntries(currentItem, idx)}
             </Itembody_body>
-        </Entry_section>);
-
-        const WithDelay = delayHOC(Markup);
-
-        return isFetching ? <WithDelay /> : <Markup />;
+        </Entry_section>;
     }
 }

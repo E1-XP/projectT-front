@@ -6,6 +6,7 @@ export default (state = {}, action) => {
         case types.IS_RUNNING: return Object.assign({}, state, { isRunning: action.payload });
         case types.IS_FETCHING: return Object.assign({}, state, { isFetching: action.payload });
         case types.IS_ONLINE: return Object.assign({}, state, { isOnline: action.payload });
+        case types.IS_TAB_ACTIVE: return Object.assign({}, state, { isTabActive: action.payload });
         case types.IS_AUTHENTICATED: return Object.assign({}, state, { isUserLoggedIn: action.payload });
         case types.SET_DAYS_TO_SHOW_LENGTH: return Object.assign({}, state, { daysToShowLength: action.payload });
         case types.ALL_ENTRIES_FETCHED: return Object.assign({}, state, { allEntriesFetched: action.payload });
