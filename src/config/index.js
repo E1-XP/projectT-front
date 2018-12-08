@@ -1,4 +1,4 @@
 export default {
-    BASE_URL: "http://localhost:3001"// "https://project--t.herokuapp.com"
+    BASE_URL: "https://project--t.herokuapp.com"
 }
-
+//"http://localhost:3001"
