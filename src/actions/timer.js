@@ -13,6 +13,11 @@ export const setTimer = string => ({
     payload: string
 });
 
+export const setTimerId = number => ({
+    type: consts.SET_TIMER_ID,
+    payload: number
+});
+
 export const setWeekTimer = string => ({
     type: consts.SET_WEEK_TIMER,
     payload: string
@@ -21,33 +26,69 @@ export const setWeekTimer = string => ({
 export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState) => {
     console.log('istrue', isTrue);
     if (isTrue) {
-        let start = moment().format();
-        let initialWeekTime = getState().timer.weekTimer;
-        const shouldShowTimerOnTitle = getState().user.settings.shouldShowTimerOnTitle;
+        const now = Date.now();
+        let start = previousTime ? previousTime : now;
+        let initialWeekTime = getState().timer.weekTimerNum;
 
-        window.interval && clearInterval(window.interval);
+        dispatch(batchActions([
+            setTimerId(now),
+            setIsRunning(true)
+        ]));
 
-        if (previousTime) start = previousTime;
-        dispatch(setIsRunning(true));
+        const getFormattedDuration = (mSeconds) => {
+            const number = mSeconds / 1000;
+            const string = moment.duration(mSeconds).format('h:mm:ss', { stopTrim: "hh mm ss" });
 
-        window.interval = setInterval(() => {
-            if (previousTime && initialWeekTime === '0:00:00') initialWeekTime = getState().timer.weekTimer;
+            return { number, string };
+        };
 
-            const state = getState();
-            const time = moment.duration(moment().diff(start)).format('h:mm:ss', { stopTrim: "hh mm ss" });
-            const weekTime = moment.duration(initialWeekTime).add(moment().diff(moment(start)))
-                .format('h:mm:ss', { stopTrim: "hh mm ss" });
+        const interval = (timerId, sum = 0, prevTstamp = 0) =>
+            setTimeout(() => {
+                const tstamp = Date.now();
 
-            if (state.timer.timer !== time) {
-                dispatch(batchActions([
-                    setTimer(time),
-                    setWeekTimer(weekTime)
-                ]));
+                const diff = prevTstamp ? (tstamp - prevTstamp) : 0;
+                sum += diff;
 
-                if (state.user.settings.shouldShowTimerOnTitle) document.title = `${time} - ProjectT`;
-                else if (document.title !== 'ProjectT') document.title = 'ProjectT';
-            }
-        }, 350);
+                const state = getState();
+                const { isTabActive } = state.global;
+
+                if (!isTabActive && state.user.settings.shouldShowTimerOnTitle) {
+                    const time = getFormattedDuration(tstamp - start).string;
+                    document.title = `${time} - ProjectT`;
+                }
+                else if (sum >= 1000) {
+                    sum = 0;
+
+                    if (previousTime && initialWeekTime === 0) {
+                        initialWeekTime = state.timer.weekTimerNum;
+                    }
+
+                    const time = getFormattedDuration(tstamp - start).string;
+                    const weekTime = getFormattedDuration(Math.round((initialWeekTime + (tstamp - start))));
+
+                    dispatch(batchActions([
+                        setTimer(time),
+                        setWeekTimer(weekTime)
+                    ]));
+
+                    if (state.user.settings.shouldShowTimerOnTitle) {
+                        document.title = `${time} - ProjectT`;
+                    }
+                    else if (document.title !== 'ProjectT') {
+                        document.title = 'ProjectT';
+                    }
+                }
+
+                prevTstamp = tstamp;
+
+                if (state.global.isRunning && state.timer.timerId === timerId) {
+                    interval(timerId, sum, prevTstamp);
+                } else {
+                    if (document.title !== 'ProjectT') document.title = 'ProjectT';
+                }
+            }, 1000 / 60);
+
+        interval(now);
     }
     else {
         const entryThatStillRuns = getState().user.entries.find(itm => !itm.stop);
@@ -79,14 +120,12 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
             dispatch(updateEntry(getState().user.userData._id, state.runningEntry, payload));
         }
 
-        clearInterval(window.interval);
         dispatch(batchActions([
             setIsRunning(false),
+            setTimerId(null),
             setTimer('0:00:00'),
             setBillable(false)
         ]));
-
-        document.title = 'ProjectT';
     }
 };
 

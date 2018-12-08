@@ -11,6 +11,7 @@ import Icon from '../components//icon';
 const Sidebar = styled.section`
     color:white;
     background-color:rgb(50, 50, 50);
+    box-shadow: 4px 0px 5px rgba(0,0,0,.2);
     max-width:52px;
     padding:1rem;
     order:-1;

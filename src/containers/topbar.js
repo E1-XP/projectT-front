@@ -59,11 +59,6 @@ const Task_timer = styled.span`
     font-size:18px;    
 `;
 
-const Settings_section = styled.nav`
-    display:flex;
-    flex-direction:column;
-`;
-
 const Task_options = styled.div`
     width:18px;
     margin-left:-.5rem;
@@ -111,6 +106,10 @@ class TopBar extends React.Component {
             isMenuOpen: false
         }
 
+        this.timerQueue = [];
+
+        this.handleClick = throttle(this.handleClick, 500);
+
         this.setStateBind = this.setState.bind(this);
     }
 
@@ -120,7 +119,12 @@ class TopBar extends React.Component {
     }
 
     componentWillReceiveProps(nextP) {
-        const { runningEntryDescription } = this.props;
+        const { runningEntryDescription, isFetching } = this.props;
+
+        if (isFetching && !nextP.isFetching && this.timerQueue.length) {
+            const fn = this.timerQueue.shift();
+            fn && fn();
+        }
 
         if (nextP.runningEntryDescription !== runningEntryDescription) {
             this.setState({ description: nextP.runningEntryDescription });
@@ -136,9 +140,13 @@ class TopBar extends React.Component {
     }
 
     handleClick = () => {
-        const { isRunning } = this.props;
+        const { isRunning, isFetching } = this.props;
 
-        return isRunning ? this.stopTimer() : this.startTimer();
+        if (isFetching) {
+            this.timerQueue.push(isRunning ? this.stopTimer : isRunning);
+        } else {
+            isRunning ? this.stopTimer() : this.startTimer();
+        }
     }
 
     startTimer = () => {
@@ -152,7 +160,7 @@ class TopBar extends React.Component {
     }
 
     stopTimer = () => {
-        const { userData, toggleTimer, setRunningEntryDescription, setProject } = this.props;
+        const { toggleTimer, setRunningEntryDescription, setProject } = this.props;
 
         toggleTimer(false);
         setRunningEntryDescription('');
@@ -240,7 +248,7 @@ class TopBar extends React.Component {
                         <Icon name="attach_money" size='20px' fill={billable ? 'green' : '#bbb'} />
                     </Item_link>
                     <Task_timer>{timer}</Task_timer>
-                    <Task_button isRunning={isRunning} onClick={throttle(this.handleClick, 500)}>
+                    <Task_button isRunning={isRunning} onClick={this.handleClick}>
                         <Icon name={isRunning ? "stop" : "play_arrow"} />
                     </Task_button>
                     <Task_options>
@@ -256,6 +264,7 @@ class TopBar extends React.Component {
 
 const mapStateToProps = ({ global, entry, timer, user }) => ({
     isRunning: global.isRunning,
+    isFetching: global.isFetching,
     userData: user.userData,
     projects: user.projects,
     runningEntry: entry.runningEntry,
@@ -270,7 +279,6 @@ const mapDispatchToProps = dispatch => ({
     setIsRunning: bool => dispatch(actions.global.setIsRunning(bool)),
     setTimer: str => dispatch(actions.timer.setTimer(str)),
     toggleTimer: (bool, val) => dispatch(actions.timer.toggleTimer(bool, val)),
-    setWeekTimer: str => dispatch(actions.timer.setWeekTimer(str)),
     setProject: obj => dispatch(actions.entry.setProject(obj)),
     setBillable: v => dispatch(actions.entry.setBillable(v)),
     setRunningEntry: v => dispatch(actions.entry.setRunningEntry(v)),

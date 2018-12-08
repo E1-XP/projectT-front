@@ -2,8 +2,7 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-//const baseUrl = `http://localhost:3001`;
-const baseUrl = `https://project--t.herokuapp.com`;
+import config from './../config';
 
 import { loadingError, setAllEntriesFetched, setIsFetching } from './global';
 
@@ -56,7 +55,7 @@ export const removeEntries = data => ({
 });
 
 export const setPassword = (userid, data) => dispatch => {
-    const url = `${baseUrl}/users/${userid}/password`;
+    const url = `${config.BASE_URL}/users/${userid}/password`;
     dispatch(setIsFetching(true));
 
     return new Promise((res, rej) => {
@@ -70,7 +69,7 @@ export const setPassword = (userid, data) => dispatch => {
 };
 
 export const setUserInfo = (userid, data) => (dispatch, getState) => {
-    const url = `${baseUrl}/users/${userid}/`;
+    const url = `${config.BASE_URL}/users/${userid}/`;
     dispatch(setIsFetching(true));
 
     axios.put(url, data)
@@ -91,7 +90,7 @@ export const setUserInfo = (userid, data) => (dispatch, getState) => {
 };
 
 export const sendAvatar = (userid, data) => dispatch => {
-    const url = `${baseUrl}/users/${userid}/avatar`;
+    const url = `${config.BASE_URL}/users/${userid}/avatar`;
     const config = {
         onUploadProgress: progressEvent => console.log(progressEvent.loaded)
     }
@@ -116,7 +115,7 @@ export const sendAvatar = (userid, data) => dispatch => {
 };
 
 export const fetchEntries = (userId, beginAt, endAt, dayCount) => dispatch => {
-    let url = `${baseUrl}/users/${userId}/entries?`;
+    let url = `${config.BASE_URL}/users/${userId}/entries?`;
     if (beginAt) url += `begin=${beginAt}`;
     if (endAt) url += `&end=${endAt}`;
     if (dayCount) url += `&days=${dayCount}`;

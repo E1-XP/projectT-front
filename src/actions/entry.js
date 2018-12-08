@@ -3,8 +3,7 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-//const baseUrl = `http://localhost:3001`;
- const baseUrl = `https://project--t.herokuapp.com`;
+import config from './../config';
 
 import { toggleTimer } from './timer';
 import { editEntries, removeEntries, setUserData } from './user';
@@ -36,7 +35,7 @@ export const createNewEntry = (userid, queryParams, ignoreIsRunning = false, mul
         Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
         if (!multiDayMode) queryStr += `start=${Date.now()}`;
 
-        const url = `${baseUrl}/users/${userid}/entries?${queryStr}`;
+        const url = `${config.BASE_URL}/users/${userid}/entries?${queryStr}`;
         console.log(url, 'NEW');
 
         const projects = getState().user.projects;
@@ -78,7 +77,7 @@ export const updateEntry = (userid, runningEntryId, queryParams) => (dispatch, g
     let queryStr = ``;
     Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
 
-    const URL = `${baseUrl}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
+    const URL = `${config.BASE_URL}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
     dispatch(setIsFetching(true));
 
     axios.put(URL).then(resp => {
@@ -96,7 +95,7 @@ export const updateEntry = (userid, runningEntryId, queryParams) => (dispatch, g
 export const removeEntry = (userid, entryid) => dispatch => {
     if (entryid.length !== 24) entryid = JSON.stringify(entryid);
 
-    const url = `${baseUrl}/users/${userid}/entries/${entryid}/`;
+    const url = `${config.BASE_URL}/users/${userid}/entries/${entryid}/`;
     dispatch(setIsFetching(true));
 
     axios.delete(url).then(res => {
@@ -114,7 +113,7 @@ export const createProject = (userid, name, color, client) => dispatch => {
     console.log(userid, name, color);
     color = color.split('').splice(1).join('');
 
-    const url = `${baseUrl}/users/${userid}/projects/?name=${name}&color=${color}&client=${client}`;
+    const url = `${config.BASE_URL}/users/${userid}/projects/?name=${name}&color=${color}&client=${client}`;
     console.log(url);
     dispatch(setIsFetching(true));
 
@@ -127,7 +126,7 @@ export const createProject = (userid, name, color, client) => dispatch => {
 export const removeProject = (userid, name) => dispatch => {
     name = JSON.stringify(name);
 
-    const url = `${baseUrl}/users/${userid}/projects/?name=${name}`;
+    const url = `${config.BASE_URL}/users/${userid}/projects/?name=${name}`;
     console.log(url);
     dispatch(setIsFetching(true));
 

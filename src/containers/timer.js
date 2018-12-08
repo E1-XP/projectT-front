@@ -10,6 +10,7 @@ momentDFPlugin(moment);
 import Topbar from '../containers/topbar';
 import WeekCounter from '../containers/weekcounter';
 import EntriesTable from '../containers/entriestable';
+import WelcomeScreen from '../components/welcomescreen'
 
 const Container = styled.div`
     background-color:rgb(250,250,250);
@@ -27,39 +28,12 @@ const Container_center = styled.div`
 const List = styled.ul`
 `;
 
-const List_item = styled.li`
-    padding:1rem;
-    text-align:center;
-`;
-
-const Item_row = styled.td`
-    text-align:center;
-    padding:.5rem;
-    border:1px solid #ddd;
-    display:flex;
-    justify-content:space-around;
-`;
-
-const Item_link = styled.a`
-    color:#ccc;
-    cursor:pointer;
-`;
-
 const Button_load = styled.button`
     background-color:white;
     font-weight:500;
     border:none; 
     padding:.1rem;
     cursor:pointer;
-`;
-
-const Paragraph = styled.p`
-    text-align:center;
-    padding:2rem;
-    color:#999;
-    margin-top:50px;
-    font-weight: 700;
-    font-size: 20px;
 `;
 
 const rotateAnim = keyframes`
@@ -179,7 +153,10 @@ class Timer extends React.Component {
     }
 
     getWeekTimeComposed = entries => {
-        return this.getWeekTimeFormatted(this.getWeekTime(entries));
+        const number = this.getWeekTime(entries);
+        const string = this.getWeekTimeFormatted(number);
+
+        return { number, string };
     }
 
     passRefToChild = str => {
@@ -252,7 +229,7 @@ class Timer extends React.Component {
 
     render() {
         const { userData, entries, projects, isRunning, allEntriesFetched, mappedItems, daysToShowLength,
-            createNewEntry } = this.props;
+            createNewEntry,isFetching } = this.props;
         const { isFetchingEntries, filteredItems, mappedTasks, isUpdating } = this.state;
 
         return (<Container>
@@ -276,8 +253,9 @@ class Timer extends React.Component {
                         isFetching={isFetchingEntries}
                         isUpdating={isUpdating}
                         isRunning={isRunning}
+                        isFetching={isFetching}
                         setState={this.setStateBind} /> :
-                    <Paragraph>Nothing to show here. Hit the start button to begin time tracking.</Paragraph>}
+                    <WelcomeScreen />}
             </List>
             {Object.keys(mappedItems).length > 9 &&
                 <Container_center>
@@ -294,6 +272,7 @@ const mapStateToProps = ({ user, global, timer }) => ({
     entries: user.entries,
     projects: user.projects,
     isRunning: global.isRunning,
+    isFetching:global.isFetching,
     weekTimer: timer.weekTimer,
     daysToShowLength: global.daysToShowLength,
     allEntriesFetched: global.allEntriesFetched,
@@ -305,7 +284,7 @@ const mapDispatchToProps = dispatch => ({
     createNewEntry: (uid, obj) => dispatch(actions.entry.createNewEntry(uid, obj)),
     removeEntry: (v, v2) => dispatch(actions.entry.removeEntry(v, v2)),
     updateEntry: (userid, runningEntry, obj) => dispatch(actions.entry.updateEntry(userid, runningEntry, obj)),
-    setWeekTimer: str => dispatch(actions.timer.setWeekTimer(str)),
+    setWeekTimer: obj => dispatch(actions.timer.setWeekTimer(obj)),
     setDaysToShowLength: num => dispatch(actions.global.setDaysToShowLength(num)),
     setAllEntriesFetched: bool => dispatch(actions.global.setAllEntriesFetched(bool))
 });

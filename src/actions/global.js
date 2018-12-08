@@ -3,8 +3,7 @@ import consts from './types';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
-//const baseUrl = `http://localhost:3001`;
-const baseUrl = `https://project--t.herokuapp.com`;
+import config from './../config';
 
 import { push } from 'connected-react-router';
 import { setUserData, setSettings } from './user';
@@ -27,6 +26,11 @@ export const setIsFetching = bool => ({
 
 export const setIsOnline = bool => ({
     type: consts.IS_ONLINE,
+    payload: bool
+});
+
+export const setIsTabActive = bool => ({
+    type: consts.IS_TAB_ACTIVE,
     payload: bool
 });
 
@@ -55,7 +59,7 @@ export const loadingError = err => dispatch => {
 };
 
 export const handleAuth = (type, formData) => (dispatch, getState) => {
-    const URL = `${baseUrl}/auth/${type}`;
+    const URL = `${config.BASE_URL}/auth/${type}`;
 
     return axios.post(URL, formData).then(resp => {
         console.log(resp);
@@ -65,7 +69,7 @@ export const handleAuth = (type, formData) => (dispatch, getState) => {
             if (type === 'login') {
                 const userId = resp.data.userId;
                 console.log(resp.data);
-                const URL = `${baseUrl}/users/${userId}`;
+                const URL = `${config.BASE_URL}/users/${userId}`;
 
                 return axios.get(URL).then(resp => {
                     console.log(URL);
@@ -123,7 +127,7 @@ export const handleAuth = (type, formData) => (dispatch, getState) => {
 }
 
 export const handleReAuth = () => (dispatch, getState) => {
-    const url = `${baseUrl}/auth/refresh`;
+    const url = `${config.BASE_URL}/auth/refresh`;
 
     axios.post(url).then(res => {
         if (res.status === 200) {
@@ -154,7 +158,7 @@ export const handleReAuth = () => (dispatch, getState) => {
 }
 
 export const handleLogout = () => dispatch => {
-    const url = `${baseUrl}/auth/logout`;
+    const url = `${config.BASE_URL}/auth/logout`;
 
     dispatch(setIsLoading(true));
 
