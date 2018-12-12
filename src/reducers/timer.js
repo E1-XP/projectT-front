@@ -1,6 +1,7 @@
 import types from '../actions/types';
 
 export default (state = {}, action) => {
+    console.log(action.type,'ACTION FIRED');
     switch (action.type) {
         case types.SET_TIMER: return Object.assign({}, state, { timer: action.payload });
         case types.SET_TIMER_ID: return Object.assign({}, state, { timerId: action.payload });

@@ -56,15 +56,20 @@ export default (state = {}, action) => {
             const getDayStr = itm => moment(itm).format('ddd, Do MMM');
             const getDayStart = itm => moment(itm).startOf('day').valueOf();
             const getDayEnd = itm => moment(itm).endOf('day').valueOf();
-            const isArray = Array.isArray(action.payload);
+            const isPayloadArray = Array.isArray(action.payload);
             console.log(action.payload);
-            if (!isArray && !action.payload.stop) return state;
+
+            if (!isPayloadArray && !action.payload.stop) {
+                return { ...state, entries: [action.payload, ...state.entries] };
+            }
 
             let found = false;
-            const dayToModify = isArray ? getDayStr(action.payload[0].start) :
+            const dayToModify = isPayloadArray ? getDayStr(action.payload[0].start) :
                 getDayStr(action.payload.start);
-            const unixDayStart = getDayStart(isArray ? action.payload[0].start : action.payload.start);
-            const unixDayEnd = getDayEnd(isArray ? action.payload[0].start : action.payload.start);
+            const unixDayStart = getDayStart(isPayloadArray ? action.payload[0].start :
+                action.payload.start);
+            const unixDayEnd = getDayEnd(isPayloadArray ? action.payload[0].start :
+                action.payload.start);
             const prevMappedItems = Object.assign({}, state.mappedItems);
 
             const sortMappeditems = obj => Object.keys(obj)
@@ -81,7 +86,7 @@ export default (state = {}, action) => {
             //replace modified items in entries array
             const entriesCpy = state.entries.map(itm => {
 
-                if (isArray) {
+                if (isPayloadArray) {
                     if (action.payload.findIndex(elem => elem._id === itm._id) !== -1) {
                         found = true;
                         return action.payload[action.payload.findIndex(elem => elem._id === itm._id)]

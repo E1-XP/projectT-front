@@ -16,6 +16,7 @@ const Container = styled.div`
     background-color:rgb(250,250,250);
     padding-bottom:3rem;
     position:relative;
+    min-width: 570px;
 `;
 
 const Container_center = styled.div`
