@@ -44,9 +44,7 @@ class EntriesTable extends React.Component {
         this.today = moment().format('ddd, Do MMM');
         this.yesterday = moment().add(-1, 'days').format('ddd, Do MMM');
 
-        this.actionsQueue = [];
-
-        this.startNewEntry = throttle(this.startNewEntry, 1500);
+        this.startNewEntry = throttle(this.startNewEntry, 1000);
     }
 
     shouldComponentUpdate(nextP) {
@@ -66,18 +64,11 @@ class EntriesTable extends React.Component {
         return true;
     }
 
-    componentWillReceiveProps(nextP) {
-        console.log(this.actionsQueue.length);
-
-        while (!nextP.isFetching && this.actionsQueue.length) {
-            const fn = this.actionsQueue.shift();
-            fn && fn();
-        }
-    }
-
     componentDidUpdate() {
-        if (this.props.isUpdating) this.props.setState({ isUpdating: false });
-        if (this.props.isUpdating) console.log('set isupdating to false')
+        if (this.props.isUpdating) {
+            this.props.setState({ isUpdating: false });
+            console.log('set isupdating to false');
+        }
     }
 
     toggleEntries = (day, item) => {
@@ -88,20 +79,15 @@ class EntriesTable extends React.Component {
     }
 
     startNewEntry = item => {
-        const { setTopbarDescription, userData, createNewEntry,
-            isFetching } = this.props;
+        const { setTopbarDescription, userData, createNewEntry } = this.props;
 
-        const innerFn = () => {
-            const paramsObj = {};
-            paramsObj.billable = item.billable;
-            if (item.description) paramsObj.description = item.description;
-            if (item.project) paramsObj.project = item.project;
+        const paramsObj = {};
+        paramsObj.billable = item.billable;
+        if (item.description) paramsObj.description = item.description;
+        if (item.project) paramsObj.project = item.project;
 
-            createNewEntry(userData._id, paramsObj);
-            setTopbarDescription(item.description);
-        }
-
-        isFetching ? this.actionsQueue.push(innerFn) : innerFn();
+        createNewEntry(userData._id, paramsObj);
+        setTopbarDescription(item.description);
     }
 
     getTotalDayCount = dayOfItems => {

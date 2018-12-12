@@ -59,6 +59,8 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
                 else if (sum >= 1000) {
                     sum = 0;
 
+                    if (!state.global.isRunning) return;
+
                     if (previousTime && initialWeekTime === 0) {
                         initialWeekTime = state.timer.weekTimerNum;
                     }
@@ -91,33 +93,44 @@ export const toggleTimer = (isTrue, previousTime = null) => (dispatch, getState)
         interval(now);
     }
     else {
-        const entryThatStillRuns = getState().user.entries.find(itm => !itm.stop);
-        const runningEntry = getState().entry.runningEntry;
-        const dayStart = moment().startOf('day');
+        const state = getState();
+        const entryThatStillRuns = state.user.entries.find(itm => !itm.stop);
+        const runningEntry = state.entry.runningEntry;
+        const dayStart = moment().startOf('day').valueOf();
 
-        if (entryThatStillRuns && entryThatStillRuns.start < dayStart.valueOf()) {
-            const state = getState().entry;
+        if (entryThatStillRuns && entryThatStillRuns.start < dayStart) {
             const entryState = {
-                project: state.currentProject.name || '',
-                description: state.runningEntryDescription,
-                billable: state.billable
+                project: state.entry.currentProject.name || '',
+                description: state.entry.runningEntryDescription,
+                billable: state.entry.billable
             };
-            handleMultipleDaysBetweenStop(entryThatStillRuns, entryState, dispatch);
 
+            handleMultipleDaysBetweenStop(entryThatStillRuns, entryState, dispatch);
         }
         else if (runningEntry) {
-            const now = moment().valueOf();
-            const state = getState().entry;
-            const project = (state.currentProject && state.currentProject.name) ? state.currentProject.name : '';
+            const project = (state.entry.currentProject && state.entry.currentProject.name) ?
+                state.entry.currentProject.name : '';
 
             const payload = {
-                stop: now,
-                description: state.runningEntryDescription,
+                stop: Date.now(),
+                description: state.entry.runningEntryDescription,
                 project,
-                billable: state.billable
+                billable: state.entry.billable
             };
 
-            dispatch(updateEntry(getState().user.userData._id, state.runningEntry, payload));
+            const runningEntries = state.user.entries.filter(itm => !itm.stop);
+            const getFoundEntry = () => runningEntries.shift();
+            const entryId = runningEntries.length ? getFoundEntry()._id : undefined;
+
+            if (entryId) {
+                dispatch(updateEntry(state.user.userData._id, entryId, payload));
+                if (runningEntries.length) {
+                    runningEntries.forEach(itm => {
+                        dispatch(updateEntry(state.user.userData._id, itm._id, { stop: Date.now() }));
+                    });
+                }
+            }
+            else return;
         }
 
         dispatch(batchActions([

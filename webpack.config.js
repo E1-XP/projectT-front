@@ -48,6 +48,8 @@ module.exports = {
             new uglifyJSPlugin({
                 uglifyOptions: {
                     compress: {
+                        unused: true,
+                        dead_code: true,
                         drop_console: true
                     },
                     output: {

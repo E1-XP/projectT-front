@@ -56,8 +56,8 @@ export const createNewEntry = (userid, queryParams, ignoreIsRunning = false, mul
             dispatch(setIsFetching(true));
             axios.post(url).then(resp => {
 
-                //dispatch(editEntries(resp.data));
-                (!queryParams.stop) && dispatch(setRunningEntry(resp.data._id));
+                dispatch(editEntries(resp.data));
+                if (!queryParams.stop) dispatch(setRunningEntry(resp.data._id));
                 dispatch(setIsFetching(false));
 
             }).catch(err => dispatch(loadingError(err)));
@@ -78,6 +78,7 @@ export const updateEntry = (userid, runningEntryId, queryParams) => (dispatch, g
     Object.keys(queryParams).map(key => queryStr += `${key}=${queryParams[key]}&`);
 
     const URL = `${config.BASE_URL}/users/${userid}/entries/${runningEntryId}?${queryStr}`;
+    console.log(URL, 'UPD');
     dispatch(setIsFetching(true));
 
     axios.put(URL).then(resp => {
