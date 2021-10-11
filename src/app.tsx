@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import { Provider } from "react-redux";
+import { ConnectedRouter } from "connected-react-router";
 
-export const App = () => {
-  const [state, setState] = useState("hello world!");
+import { Routes } from "./routes";
+import { history } from "./routes/history";
+import { store } from "./store";
 
-  return <div>{state}</div>;
-};
+export const App = () => (
+  <Provider store={store}>
+    <ConnectedRouter history={history}>
+      <Routes />
+    </ConnectedRouter>
+  </Provider>
+);
