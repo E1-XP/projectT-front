@@ -7,39 +7,62 @@ import { history } from "./../routes/history";
 import { Fields } from "../pages/form";
 import { setIsLoggedIn } from "./../actions/global";
 
-const URL = `${config.API_URL}/auth${history.location.pathname.toLowerCase()}`;
-
 interface AuthResponse {
   message: string;
   userId: string;
 }
 
-type APIResponse = SagaReturnType<() => Response>;
-type Data = SagaReturnType<() => AuthResponse>;
+type FetchResponse = SagaReturnType<() => Response>;
+type AuthData = SagaReturnType<() => AuthResponse>;
+type UserData = SagaReturnType<() => AuthResponse>;
 
 const authRequest = async (fields: Fields) => {
+  const URL = `${
+    config.API_URL
+  }/auth${history.location.pathname.toLowerCase()}`;
+
   return await fetch(URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(fields),
   });
+};
+
+const userDataRequest = async (userId: AuthResponse["userId"]) => {
+  const URL = `${config.API_URL}/users/${userId}`;
+
+  return await fetch(URL, { credentials: "include" });
 };
 
 export function* initAuth(action: PayloadAction<Fields>) {
   try {
     console.log(action.payload);
 
-    const response: APIResponse = yield call(authRequest, action.payload);
+    const response: FetchResponse = yield call(authRequest, action.payload);
+
+    const data: AuthData = yield response.json();
+    console.log(data);
 
     if (response.status === 200) {
       yield put(setIsLoggedIn(true));
-      yield put(push("/dashboard"));
-    }
 
-    const data: Data = yield response.json();
-    console.log(data);
+      yield put(push("/dashboard"));
+
+      const userReqResponse: FetchResponse = yield call(
+        userDataRequest,
+        data.userId
+      );
+
+      const userData: AuthData = yield userReqResponse.json();
+      console.log(userData);
+
+      if (userReqResponse.status === 200) {
+        localStorage.setItem("isAuth", "true");
+      }
+    }
   } catch (e) {
     console.log("saga error", e);
   }
