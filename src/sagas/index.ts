@@ -1,8 +1,9 @@
-import { takeEvery } from "redux-saga/effects";
+import { takeLatest } from "redux-saga/effects";
 
 import { types } from "../actions/types";
-import { initAuth } from "./global";
+import { initAuth, requestUserData } from "./global";
 
-export function* sagas() {
-  yield takeEvery(types.GLOBAL_INIT_AUTH, initAuth);
+export function* rootSaga() {
+  yield takeLatest(types.GLOBAL_INIT_AUTH, initAuth);
+  yield takeLatest(types.USER_GET_USER_DATA, requestUserData);
 }
