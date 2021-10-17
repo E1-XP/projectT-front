@@ -3,4 +3,11 @@ enum global {
   GLOBAL_INIT_AUTH = "GLOBAL_INIT_AUTH",
 }
 
-export const types = { ...global };
+enum user {
+  USER_GET_USER_DATA = "USER_GET_USER_DATA",
+  USER_SET_USER_DATA = "USER_SET_USER_DATA",
+  USER_SET_ENTRIES = "USER_SET_ENTRIES",
+  USER_SET_PROJECTS = "USER_SET_PROJECTS",
+}
+
+export const types = { ...global, ...user };

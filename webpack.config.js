@@ -21,7 +21,8 @@ module.exports = {
     extensions: ["*", ".js", ".jsx", ".ts", ".tsx"],
   },
   output: {
-    path: path.resolve(__dirname, "/public"),
+    path: path.resolve(__dirname, "public"),
+    publicPath: "/",
     filename: "bundle.js",
   },
   plugins: [
@@ -31,7 +32,7 @@ module.exports = {
     }),
   ],
   devServer: {
-    static: path.resolve(__dirname, "./public"),
+    static: path.resolve(__dirname, ".public"),
     historyApiFallback: true,
   },
 };

@@ -8,8 +8,6 @@ const initialState = {
 
 export const globalReducer = createReducer(initialState, (builder) => {
   builder.addCase(setIsLoggedIn, (state, action) => {
-    console.log("reducer runs", action.payload);
-
     state.isUserLoggedIn = action.payload;
   });
 });
