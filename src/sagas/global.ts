@@ -5,7 +5,7 @@ import pickBy from "lodash/fp/pickBy";
 
 import { config } from "./../config";
 import { history } from "./../routes/history";
-import { Fields } from "../pages/form";
+import { Fields } from "../pages/forms";
 import { setIsLoggedIn } from "./../actions/global";
 import {
   getUserData,

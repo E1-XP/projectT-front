@@ -5,7 +5,7 @@ import { history } from "./history";
 
 import { ProtectedRoute } from "./protected";
 import { Dashboard } from "../pages/dashboard";
-import { Form } from "../pages/form";
+import { Form } from "../pages/forms";
 
 export const Routes = () => (
   <Switch>

@@ -1,7 +1,7 @@
 import { createAction } from "@reduxjs/toolkit";
 
 import { types } from "./types";
-import { Fields } from "./../pages/form";
+import { Fields } from "./../pages/forms";
 
 export const initAuth = createAction<Fields>(types.GLOBAL_INIT_AUTH);
 
