@@ -1,10 +1,14 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { Entry, Project } from "../store/interfaces";
+import { Entry, Project, UserData } from "../store/interfaces";
 
 import { setUserData, setEntries, setProjects } from "./../actions/user";
 
 const initialState = {
-  userData: {},
+  userData: {
+    avatar: "",
+    email: "",
+    username: "",
+  },
   entries: [] as Entry[],
   projects: [] as Project[],
 };
