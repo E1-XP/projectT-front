@@ -6,12 +6,16 @@ import { history } from "./history";
 import { ProtectedRoute } from "./protected";
 import { Dashboard } from "../pages/dashboard";
 import { Form } from "../pages/forms";
+import { Sidebar } from "../components/sidebar";
 
 export const Routes = () => (
-  <Switch>
+  <>
     <Route exact={true} path="/" render={() => <Redirect to="/dashboard" />} />
     <Route path="/login" component={Form} />
     <Route path="/signup" component={Form} />
-    <ProtectedRoute path="/dashboard" component={Dashboard} />
-  </Switch>
+    <ProtectedRoute path="/" component={Sidebar} />
+    <Switch>
+      <ProtectedRoute path="/dashboard" component={Dashboard} />
+    </Switch>
+  </>
 );

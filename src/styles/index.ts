@@ -3,13 +3,12 @@ import styledNormalize from "styled-normalize";
 
 import { reset } from "./reset";
 import { getBP } from "./helpers";
-import { breakPoints,FontURL } from "./variables";
+import { breakPoints, white } from "./variables";
 
 export const GlobalStyle = createGlobalStyle`
     ${styledNormalize}
     ${reset}
 
-     @import url(FontURL);
 
     html {
         ${getBP(breakPoints.veryLarge)} {
@@ -28,6 +27,6 @@ export const GlobalStyle = createGlobalStyle`
     body {     
         font-family: 'Open Sans', sans-serif;
         font-weight: 500;
-        background-color: rgb(250, 250, 250);
+        background-color: ${white};
     }
 `;

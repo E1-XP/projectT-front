@@ -6,5 +6,6 @@ export const breakPoints = {
   veryLarge: `100em`, // 1600px
 };
 
-export const FontURL =
-  "https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap";
+export const darkGrey = `rgb(50, 50, 50);`;
+export const white = `rgb(250, 250, 250)`;
+export const red = `#e20505`;

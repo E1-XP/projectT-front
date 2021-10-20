@@ -1,5 +1,5 @@
-export const getBP = (width: string) =>
-  `@media only screen and (max-width: ${width})`;
+export const getBP = (width: string, direction = "max") =>
+  `@media only screen and (${direction}-width: ${width})`;
 
 export const visuallyHidden = `
   clip: rect(1px, 1px, 1px, 1px);
