@@ -6,7 +6,7 @@ import pickBy from "lodash/fp/pickBy";
 import { config } from "./../config";
 import { history } from "./../routes/history";
 import { Fields } from "../pages/forms";
-import { setIsLoggedIn } from "./../actions/global";
+import { setIsLoggedIn, setIsLoading } from "./../actions/global";
 import {
   getUserData,
   setEntries,
@@ -61,10 +61,12 @@ export function* initAuth(action: PayloadAction<Fields>) {
     console.log(data);
 
     if (response.status === 200) {
+      yield put(setIsLoading(true));
       yield put(setIsLoggedIn(true));
       yield put(getUserData(data.userId));
     }
   } catch (e) {
+    yield put(push("/500"));
     console.log("saga error", e);
   }
 }
@@ -91,5 +93,6 @@ export function* requestUserData(action: PayloadAction<string>) {
     yield put(setProjects(userData.projects));
 
     yield put(push("/dashboard"));
+    yield put(setIsLoading(false));
   }
 }
