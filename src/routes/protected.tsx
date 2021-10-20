@@ -1,7 +1,7 @@
 import React, { ComponentType, useContext } from "react";
 import { Route, Redirect, RouteProps } from "react-router-dom";
 
-import { useAppSelector } from "./../hooks";
+import { useStoreSelector } from "./../hooks";
 
 interface Props extends RouteProps {
   path: string;
@@ -9,7 +9,9 @@ interface Props extends RouteProps {
 }
 
 export const ProtectedRoute = ({ path, component: Component }: Props) => {
-  const isUserLoggedIn = useAppSelector((state) => state.global.isUserLoggedIn);
+  const isUserLoggedIn = useStoreSelector(
+    (state) => state.global.isUserLoggedIn
+  );
 
   return (
     <Route

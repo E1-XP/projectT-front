@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styled from "styled-components";
 
-import { useAppDispatch } from "../../hooks";
+import { useStoreDispatch } from "../../hooks";
 import { initAuth } from "../../actions/global";
 
 import { NavBar } from "../../components/navbar";
@@ -67,7 +67,7 @@ const ErrorParagraph = styled.p`
 `;
 
 export const Form = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useStoreDispatch();
   const location = useLocation();
 
   const onSignUpPage = location.pathname.toLowerCase() === "/signup";
