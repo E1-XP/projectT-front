@@ -4,7 +4,8 @@ import { push } from "connected-react-router";
 import styled from "styled-components";
 import { getBP } from "../styles/helpers";
 import { breakPoints, red } from "../styles/variables";
-import { useStoreSelector } from "./../hooks";
+import { useStoreDispatch, useStoreSelector } from "./../hooks";
+import { initLogOut } from "../actions/global";
 
 const Profile_link = styled.a`
   cursor: pointer;
@@ -103,6 +104,9 @@ const getShortUserName = (userName: string) =>
     : userName.toUpperCase().slice(0, 2);
 
 export const ProfileDropdown = () => {
+  const dispatch = useStoreDispatch();
+  const logOut = () => dispatch(initLogOut());
+
   const [isOpen, setIsOpen] = useState(false);
 
   const username = useStoreSelector((state) => state.user.userData.username);
@@ -116,13 +120,15 @@ export const ProfileDropdown = () => {
         <Icon_profile url={null}>{getShortUserName(username)}</Icon_profile>
         {isOpen && (
           <Dropdown>
-            <Dropdown_item_noclick className="js-noclick">
+            <Dropdown_item_noclick>
               {`${username}'s workspace`}
             </Dropdown_item_noclick>
             <Dropdown_item onClick={() => push("/settings")}>
               Profile settings
             </Dropdown_item>
-            <Dropdown_item_border>Log out</Dropdown_item_border>
+            <Dropdown_item_border onClick={logOut}>
+              Log out
+            </Dropdown_item_border>
           </Dropdown>
         )}
       </Profile_link>

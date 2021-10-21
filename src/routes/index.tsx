@@ -11,13 +11,13 @@ import { Dashboard } from "../pages/dashboard";
 import { Form } from "../pages/forms";
 import { Sidebar } from "../components/sidebar";
 
-import { setIsLoading } from "../actions/global";
+import { initReAuth } from "../actions/global";
 
 export const Routes = () => {
   const dispatch = useStoreDispatch();
 
   useEffect(() => {
-    dispatch(setIsLoading(false));
+    dispatch(initReAuth());
   }, []);
 
   return (
@@ -27,6 +27,7 @@ export const Routes = () => {
       <Route path="/signup" component={Form} />
       <ProtectedRoute path="/" component={Sidebar} />
       <Switch>
+        <ProtectedRoute path="/timer" component={Timer} />
         <ProtectedRoute path="/dashboard" component={Dashboard} />
       </Switch>
     </Loader>
