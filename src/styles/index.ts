@@ -9,7 +9,6 @@ export const GlobalStyle = createGlobalStyle`
     ${styledNormalize}
     ${reset}
 
-
     html {
         ${getBP(breakPoints.veryLarge)} {
             font-size: 87.5%;
@@ -22,11 +21,19 @@ export const GlobalStyle = createGlobalStyle`
         ${getBP(breakPoints.verySmall)} {
             font-size: 62.5%;
         }
+  
+        height: 100%;
     }
 
     body {     
         font-family: 'Open Sans', sans-serif;
         font-weight: 500;
         background-color: ${white};
+        height: 100%;
+    }
+
+    .root {
+        display: flex;
+        height: 100%;
     }
 `;

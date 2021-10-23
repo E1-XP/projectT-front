@@ -17,7 +17,6 @@ const Wrapper = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: fixed;
   height: 100%;
 
   ${getBP(breakPoints.medium, "min")} {
@@ -44,9 +43,10 @@ const Navigation_link = styled(NavLink)`
   border-radius: 7px;
   position: relative;
 
-  @media only screen and (min-width: 1024px) {
+  ${getBP(breakPoints.medium, "min")} {
     justify-content: initial;
   }
+
   &:hover {
     color: white;
   }

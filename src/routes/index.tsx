@@ -6,7 +6,7 @@ import { history } from "./history";
 
 import { Loader } from "./../components/loader";
 import { ProtectedRoute } from "./protected";
-import { Timer } from "./../pages/timer";
+import { Timer } from "../pages/timer";
 import { Dashboard } from "../pages/dashboard";
 import { Form } from "../pages/forms";
 import { Sidebar } from "../components/sidebar";
