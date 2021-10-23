@@ -3,11 +3,17 @@ import styled from "styled-components";
 
 import { Icon } from "../../components/icon";
 
-import { getBP } from "../../styles/helpers";
-import { breakPoints, green, red } from "../../styles/variables";
+import {
+  darkGrey,
+  green,
+  greyWhite,
+  greyWhiteDarker,
+  red,
+  white,
+} from "../../styles/variables";
 
 const Task = styled.section`
-  border: 1px solid #eee;
+  border: 1px solid ${greyWhite};
   border-width: 0 0 2px 0;
   display: flex;
   padding: 1rem;
@@ -15,7 +21,7 @@ const Task = styled.section`
   align-items: center;
   top: 0;
   z-index: 50;
-  background-color: #fff;
+  background-color: ${white};
   height: 4.688rem;
 `;
 
@@ -43,7 +49,7 @@ const Task_description = styled.input`
 `;
 
 const Task_timer = styled.span`
-  color: #333;
+  color: ${darkGrey};
   font-weight: 500;
   font-size: 1.125rem;
 `;
@@ -59,7 +65,7 @@ interface TaskButtonProps {
 
 const Task_button = styled.a`
   cursor: pointer;
-  color: white;
+  color: ${white};
   background-color: ${(props: TaskButtonProps) =>
     props.isRunning ? red : green};
   border-radius: 50%;
@@ -109,13 +115,13 @@ export const TaskController = () => {
         <Span_relative>
           {false && (
             <Item_link>
-              <Color_indicator color={"orange"} />
+              <Color_indicator color={red} />
               <span>{"no project"}</span>
             </Item_link>
           )}
           {!false && (
             <Item_link>
-              <Icon name="folder" fill="#bbb" size="1.25rem" />
+              <Icon name="folder" fill={greyWhiteDarker} size="1.25rem" />
             </Item_link>
           )}
         </Span_relative>
@@ -124,7 +130,7 @@ export const TaskController = () => {
             <Icon
               name="attach_money"
               size="1.25rem"
-              fill={isBillable ? "green" : "#bbb"}
+              fill={isBillable ? green : greyWhiteDarker}
             />
           </Item_link>
           <Task_timer>{"test"}</Task_timer>
@@ -134,7 +140,7 @@ export const TaskController = () => {
           <Task_options>
             {isRunning && (
               <Item_link>
-                <Icon name="delete" fill="#bbb" size="1rem" />
+                <Icon name="delete" fill={greyWhiteDarker} size="1rem" />
               </Item_link>
             )}
           </Task_options>

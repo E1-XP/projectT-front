@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { push } from "connected-react-router";
 
 import styled from "styled-components";
 import { getBP } from "../styles/helpers";
-import { breakPoints, red } from "../styles/variables";
+import {
+  black,
+  breakPoints,
+  greyWhiteDarker,
+  red,
+  white,
+} from "../styles/variables";
 import { useStoreDispatch, useStoreSelector } from "./../hooks";
 import { initLogOut } from "../actions/global";
 
 const Profile_link = styled.a`
   cursor: pointer;
   position: relative;
-  color: #ddd;
+  color: ${greyWhiteDarker};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,7 +39,7 @@ const Icon_profile = styled.span`
   background-size: cover;
   width: 1.7rem;
   height: 1.7rem;
-  font-size: 14px;
+  font-size: 0.875rem;
   border-radius: 50%;
   justify-content: center;
   align-items: center;
@@ -51,23 +57,23 @@ const Link_label = styled.span`
 
 const Dropdown = styled.ul`
   position: absolute;
-  border: 1px solid #ccc;
+  border: 1px solid ${greyWhiteDarker};
   right: -3px;
   width: 18rem;
-  background-color: white;
+  background-color: ${white};
   z-index: 100;
-  top: -95px;
-  right: -295px;
+  top: -5.938rem;
+  right: -18.438rem;
   border-radius: 7px;
 `;
 
 const Dropdown_item = styled.li`
-  color: black;
+  color: ${black};
   padding: 0.6rem;
   text-align: left;
 
   &:hover {
-    background-color: #ddd;
+    background-color: ${greyWhiteDarker};
   }
 
   &:last-child {
@@ -86,7 +92,7 @@ const Screen_blocker = styled.div`
 `;
 
 const Dropdown_item_border = styled(Dropdown_item)`
-  border-top: 1px solid #ddd;
+  border-top: 1px solid ${greyWhiteDarker};
 `;
 
 const Dropdown_item_noclick = styled(Dropdown_item)`
@@ -97,19 +103,25 @@ const Dropdown_item_noclick = styled(Dropdown_item)`
   }
 `;
 
-const getShortUserName = (userName: string) =>
-  userName.split(" ").length >= 2
-    ? userName.split(" ")[0].charAt(0).toUpperCase() +
-      userName.split(" ")[1].charAt(0).toUpperCase()
-    : userName.toUpperCase().slice(0, 2);
-
 export const ProfileDropdown = () => {
   const dispatch = useStoreDispatch();
-  const logOut = () => dispatch(initLogOut());
+  const logOut = useCallback(() => dispatch(initLogOut()), []);
 
   const [isOpen, setIsOpen] = useState(false);
+  const setIsClosed = useCallback(() => setIsOpen(false), []);
+
+  const pushToSettings = useCallback(() => push("/settings"), []);
 
   const username = useStoreSelector((state) => state.user.userData.username);
+
+  const getShortUserName = useCallback(
+    (userName: string) =>
+      userName.split(" ").length >= 2
+        ? userName.split(" ")[0].charAt(0).toUpperCase() +
+          userName.split(" ")[1].charAt(0).toUpperCase()
+        : userName.toUpperCase().slice(0, 2),
+    [username]
+  );
 
   return (
     <>
@@ -123,7 +135,7 @@ export const ProfileDropdown = () => {
             <Dropdown_item_noclick>
               {`${username}'s workspace`}
             </Dropdown_item_noclick>
-            <Dropdown_item onClick={() => push("/settings")}>
+            <Dropdown_item onClick={pushToSettings}>
               Profile settings
             </Dropdown_item>
             <Dropdown_item_border onClick={logOut}>
@@ -132,7 +144,7 @@ export const ProfileDropdown = () => {
           </Dropdown>
         )}
       </Profile_link>
-      {isOpen && <Screen_blocker onClick={() => setIsOpen(false)} />}
+      {isOpen && <Screen_blocker onClick={setIsClosed} />}
     </>
   );
 };

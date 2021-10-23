@@ -1,10 +1,12 @@
 import React, { PropsWithChildren } from "react";
 import styled, { keyframes } from "styled-components";
+
 import { useStoreSelector } from "../hooks";
+import { darkGrey, white } from "../styles/variables";
 
 const Main_preloader = styled.div`
-  background-color: #333;
-  color: white;
+  background-color: ${darkGrey};
+  color: ${white};
   width: 100%;
   display: flex;
   flex-direction: column;

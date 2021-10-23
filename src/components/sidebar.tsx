@@ -5,13 +5,13 @@ import styled from "styled-components";
 import { ProfileDropdown } from "./profileDropdown";
 import { Icon } from "./../components/icon";
 import { getBP } from "../styles/helpers";
-import { breakPoints, darkGrey } from "../styles/variables";
+import { breakPoints, darkGrey, greyWhite, white } from "../styles/variables";
 
 const Wrapper = styled.section`
-  color: white;
-  background-color: rgb(50, 50, 50);
+  color: ${white};
+  background-color: ${darkGrey};
   box-shadow: 4px 0px 5px rgba(0, 0, 0, 0.2);
-  max-width: 52px;
+  max-width: 3.25rem;
   padding: 1rem;
   order: -1;
   display: flex;
@@ -35,7 +35,7 @@ const Sidebar_navigation = styled.nav`
 `;
 
 const Navigation_link = styled(NavLink)`
-  color: #ddd;
+  color: ${greyWhite};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -48,7 +48,7 @@ const Navigation_link = styled(NavLink)`
   }
 
   &:hover {
-    color: white;
+    color: ${white};
   }
 
   &.active {
@@ -57,12 +57,12 @@ const Navigation_link = styled(NavLink)`
 `;
 
 const Header_link = styled(Link)`
-  color: #ddd;
+  color: ${greyWhite};
   display: flex;
   align-items: center;
 
   &:hover {
-    color: white;
+    color: ${white};
   }
 `;
 

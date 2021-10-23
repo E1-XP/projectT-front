@@ -12,6 +12,7 @@ import { ActionButton } from "../../components/buttons";
 import { visuallyHidden } from "../../styles/helpers";
 
 import { getSchema } from "./validation";
+import { greyWhiteDarker, red } from "../../styles/variables";
 
 export interface Fields {
   email: string;
@@ -56,12 +57,12 @@ const Input = styled.input`
   padding: 0.8rem;
   margin: 0.5rem 0;
   border: 1.5px solid
-    ${(props: InputProps) => (props.valid !== false ? "#eee" : "red")};
+    ${(props: InputProps) => (props.valid ? greyWhiteDarker : red)};
   border-radius: 0.3rem;
 `;
 
 const ErrorParagraph = styled.p`
-  color: red;
+  color: ${red};
   padding: 2rem;
   text-align: center;
 `;

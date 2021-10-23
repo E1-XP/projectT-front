@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import { red } from "../styles/variables";
+import { red, white } from "../styles/variables";
 
 export const ActionButton = styled.button`
   padding: 0.8rem 0.5rem;
@@ -9,7 +9,7 @@ export const ActionButton = styled.button`
   cursor: pointer;
   border: none;
   margin: none;
-  color: white;
+  color: ${white};
   border-radius: 0.3rem;
 
   &:hover {
