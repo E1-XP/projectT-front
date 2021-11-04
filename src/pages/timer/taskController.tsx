@@ -23,6 +23,7 @@ const Task = styled.section`
   z-index: 50;
   background-color: ${white};
   height: 4.688rem;
+  position: sticky;
 `;
 
 const Task_timing = styled.div`
