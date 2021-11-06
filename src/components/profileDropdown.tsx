@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { push } from "connected-react-router";
-
 import styled from "styled-components";
+
 import { getBP } from "../styles/helpers";
 import {
   black,

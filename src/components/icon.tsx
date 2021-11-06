@@ -4,11 +4,12 @@ interface Props {
   name: string;
   fill?: string;
   size?: string;
+  className?: string;
 }
 
-export const Icon = ({ fill, size, name }: Props) => (
+export const Icon = ({ fill, size, name, className }: Props) => (
   <span
-    className="material-icons"
+    className={`material-icons ${className}`}
     style={{ color: fill, fontSize: size, userSelect: "none" }}
   >
     {name}
