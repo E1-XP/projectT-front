@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import format from "date-fns/format";
 import intervalToDuration from "date-fns/intervalToDuration";
@@ -7,17 +7,21 @@ import { Entry as IEntry } from "../../store/interfaces";
 import { GroupedEntries } from "../../selectors/groupEntriesByDays";
 
 import {
+  black,
   breakPoints,
+  darkGrey,
   green,
   greyWhite,
   greyWhiteDarker,
   whiteGrey,
 } from "../../styles/variables";
-import { Icon } from "./../../components/icon";
 
 import { formatDuration } from "./helpers";
 import { useStoreSelector } from "./../../hooks";
 import { getBP } from "../../styles/helpers";
+
+import { Icon } from "./../../components/icon";
+import { EntryDropdown } from "./entryDropdown";
 
 interface StandardProps {
   data: IEntry;
@@ -28,7 +32,7 @@ interface HeaderTypeProps {
   asEntryHeader: boolean;
   data: GroupedEntries;
   isOpen: boolean;
-  setIsOpen: (state: boolean) => void;
+  setIsOpen: (value: boolean) => void;
 }
 
 const Wrapper = styled.div`
@@ -38,14 +42,14 @@ const Wrapper = styled.div`
   margin: auto 0;
   height: 4rem;
   align-items: center;
-
-  &:hover {
-    background-color: ${greyWhite};
-  }
 `;
+interface IDescriptionSide {
+  isHeader: boolean;
+}
 
 const Description_side = styled.section`
-  margin-left: 1.5rem;
+  margin-left: ${({ isHeader }: IDescriptionSide) =>
+    isHeader ? "1.5rem" : "4rem"};
   white-space: nowrap;
 `;
 
@@ -88,16 +92,17 @@ const Timing_side_inner = styled.div`
 `;
 
 interface IItem_link_toggle {
-  isOpen?: boolean;
+  isActive: boolean;
 }
 
 const Item_link_toggle = styled(Item_link)`
-  opacity: ${(props: IItem_link_toggle) => (props.isOpen ? "1" : "0")};
-  pointer-events: none;
+  opacity: ${(props: IItem_link_toggle) => (props.isActive ? "1" : "0")};
+  pointer-events: ${(props: IItem_link_toggle) =>
+    props.isActive ? "all" : "none"};
   color: ${(props: IItem_link_toggle) =>
-    props.isOpen ? greyWhiteDarker : whiteGrey};
+    props.isActive ? greyWhiteDarker : whiteGrey};
   background-color: ${(props: IItem_link_toggle) =>
-    props.isOpen ? whiteGrey : "transparent"};
+    props.isActive ? whiteGrey : "transparent"};
   padding: 0.2rem 0.4rem;
   border-radius: 5px;
 
@@ -123,12 +128,26 @@ const Item_project = styled.span`
   }
 `;
 
+const Icon_hover = styled(Icon)`
+  &:hover {
+    color: ${darkGrey};
+  }
+`;
+
 type Props = HeaderTypeProps | StandardProps;
 
-function isEntryHeader(props: Props): props is HeaderTypeProps {
-  return "asEntryHeader" in props && props.asEntryHeader;
-}
 export const Entry = (props: Props) => {
+  const isEntryHeader = (props: Props): props is HeaderTypeProps => {
+    return "asEntryHeader" in props && props.asEntryHeader;
+  };
+
+  const isRegularEntry = !isEntryHeader(props);
+
+  const [isMouseOver, setIsMouseOver] = useState(false);
+
+  const onMouseOver = useCallback(() => setIsMouseOver(true), []);
+  const onMouseLeave = useCallback(() => setIsMouseOver(false), []);
+
   const currentProject = useStoreSelector((store) =>
     store.user.projects.find(({ name }) =>
       isEntryHeader(props)
@@ -137,18 +156,20 @@ export const Entry = (props: Props) => {
     )
   );
 
+  const isBillable = isEntryHeader(props)
+    ? props.data.entries.every(({ billable }) => billable)
+    : props.data.billable;
+
   return (
-    <Wrapper>
-      <Description_side>
+    <Wrapper onMouseOver={onMouseOver} onMouseLeave={onMouseLeave}>
+      <Description_side isHeader={isEntryHeader(props)}>
         {isEntryHeader(props) && (
           <EntriesCount onClick={() => props.setIsOpen(!props.isOpen)}>
             {props.size}
           </EntriesCount>
         )}
         <Task_Input
-          defaultValue={
-            (!isEntryHeader(props) && props.data?.description) || ""
-          }
+          defaultValue={(isRegularEntry && props.data?.description) || ""}
           placeholder="Add description"
         />
         {currentProject && (
@@ -159,15 +180,19 @@ export const Entry = (props: Props) => {
             </Item_project>
           </Item_link>
         )}
-        {!isEntryHeader(props) && !currentProject && (
-          <Item_link_toggle isOpen={false}>
+        {!currentProject && (
+          <Item_link_toggle isActive={isMouseOver}>
             <Icon name="folder" size="1.25rem" />
           </Item_link_toggle>
         )}
       </Description_side>
       <Timing_side>
-        <Item_link_toggle>
-          <Icon name="attach_money" size="1.25rem" fill={green} />
+        <Item_link_toggle isActive={isMouseOver}>
+          <Icon
+            name="attach_money"
+            size="1.25rem"
+            fill={isBillable ? green : greyWhiteDarker}
+          />
         </Item_link_toggle>
         <Timing_side_inner>
           <span>
@@ -185,9 +210,10 @@ export const Entry = (props: Props) => {
             )}
           </span>
         </Timing_side_inner>
-        <Item_link_toggle>
-          <Icon name="play_arrow" size="2rem" />
+        <Item_link_toggle isActive={isMouseOver}>
+          <Icon_hover name="play_arrow" size="2rem" />
         </Item_link_toggle>
+        <EntryDropdown isHovered={isMouseOver}></EntryDropdown>
       </Timing_side>
     </Wrapper>
   );
