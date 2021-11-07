@@ -10,7 +10,9 @@ import {
   white,
   whiteGrey,
 } from "../../styles/variables";
+
 import { Icon } from "./../../components/icon";
+import { Screen_blocker } from "./styles";
 
 interface Props {
   isHovered: boolean;
@@ -43,38 +45,21 @@ const Dropdown_item = styled.li`
   }
 `;
 
-interface IItemLinkRelative {
+interface IItemLink {
   fill?: string;
   isActive?: boolean;
 }
 
-const Item_link_danger = styled.a`
-  cursor: pointer;
-  color: ${red};
-  display: block;
-`;
-
 const Item_link = styled.a`
   cursor: pointer;
   display: block;
-  opacity: ${({ isActive }: IItemLinkRelative) =>
+  opacity: ${({ isActive }: IItemLink) =>
     isActive || isActive === undefined ? 1 : 0};
-
-  color: ${(props: IItemLinkRelative) => props.fill || greyWhite};
+  color: ${(props: IItemLink) => props.fill || greyWhite};
 
   &:hover {
-    color: ${(props: IItemLinkRelative) => props.fill || greyWhiteDarker};
+    color: ${(props: IItemLink) => props.fill || greyWhiteDarker};
   }
-`;
-
-const Screen_blocker = styled.div`
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: transparent;
-  width: 100%;
-  height: 100%;
 `;
 
 export const EntryDropdown = ({ isHovered }: Props) => {
@@ -95,7 +80,7 @@ export const EntryDropdown = ({ isHovered }: Props) => {
               <Item_link fill={darkGrey}>Go to Projects</Item_link>
             </Dropdown_item>
             <Dropdown_item>
-              <Item_link_danger>Delete</Item_link_danger>
+              <Item_link fill={red}>Delete</Item_link>
             </Dropdown_item>
           </Dropdown>
         )}

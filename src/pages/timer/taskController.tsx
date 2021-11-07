@@ -1,8 +1,6 @@
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 
-import { Icon } from "../../components/icon";
-
 import {
   darkGrey,
   green,
@@ -11,6 +9,10 @@ import {
   red,
   white,
 } from "../../styles/variables";
+import { useStoreSelector } from "../../hooks";
+
+import { Icon } from "../../components/icon";
+import { ProjectDropdown } from "./projectDropdown";
 
 const Task = styled.section`
   border: 1px solid ${greyWhite};
@@ -42,7 +44,6 @@ const Task_timing_inner = styled.div`
 `;
 
 const Task_description = styled.input`
-  outline-color: transparent;
   flex: 1 1 25%;
   padding: 0.3rem;
   border: none;
@@ -76,56 +77,33 @@ const Task_button = styled.a`
   align-items: center;
 `;
 
-const Color_indicator = styled.span`
-  display: inline-block;
-  width: 0.6rem;
-  height: 0.6rem;
-  background-color: ${(props) => "#" + props.color};
-  border-radius: 50%;
-  margin-right: 0.5rem;
-`;
-
 const Item_link = styled.a`
   cursor: pointer;
   display: flex;
   align-items: center;
 `;
 
-const Span_relative = styled.span`
-  position: relative;
-`;
+const wrapperStyle = { left: "-12.5rem", top: "1rem" };
 
 export const TaskController = () => {
+  const projects = useStoreSelector((store) => store.user.projects);
+
   const [isBillable, setIsBillable] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
 
-  const handleStartStopBtn = useCallback(
-    () => setIsRunning(!isRunning),
-    [isRunning]
-  );
-
-  const handleIsBillable = useCallback(
-    () => setIsBillable(!isBillable),
-    [isBillable]
-  );
+  const handleStartStopBtn = useCallback(() => setIsRunning(!isRunning), []);
+  const handleIsBillable = useCallback(() => setIsBillable(!isBillable), []);
 
   return (
     <Task>
       <Task_description placeholder="What are you working on?"></Task_description>
       <Task_timing>
-        <Span_relative>
-          {false && (
-            <Item_link>
-              <Color_indicator color={red} />
-              <span>{"no project"}</span>
-            </Item_link>
-          )}
-          {!false && (
-            <Item_link>
-              <Icon name="folder" fill={greyWhiteDarker} size="1.25rem" />
-            </Item_link>
-          )}
-        </Span_relative>
+        <ProjectDropdown
+          projects={projects}
+          isHovered={true}
+          wrapperStyle={wrapperStyle}
+        />
+
         <Task_timing_inner>
           <Item_link onClick={handleIsBillable}>
             <Icon
