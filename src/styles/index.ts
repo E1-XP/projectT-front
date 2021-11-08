@@ -5,6 +5,10 @@ import { reset } from "./reset";
 import { getBP } from "./helpers";
 import { breakPoints, white } from "./variables";
 
+interface IGlobalStyle {
+  isUserLoggedIn: boolean;
+}
+
 export const GlobalStyle = createGlobalStyle`
     ${styledNormalize}
     ${reset}
@@ -33,7 +37,9 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     .root {
-        display: flex;
-        height: 100%;
+        ${(props: IGlobalStyle) =>
+          props.isUserLoggedIn &&
+          `display: flex;
+           height: 100%;`}
     }
 `;
