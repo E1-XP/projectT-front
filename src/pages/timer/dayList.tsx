@@ -100,7 +100,10 @@ export const DayList = ({ data }: Props) => {
 
   const entriesWithoutProjectHeaderData: GroupedEntries = {
     entries: entriesWithoutProject,
-    totalDuration: 0,
+    totalDuration: entriesWithoutProject.reduce(
+      (acc, entry) => acc + (entry.stop - entry.start),
+      0
+    ),
     ...getStartAndStopDates(),
   };
 

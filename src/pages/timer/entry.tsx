@@ -177,10 +177,14 @@ export const Entry = (props: Props) => {
           </span>
           <span>
             {formatDuration(
-              intervalToDuration({
-                start: props.data.start,
-                end: props.data.stop,
-              })
+              intervalToDuration(
+                isEntryHeader
+                  ? { start: 0, end: props.data.totalDuration }
+                  : {
+                      start: props.data.start,
+                      end: props.data.stop,
+                    }
+              )
             )}
           </span>
         </Timing_side_inner>
