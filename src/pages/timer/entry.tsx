@@ -158,6 +158,7 @@ export const Entry = (props: Props) => {
           projects={projects}
           currentProject={currentProject}
           isHovered={isMouseOver}
+          onProjectSelect={(project: string) => console.log("todo")}
         />
       </Description_side>
       <Timing_side>

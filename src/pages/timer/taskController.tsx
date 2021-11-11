@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { ChangeEvent, useCallback, useState } from "react";
 import styled from "styled-components";
 
 import {
@@ -13,7 +13,13 @@ import { useStoreDispatch, useStoreSelector } from "../../hooks";
 
 import { Icon } from "../../components/icon";
 import { ProjectDropdown } from "./projectDropdown";
-import { setIsTimerRunning } from "../../actions/timer";
+
+import {
+  setIsTimerRunning,
+  setDescription,
+  setBillable,
+  setProject,
+} from "../../actions/timer";
 
 const Task = styled.section`
   border: 1px solid ${greyWhite};
@@ -88,29 +94,59 @@ const wrapperStyle = { left: "-12.5rem", top: "1rem" };
 
 export const TaskController = () => {
   const dispatch = useStoreDispatch();
-  const { isRunning, timer } = useStoreSelector((store) => store.timer);
-  const projects = useStoreSelector((store) => store.user.projects);
 
-  const [isBillable, setIsBillable] = useState(false);
+  const {
+    isRunning,
+    timer,
+    description,
+    isBillable,
+    project: projectString,
+  } = useStoreSelector((store) => store.timer);
+  const projects = useStoreSelector((store) => store.user.projects);
 
   const handleStartStopBtn = useCallback(
     () => dispatch(setIsTimerRunning(!isRunning)),
     [isRunning]
   );
-  const handleIsBillable = useCallback(() => setIsBillable(!isBillable), []);
+
+  const setEntryDescription = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) =>
+      dispatch(setDescription(e.currentTarget.value)),
+    []
+  );
+
+  const setIsBillable = useCallback(
+    () => dispatch(setBillable(!isBillable)),
+    [isBillable]
+  );
+
+  const currentProject = projects.find(
+    (project) => project.name === projectString
+  );
+
+  const setCurrentProject = useCallback(
+    (project: string) => dispatch(setProject(project)),
+    []
+  );
 
   return (
     <Task>
-      <Task_description placeholder="What are you working on?"></Task_description>
+      <Task_description
+        placeholder="What are you working on?"
+        value={description}
+        onChange={setEntryDescription}
+      />
       <Task_timing>
         <ProjectDropdown
           projects={projects}
+          currentProject={currentProject}
+          onProjectSelect={setCurrentProject}
           isHovered={true}
           wrapperStyle={wrapperStyle}
         />
 
         <Task_timing_inner>
-          <Item_link onClick={handleIsBillable}>
+          <Item_link onClick={setIsBillable}>
             <Icon
               name="attach_money"
               size="1.25rem"

@@ -17,6 +17,16 @@ enum user {
 enum timer {
   TIMER_SET_IS_RUNNING = "TIMER_SET_IS_RUNNING",
   TIMER_SET_TIMER = "TIMER_SET_TIMER",
+  TIMER_SET_DESCRIPTION = "TIMER_SET_DESCRIPTION",
+  TIMER_SET_BILLABLE = "TIMER_SET_BILLABLE",
+  TIMER_SET_PROJECT = "TIMER_SET_PROJECT",
+  TIMER_SET_CURRENT_ENTRY = "TIMER_SET_CURRENT_ENTRY",
 }
 
-export const types = { ...global, ...user, ...timer };
+enum entry {
+  ENTRY_CREATE = "ENTRY_CREATE",
+  ENTRY_UPDATE = "ENTRY_UPDATE",
+  ENTRY_DELETE = "ENTRY_DELETE",
+}
+
+export const types = { ...global, ...user, ...timer, ...entry };

@@ -22,6 +22,7 @@ interface Props {
   projects: Project[];
   currentProject?: Project;
   wrapperStyle?: Record<string, string>;
+  onProjectSelect: (project: string) => any;
 }
 
 const Item_link = styled.a`
@@ -126,6 +127,7 @@ export const ProjectDropdown = ({
   projects,
   isHovered,
   wrapperStyle,
+  onProjectSelect,
 }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -171,6 +173,10 @@ export const ProjectDropdown = ({
                   <Item
                     key={project.name}
                     project={currentProject?.name === project.name}
+                    onClick={() => {
+                      onProjectSelect(project.name);
+                      closeMenu();
+                    }}
                   >
                     <Item_link>
                       <Color_indicator color={`#${project?.color}`} />
