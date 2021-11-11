@@ -14,4 +14,9 @@ enum user {
   USER_SET_PROJECTS = "USER_SET_PROJECTS",
 }
 
-export const types = { ...global, ...user };
+enum timer {
+  TIMER_SET_IS_RUNNING = "TIMER_SET_IS_RUNNING",
+  TIMER_SET_TIMER = "TIMER_SET_TIMER",
+}
+
+export const types = { ...global, ...user, ...timer };

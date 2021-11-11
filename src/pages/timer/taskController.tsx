@@ -9,10 +9,11 @@ import {
   red,
   white,
 } from "../../styles/variables";
-import { useStoreSelector } from "../../hooks";
+import { useStoreDispatch, useStoreSelector } from "../../hooks";
 
 import { Icon } from "../../components/icon";
 import { ProjectDropdown } from "./projectDropdown";
+import { setIsTimerRunning } from "../../actions/timer";
 
 const Task = styled.section`
   border: 1px solid ${greyWhite};
@@ -86,12 +87,16 @@ const Item_link = styled.a`
 const wrapperStyle = { left: "-12.5rem", top: "1rem" };
 
 export const TaskController = () => {
+  const dispatch = useStoreDispatch();
+  const { isRunning, timer } = useStoreSelector((store) => store.timer);
   const projects = useStoreSelector((store) => store.user.projects);
 
   const [isBillable, setIsBillable] = useState(false);
-  const [isRunning, setIsRunning] = useState(false);
 
-  const handleStartStopBtn = useCallback(() => setIsRunning(!isRunning), []);
+  const handleStartStopBtn = useCallback(
+    () => dispatch(setIsTimerRunning(!isRunning)),
+    [isRunning]
+  );
   const handleIsBillable = useCallback(() => setIsBillable(!isBillable), []);
 
   return (
@@ -112,7 +117,7 @@ export const TaskController = () => {
               fill={isBillable ? green : greyWhiteDarker}
             />
           </Item_link>
-          <Task_timer>{"test"}</Task_timer>
+          <Task_timer>{timer}</Task_timer>
           <Task_button isRunning={isRunning} onClick={handleStartStopBtn}>
             <Icon name={isRunning ? "stop" : "play_arrow"} />
           </Task_button>

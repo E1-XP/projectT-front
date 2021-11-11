@@ -14,7 +14,7 @@ import {
   whiteGrey,
 } from "../../styles/variables";
 
-import { formatDuration } from "./helpers";
+import { formatDuration } from "./../../helpers";
 import { useStoreSelector } from "./../../hooks";
 
 import { Icon } from "./../../components/icon";

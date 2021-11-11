@@ -9,7 +9,7 @@ import {
 } from "./../../selectors/groupEntriesByDays";
 
 import { Entry } from "./entry";
-import { formatDuration } from "./helpers";
+import { formatDuration } from "./../../helpers";
 import { whiteGrey } from "../../styles/variables";
 
 interface Props {
