@@ -2,6 +2,7 @@ export interface UserData {
   avatar: string;
   email: string;
   username: string;
+  _id: string;
 }
 
 export interface Entry {

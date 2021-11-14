@@ -54,7 +54,8 @@ const groupbyDays = (acc: Record<string, SingleDay>, entry: Entry) => {
   const dayKey = lightFormat(dayStart, "yyyy-MM-dd");
 
   const endsOnSameDay = isSameDay(entry.start, entry.stop);
-  if (!endsOnSameDay || !entry.stop) console.log("handle this asap");
+  if (!endsOnSameDay) console.log("handle this asap");
+  if (!entry.stop) return acc;
 
   if (!acc[dayKey]) {
     acc[dayKey] = {

@@ -13,3 +13,11 @@ export const setDescription = createAction<string>(types.TIMER_SET_DESCRIPTION);
 export const setBillable = createAction<boolean>(types.TIMER_SET_BILLABLE);
 
 export const setProject = createAction<string>(types.TIMER_SET_PROJECT);
+
+export const setCurrentEntryId = createAction<string | undefined>(
+  types.TIMER_SET_CURRENT_ENTRY_ID
+);
+
+export const handleRunningEntry = createAction(
+  types.TIMER_HANDLE_RUNNING_ENTRY
+);

@@ -7,6 +7,7 @@ import {
   setBillable,
   setProject,
   setDescription,
+  setCurrentEntryId,
 } from "./../actions/timer";
 
 const initialState = {
@@ -15,7 +16,7 @@ const initialState = {
   description: "",
   isBillable: false,
   project: undefined as undefined | string,
-  currentEntry: undefined as undefined | Entry,
+  currentEntryId: undefined as undefined | string,
 };
 
 export const timerReducer = createReducer(initialState, (builder) => {
@@ -33,5 +34,8 @@ export const timerReducer = createReducer(initialState, (builder) => {
   });
   builder.addCase(setProject, (state, action) => {
     state.project = action.payload;
+  });
+  builder.addCase(setCurrentEntryId, (state, action) => {
+    state.currentEntryId = action.payload;
   });
 });

@@ -5,28 +5,65 @@ import {
   SagaReturnType,
   call,
 } from "@redux-saga/core/effects";
-import { Action } from "@reduxjs/toolkit";
+import { Action, PayloadAction } from "@reduxjs/toolkit";
 import compose from "lodash/fp/compose";
 
 import intervalToDuration from "date-fns/intervalToDuration";
 import { formatDuration } from "./../helpers";
 
 import { RootState } from "../store";
-import { setTimer } from "./../actions/timer";
+import {
+  setBillable,
+  setCurrentEntryId,
+  setDescription,
+  setIsTimerRunning,
+  setProject,
+  setTimer,
+} from "./../actions/timer";
+import { createEntry, updateEntry } from "../actions/entry";
 
 type StoreSelector = SagaReturnType<() => RootState>;
 
-export function* startTimerInterval(action: Action) {
-  try {
-    const isRunning: StoreSelector["timer"]["isRunning"] = yield select(
-      (state) => state.timer.isRunning
-    );
+const SECOND = 1000;
 
+export function* startTimerInterval(action: Action, runningEntryMode = false) {
+  try {
+    const {
+      isRunning,
+      description,
+      isBillable: billable,
+      project,
+      currentEntryId,
+    }: StoreSelector["timer"] = yield select((state) => state.timer);
+    const runningEntryMode = !!currentEntryId;
     let duration = 0;
+
+    if (runningEntryMode) {
+      const entries: StoreSelector["user"]["entries"] = yield select(
+        (state) => state.user.entries
+      );
+
+      const currentRunningEntry = entries.find(
+        (entry) => entry._id === currentEntryId
+      );
+      if (currentRunningEntry)
+        duration = Date.now() - currentRunningEntry.start;
+    }
+
     let isYielding = true;
 
     if (isRunning) {
-      const tStamp = Date.now();
+      const start = Date.now();
+
+      if (!runningEntryMode)
+        yield put(
+          createEntry({
+            start,
+            description,
+            billable,
+            project,
+          })
+        );
 
       while (isYielding) {
         const displayValue = compose(
@@ -38,14 +75,43 @@ export function* startTimerInterval(action: Action) {
         });
 
         yield put(setTimer(displayValue));
-        yield delay(1000);
-        duration += 1000;
+        yield delay(SECOND);
+        duration += SECOND;
 
         isYielding = yield select((state) => state.timer.isRunning);
       }
     } else {
-      const tStamp = Date.now();
+      const stop = Date.now();
+
+      yield put(
+        updateEntry({
+          stop,
+        })
+      );
       yield put(setTimer(`0:00:00`));
+      yield put(setCurrentEntryId(undefined));
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export function* handleRunningEntry(action: Action) {
+  try {
+    const entries: StoreSelector["user"]["entries"] = yield select(
+      (state) => state.user.entries
+    );
+
+    const runningEntry = entries.find((entry) => !entry.stop);
+    if (runningEntry) {
+      const { description, project, billable, _id } = runningEntry;
+
+      if (description) yield put(setDescription(description));
+      if (project) yield put(setProject(project));
+      if (billable) yield put(setBillable(billable));
+
+      yield put(setCurrentEntryId(_id));
+      yield put(setIsTimerRunning(true));
     }
   } catch (e) {
     console.log(e);

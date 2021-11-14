@@ -14,6 +14,7 @@ import {
   setProjects,
   setUserData,
 } from "./../actions/user";
+import { handleRunningEntry } from "../actions/timer";
 
 import { UserData, Entry, Project } from "./../store/interfaces";
 import { RootState } from "./../store";
@@ -106,6 +107,7 @@ export function* requestUserData(action: PayloadAction<string>) {
 
       yield put(setUserData(userDataFiltered));
       yield put(setEntries(userData.entries));
+      yield put(handleRunningEntry());
       yield put(setProjects(userData.projects));
 
       yield put(push("/timer"));
@@ -136,6 +138,7 @@ export function* initReAuth(action: Action) {
 
       yield put(setUserData(userDataFiltered));
       yield put(setEntries(userData.entries));
+      yield put(handleRunningEntry());
       yield put(setProjects(userData.projects));
 
       yield put(setIsLoggedIn(true));
