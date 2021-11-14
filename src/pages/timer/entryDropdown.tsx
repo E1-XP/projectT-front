@@ -16,6 +16,7 @@ import { Screen_blocker } from "./styles";
 
 interface Props {
   isHovered: boolean;
+  onDelete: () => any;
 }
 
 const Relative_container = styled.div`
@@ -62,7 +63,7 @@ const Item_link = styled.a`
   }
 `;
 
-export const EntryDropdown = ({ isHovered }: Props) => {
+export const EntryDropdown = ({ isHovered, onDelete }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const openMenu = useCallback(() => setIsOpen(true), []);
@@ -79,7 +80,7 @@ export const EntryDropdown = ({ isHovered }: Props) => {
             <Dropdown_item>
               <Item_link fill={darkGrey}>Go to Projects</Item_link>
             </Dropdown_item>
-            <Dropdown_item>
+            <Dropdown_item onClick={onDelete}>
               <Item_link fill={red}>Delete</Item_link>
             </Dropdown_item>
           </Dropdown>

@@ -15,11 +15,13 @@ import {
 } from "../../styles/variables";
 
 import { formatDuration } from "./../../helpers";
-import { useStoreSelector } from "./../../hooks";
+import { useStoreDispatch, useStoreSelector } from "./../../hooks";
 
 import { Icon } from "./../../components/icon";
 import { EntryDropdown } from "./entryDropdown";
 import { ProjectDropdown } from "./projectDropdown";
+
+import { initDeleteEntry } from "../../actions/entry";
 
 interface StandardProps {
   data: IEntry;
@@ -123,6 +125,8 @@ export const Entry = (props: Props) => {
     "asEntryHeader" in props && props.asEntryHeader)(props);
   const isRegularEntry = !isEntryHeader;
 
+  const dispatch = useStoreDispatch();
+
   const [isMouseOver, setIsMouseOver] = useState(false);
 
   const onMouseOver = useCallback(() => setIsMouseOver(true), []);
@@ -192,7 +196,18 @@ export const Entry = (props: Props) => {
         <Item_link_toggle isActive={isMouseOver}>
           <Icon_hover name="play_arrow" size="2rem" />
         </Item_link_toggle>
-        <EntryDropdown isHovered={isMouseOver}></EntryDropdown>
+        <EntryDropdown
+          onDelete={() =>
+            dispatch(
+              initDeleteEntry(
+                isEntryHeader
+                  ? props.data.entries.map(({ _id }) => _id)
+                  : props.data._id
+              )
+            )
+          }
+          isHovered={isMouseOver}
+        ></EntryDropdown>
       </Timing_side>
     </Wrapper>
   );

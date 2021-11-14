@@ -1,7 +1,9 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { select, SagaReturnType, call, put } from "redux-saga/effects";
-import { insertEntry } from "../actions/entry";
+
+import { insertEntry, deleteEntry } from "../actions/entry";
 import { setCurrentEntryId } from "../actions/timer";
+
 import { RootState } from "../store";
 import { Entry } from "../store/interfaces";
 
@@ -45,6 +47,14 @@ const postEntryUpdate = async (
   const URL = `${config.API_URL}/users/${userId}/entries/${currentEntryId}?${queryString}`;
 
   return await fetch(URL, { method: "PUT", credentials: "include" });
+};
+
+const postEntryRemove = async (userId: string, entryId: string | string[]) => {
+  const entriesId = Array.isArray(entryId) ? JSON.stringify(entryId) : entryId;
+
+  const URL = `${config.API_URL}/users/${userId}/entries/${entriesId}/`;
+
+  return await fetch(URL, { method: "DELETE", credentials: "include" });
 };
 
 export function* createEntry(action: PayloadAction<NewEntryData>) {
@@ -96,6 +106,32 @@ export function* updateEntry(action: PayloadAction<Partial<NewEntryData>>) {
     if (response.status === 200) {
       const entryData: Entry = yield response.json();
       yield put(insertEntry(entryData));
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export function* removeEntry(action: PayloadAction<string | string[]>) {
+  try {
+    const entryId = action.payload;
+
+    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
+      (state) => state.user.userData
+    );
+
+    const response: FetchResponse = yield call(
+      postEntryRemove,
+      userId,
+      entryId
+    );
+
+    if (response.status === 200) {
+      const forcedArray = Array.isArray(entryId) ? entryId : [entryId];
+
+      for (const id of forcedArray) {
+        yield put(deleteEntry(id));
+      }
     }
   } catch (e) {
     console.log(e);

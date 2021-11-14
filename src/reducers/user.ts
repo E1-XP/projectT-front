@@ -3,7 +3,7 @@ import { createReducer } from "@reduxjs/toolkit";
 import { Entry, Project, UserData } from "../store/interfaces";
 
 import { setUserData, setEntries, setProjects } from "./../actions/user";
-import { insertEntry } from "../actions/entry";
+import { insertEntry, deleteEntry } from "../actions/entry";
 
 const initialState = {
   userData: {
@@ -30,6 +30,9 @@ export const userReducer = createReducer(initialState, (builder) => {
 
     if (foundIdx > -1) state.entries[foundIdx] = action.payload;
     else state.entries.unshift(action.payload);
+  });
+  builder.addCase(deleteEntry, (state, action) => {
+    state.entries = state.entries.filter(({ _id }) => _id !== action.payload);
   });
   builder.addCase(setProjects, (state, action) => {
     state.projects = action.payload;
