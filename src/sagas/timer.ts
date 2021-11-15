@@ -8,7 +8,13 @@ import {
 import { Action, PayloadAction } from "@reduxjs/toolkit";
 import compose from "lodash/fp/compose";
 
+import isSameDay from "date-fns/isSameDay";
 import intervalToDuration from "date-fns/intervalToDuration";
+import differenceInDays from "date-fns/differenceInDays";
+import startOfDay from "date-fns/startOfDay";
+import endOfDay from "date-fns/endOfDay";
+import addDays from "date-fns/addDays";
+
 import { formatDuration } from "./../helpers";
 
 import { RootState } from "../store";
@@ -35,15 +41,17 @@ export function* startTimerInterval(action: Action, runningEntryMode = false) {
       project,
       currentEntryId,
     }: StoreSelector["timer"] = yield select((state) => state.timer);
+
     const runningEntryMode = !!currentEntryId;
     let duration = 0;
+    let currentRunningEntry;
 
     if (runningEntryMode) {
       const entries: StoreSelector["user"]["entries"] = yield select(
         (state) => state.user.entries
       );
 
-      const currentRunningEntry = entries.find(
+      currentRunningEntry = entries.find(
         (entry) => entry._id === currentEntryId
       );
       if (currentRunningEntry)
@@ -83,11 +91,44 @@ export function* startTimerInterval(action: Action, runningEntryMode = false) {
     } else {
       const stop = Date.now();
 
-      yield put(
-        updateEntry({
-          stop,
-        })
-      );
+      if (
+        runningEntryMode &&
+        currentRunningEntry &&
+        !isSameDay(currentRunningEntry.start, stop)
+      ) {
+        const dayCount = differenceInDays(currentRunningEntry.start, stop);
+        let currDay = currentRunningEntry.start;
+        let i = dayCount;
+
+        yield put(
+          updateEntry({
+            stop: endOfDay(currentRunningEntry.start).getMilliseconds(),
+          })
+        );
+        i -= 1;
+        currDay = addDays(currDay, 1).getMilliseconds();
+
+        while (i) {
+          yield put(
+            createEntry({
+              start: startOfDay(currDay).getMilliseconds(),
+              stop: i === 1 ? stop : endOfDay(currDay).getMilliseconds(),
+              description,
+              billable,
+              project,
+            })
+          );
+
+          i -= 1;
+          currDay = addDays(currDay, 1).getMilliseconds();
+        }
+      } else
+        yield put(
+          updateEntry({
+            stop,
+          })
+        );
+
       yield put(setTimer(`0:00:00`));
       yield put(setCurrentEntryId(undefined));
     }
