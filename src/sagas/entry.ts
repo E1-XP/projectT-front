@@ -15,7 +15,7 @@ type FetchResponse = SagaReturnType<() => Response>;
 type NewEntryData = Pick<
   Entry,
   "description" | "billable" | "project" | "start"
->;
+> & { stop?: number };
 
 const getQueryString = (
   dataObj: Record<string, any>,

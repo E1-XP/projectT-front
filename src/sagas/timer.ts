@@ -5,7 +5,7 @@ import {
   SagaReturnType,
   call,
 } from "@redux-saga/core/effects";
-import { Action, PayloadAction } from "@reduxjs/toolkit";
+import { Action } from "@reduxjs/toolkit";
 import compose from "lodash/fp/compose";
 
 import isSameDay from "date-fns/isSameDay";
@@ -27,6 +27,10 @@ import {
   setTimer,
 } from "./../actions/timer";
 import { createEntry, updateEntry } from "../actions/entry";
+import {
+  createEntry as createEntrySaga,
+  updateEntry as updateEntrySaga,
+} from "../sagas/entry";
 
 type StoreSelector = SagaReturnType<() => RootState>;
 
@@ -96,41 +100,47 @@ export function* startTimerInterval(action: Action, runningEntryMode = false) {
         currentRunningEntry &&
         !isSameDay(currentRunningEntry.start, stop)
       ) {
-        const dayCount = differenceInDays(currentRunningEntry.start, stop);
-        let currDay = currentRunningEntry.start;
+        const dayCount = differenceInDays(stop, currentRunningEntry.start);
+        let currentDay = currentRunningEntry.start;
         let i = dayCount;
 
-        yield put(
-          updateEntry({
-            stop: endOfDay(currentRunningEntry.start).getMilliseconds(),
-          })
-        );
-        i -= 1;
-        currDay = addDays(currDay, 1).getMilliseconds();
+        yield call(updateEntrySaga, {
+          type: updateEntry.type,
+          payload: {
+            stop: endOfDay(currentRunningEntry.start).getTime(),
+          },
+        });
 
-        while (i) {
-          yield put(
-            createEntry({
-              start: startOfDay(currDay).getMilliseconds(),
-              stop: i === 1 ? stop : endOfDay(currDay).getMilliseconds(),
+        currentDay = addDays(currentDay, 1).getTime();
+
+        while (i > 0) {
+          yield call(createEntrySaga, {
+            type: createEntry.type,
+            payload: {
+              start: startOfDay(currentDay).getTime(),
+              stop: i === 1 ? stop : endOfDay(currentDay).getTime(),
               description,
               billable,
               project,
-            })
-          );
+            },
+          });
 
           i -= 1;
-          currDay = addDays(currDay, 1).getMilliseconds();
+
+          currentDay = addDays(currentDay, 1).getTime();
         }
       } else
-        yield put(
-          updateEntry({
+        yield call(updateEntrySaga, {
+          type: updateEntry.type,
+          payload: {
             stop,
-          })
-        );
+          },
+        });
 
       yield put(setTimer(`0:00:00`));
       yield put(setCurrentEntryId(undefined));
+      yield put(setDescription(``));
+      yield put(setProject(``));
     }
   } catch (e) {
     console.log(e);

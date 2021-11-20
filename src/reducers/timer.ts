@@ -15,7 +15,7 @@ const initialState = {
   timer: "0:00:00",
   description: "",
   isBillable: false,
-  project: undefined as undefined | string,
+  project: "",
   currentEntryId: undefined as undefined | string,
 };
 
