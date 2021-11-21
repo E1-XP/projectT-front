@@ -1,4 +1,4 @@
-import { takeLatest } from "redux-saga/effects";
+import { takeEvery, takeLatest } from "redux-saga/effects";
 
 import { types } from "../actions/types";
 import {
@@ -19,8 +19,8 @@ export function* rootSaga() {
   yield takeLatest(types.GLOBAL_INIT_LOGOUT, initLogOut);
   yield takeLatest(types.GLOBAL_FETCH_ERROR, requestError);
   yield takeLatest(types.TIMER_SET_IS_RUNNING, startTimerInterval);
-  yield takeLatest(types.ENTRY_CREATE, createEntry);
-  yield takeLatest(types.ENTRY_UPDATE, updateEntry);
-  yield takeLatest(types.ENTRY_INIT_DELETE, removeEntry);
+  yield takeEvery(types.ENTRY_CREATE, createEntry);
+  yield takeEvery(types.ENTRY_UPDATE, updateEntry);
+  yield takeEvery(types.ENTRY_INIT_DELETE, removeEntry);
   yield takeLatest(types.TIMER_HANDLE_RUNNING_ENTRY, handleRunningEntry);
 }

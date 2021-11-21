@@ -184,6 +184,21 @@ export const ProjectDropdown = ({
                     </Item_link>
                   </Item>
                 ))}
+              {
+                <Item
+                  key={"no project"}
+                  project={!currentProject}
+                  onClick={() => {
+                    onProjectSelect("");
+                    closeMenu();
+                  }}
+                >
+                  <Item_link>
+                    <Color_indicator color={greyWhite} />
+                    {"no project"}
+                  </Item_link>
+                </Item>
+              }
               {!projects.filter(({ name }) => name.includes(inputValue))
                 .length && (
                 <Item key="nothing to show">

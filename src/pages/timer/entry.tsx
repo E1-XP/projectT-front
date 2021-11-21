@@ -21,7 +21,7 @@ import { Icon } from "./../../components/icon";
 import { EntryDropdown } from "./entryDropdown";
 import { ProjectDropdown } from "./projectDropdown";
 
-import { initDeleteEntry } from "../../actions/entry";
+import { initDeleteEntry, updateEntry } from "../../actions/entry";
 
 interface StandardProps {
   data: IEntry;
@@ -162,7 +162,13 @@ export const Entry = (props: Props) => {
           projects={projects}
           currentProject={currentProject}
           isHovered={isMouseOver}
-          onProjectSelect={(project: string) => console.log("todo")}
+          onProjectSelect={(project: string) =>
+            isRegularEntry
+              ? dispatch(updateEntry({ project, _id: props.data._id }))
+              : props.data.entries.forEach((entry) =>
+                  dispatch(updateEntry({ project, _id: entry._id }))
+                )
+          }
         />
       </Description_side>
       <Timing_side>

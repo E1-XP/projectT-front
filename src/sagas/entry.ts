@@ -15,15 +15,14 @@ type FetchResponse = SagaReturnType<() => Response>;
 type NewEntryData = Pick<
   Entry,
   "description" | "billable" | "project" | "start"
-> & { stop?: number };
+> & { stop?: number; _id?: string };
 
 const getQueryString = (
   dataObj: Record<string, any>,
   keysToOmit = [] as string[]
 ) => {
   return Object.entries(dataObj).reduce((acc, [key, value]) => {
-    const should =
-      !keysToOmit.includes(key) && ![undefined, ""].some((v) => v === value);
+    const should = !keysToOmit.includes(key);
     return should ? (acc += `${key}=${value}&`) : acc;
   }, "");
 };
@@ -32,7 +31,6 @@ const postNewEntry = async (entryData: NewEntryData, userId: string) => {
   const queryString = getQueryString(entryData, ["_id"]);
 
   const URL = `${config.API_URL}/users/${userId}/entries?${queryString}`;
-  console.log(URL);
 
   return await fetch(URL, { method: "POST", credentials: "include" });
 };
@@ -83,15 +81,15 @@ export function* createEntry(action: PayloadAction<NewEntryData>) {
 
 export function* updateEntry(action: PayloadAction<Partial<NewEntryData>>) {
   try {
-    console.log(action);
-
     const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
       (state) => state.user.userData
     );
     const currentEntryId: StoreSelector["timer"]["currentEntryId"] =
       yield select((state) => state.timer.currentEntryId);
 
-    if (!currentEntryId) {
+    const entryId = [currentEntryId, action.payload._id].find(Boolean);
+
+    if (!entryId) {
       console.log("check this");
       return;
     }
@@ -100,7 +98,7 @@ export function* updateEntry(action: PayloadAction<Partial<NewEntryData>>) {
       postEntryUpdate,
       action.payload,
       userId,
-      currentEntryId
+      entryId
     );
 
     if (response.status === 200) {
