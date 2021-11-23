@@ -118,6 +118,26 @@ export const DayList = ({ data }: Props) => {
         </Header_dayCount>
       </Header>
       <Project_list>
+        {/*append project entries */}
+        {Object.entries(data.projects).map(([key, value]) => (
+          <Project_item key={value.start}>
+            <Entry_list>
+              {value.entries.length > 1 && (
+                <Entry
+                  asEntryHeader={true}
+                  size={value.entries.length}
+                  data={value}
+                  isOpen={projectState[key]}
+                  setIsOpen={(v) => dispatch(setProjectAction(key, v))}
+                />
+              )}
+              {(projectState[key] || value.entries.length === 1) &&
+                value.entries.map((entry) => (
+                  <Entry key={entry._id} data={entry} />
+                ))}
+            </Entry_list>
+          </Project_item>
+        ))}
         {/*append entries without project */}
         {!!entriesWithoutProject.length && (
           <Project_item>
@@ -139,26 +159,6 @@ export const DayList = ({ data }: Props) => {
             </Entry_list>
           </Project_item>
         )}
-        {/*append project entries */}
-        {Object.entries(data.projects).map(([key, value]) => (
-          <Project_item key={value.start}>
-            <Entry_list>
-              {value.entries.length > 1 && (
-                <Entry
-                  asEntryHeader={true}
-                  size={value.entries.length}
-                  data={value}
-                  isOpen={projectState[key]}
-                  setIsOpen={(v) => dispatch(setProjectAction(key, v))}
-                />
-              )}
-              {(projectState[key] || value.entries.length === 1) &&
-                value.entries.map((entry) => (
-                  <Entry key={entry._id} data={entry} />
-                ))}
-            </Entry_list>
-          </Project_item>
-        ))}
       </Project_list>
     </>
   );
