@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from "react";
+import React, { ChangeEvent, useCallback, useState } from "react";
 import styled from "styled-components";
 import format from "date-fns/format";
 import intervalToDuration from "date-fns/intervalToDuration";
+import debounce from "lodash/fp/debounce";
 
 import { Entry as IEntry } from "../../store/interfaces";
 import { GroupedEntries } from "../../selectors/groupEntriesByDays";
@@ -127,6 +128,35 @@ export const Entry = (props: Props) => {
 
   const dispatch = useStoreDispatch();
 
+  const [description, setDescription] = useState(
+    isRegularEntry
+      ? props.data?.description
+      : new Set(props.data.entries.map((entry) => entry.description)).size === 1
+      ? props.data.entries[0].description
+      : ""
+  );
+
+  const postEntry = useCallback(
+    debounce(300)((description) => {
+      isRegularEntry
+        ? dispatch(updateEntry({ description, _id: props.data._id }))
+        : props.data.entries.forEach((entry) =>
+            dispatch(updateEntry({ description, _id: entry._id }))
+          );
+    }),
+    []
+  );
+
+  const setEntryDescription = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const description = e.target.value;
+      setDescription(description);
+
+      postEntry(description);
+    },
+    []
+  );
+
   const [isMouseOver, setIsMouseOver] = useState(false);
 
   const onMouseOver = useCallback(() => setIsMouseOver(true), []);
@@ -155,7 +185,8 @@ export const Entry = (props: Props) => {
           </EntriesCount>
         )}
         <Task_Input
-          defaultValue={(isRegularEntry && props.data?.description) || ""}
+          value={description}
+          onChange={setEntryDescription}
           placeholder="Add description"
         />
         <ProjectDropdown
