@@ -21,6 +21,8 @@ import {
   setProject,
 } from "../../actions/timer";
 
+import { deleteRunningEntry } from "./../../actions/entry";
+
 const Task = styled.section`
   border: 1px solid ${greyWhite};
   border-width: 0 0 2px 0;
@@ -100,6 +102,7 @@ export const TaskController = () => {
     timer,
     description,
     isBillable,
+    currentEntryId,
     project: projectString,
   } = useStoreSelector((store) => store.timer);
   const projects = useStoreSelector((store) => store.user.projects);
@@ -128,6 +131,8 @@ export const TaskController = () => {
     (project: string) => dispatch(setProject(project)),
     []
   );
+
+  const deleteEntry = useCallback(() => dispatch(deleteRunningEntry()), []);
 
   return (
     <Task>
@@ -159,7 +164,7 @@ export const TaskController = () => {
           </Task_button>
           <Task_options>
             {isRunning && (
-              <Item_link>
+              <Item_link onClick={deleteEntry}>
                 <Icon name="delete" fill={greyWhiteDarker} size="1rem" />
               </Item_link>
             )}

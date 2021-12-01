@@ -2,7 +2,14 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { select, SagaReturnType, call, put } from "redux-saga/effects";
 
 import { insertEntry, deleteEntry } from "../actions/entry";
-import { setCurrentEntryId } from "../actions/timer";
+import {
+  setBillable,
+  setCurrentEntryId,
+  setDescription,
+  setIsTimerRunning,
+  setProject,
+  setTimer,
+} from "../actions/timer";
 
 import { RootState } from "../store";
 import { Entry } from "../store/interfaces";
@@ -130,6 +137,33 @@ export function* removeEntry(action: PayloadAction<string | string[]>) {
       for (const id of forcedArray) {
         yield put(deleteEntry(id));
       }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export function* removeRunningEntry(action: PayloadAction<string | string[]>) {
+  try {
+    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
+      (state) => state.user.userData
+    );
+
+    const { currentEntryId }: StoreSelector["timer"] = yield select(
+      (state) => state.timer
+    );
+
+    if (!currentEntryId) return;
+
+    const response: FetchResponse = yield call(
+      postEntryRemove,
+      userId,
+      currentEntryId
+    );
+
+    if (response.status === 200) {
+      yield put(deleteEntry(currentEntryId));
+      yield put(setIsTimerRunning(false));
     }
   } catch (e) {
     console.log(e);

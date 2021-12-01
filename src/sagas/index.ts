@@ -10,7 +10,12 @@ import {
 } from "./global";
 
 import { handleRunningEntry, startTimerInterval } from "./timer";
-import { createEntry, updateEntry, removeEntry } from "./entry";
+import {
+  createEntry,
+  updateEntry,
+  removeEntry,
+  removeRunningEntry,
+} from "./entry";
 
 export function* rootSaga() {
   yield takeLatest(types.GLOBAL_INIT_AUTH, initAuth);
@@ -22,5 +27,6 @@ export function* rootSaga() {
   yield takeEvery(types.ENTRY_CREATE, createEntry);
   yield takeEvery(types.ENTRY_UPDATE, updateEntry);
   yield takeEvery(types.ENTRY_INIT_DELETE, removeEntry);
+  yield takeEvery(types.ENTRY_DELETE_CURRENT, removeRunningEntry);
   yield takeLatest(types.TIMER_HANDLE_RUNNING_ENTRY, handleRunningEntry);
 }

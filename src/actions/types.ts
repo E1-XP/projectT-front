@@ -30,6 +30,7 @@ enum entry {
   ENTRY_INSERT = "ENTRY_INSERT",
   ENTRY_INIT_DELETE = "ENTRY_INIT_DELETE",
   ENTRY_DELETE = "ENTRY_DELETE",
+  ENTRY_DELETE_CURRENT = "ENTRY_DELETE_CURRENT",
 }
 
 export const types = { ...global, ...user, ...timer, ...entry };

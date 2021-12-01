@@ -36,7 +36,7 @@ type StoreSelector = SagaReturnType<() => RootState>;
 
 const SECOND = 1000;
 
-export function* startTimerInterval(action: Action, runningEntryMode = false) {
+export function* startTimerInterval(action: Action) {
   try {
     const {
       isRunning,
@@ -129,7 +129,9 @@ export function* startTimerInterval(action: Action, runningEntryMode = false) {
 
           currentDay = addDays(currentDay, 1).getTime();
         }
-      } else
+      }
+
+      if (currentRunningEntry)
         yield call(updateEntrySaga, {
           type: updateEntry.type,
           payload: {
@@ -141,6 +143,7 @@ export function* startTimerInterval(action: Action, runningEntryMode = false) {
       yield put(setCurrentEntryId(undefined));
       yield put(setDescription(``));
       yield put(setProject(``));
+      yield put(setBillable(false));
     }
   } catch (e) {
     console.log(e);

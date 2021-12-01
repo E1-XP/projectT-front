@@ -15,3 +15,5 @@ export const initDeleteEntry = createAction<string | string[]>(
 );
 
 export const deleteEntry = createAction<string>(types.ENTRY_DELETE);
+
+export const deleteRunningEntry = createAction(types.ENTRY_DELETE_CURRENT);
