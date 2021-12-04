@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useCallback, useState } from "react";
 import styled from "styled-components";
+import debounce from "lodash/fp/debounce";
 
 import {
   darkGrey,
@@ -21,7 +22,7 @@ import {
   setProject,
 } from "../../actions/timer";
 
-import { deleteRunningEntry } from "./../../actions/entry";
+import { deleteRunningEntry, updateEntry } from "./../../actions/entry";
 
 const Task = styled.section`
   border: 1px solid ${greyWhite};
@@ -103,8 +104,9 @@ export const TaskController = () => {
     description,
     isBillable,
     currentEntryId,
-    project: projectString,
+    project: currentProject,
   } = useStoreSelector((store) => store.timer);
+
   const projects = useStoreSelector((store) => store.user.projects);
 
   const handleStartStopBtn = useCallback(
@@ -112,24 +114,37 @@ export const TaskController = () => {
     [isRunning]
   );
 
+  const postEntryDescription = useCallback(
+    debounce(300)((description: string, entryId) => {
+      currentEntryId && dispatch(updateEntry({ description, _id: entryId }));
+    }),
+    [currentEntryId]
+  );
+
   const setEntryDescription = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) =>
-      dispatch(setDescription(e.currentTarget.value)),
-    []
+    (e: ChangeEvent<HTMLInputElement>) => {
+      dispatch(setDescription(e.currentTarget.value));
+      postEntryDescription(e.currentTarget.value, currentEntryId);
+    },
+    [currentEntryId]
   );
 
-  const setIsBillable = useCallback(
-    () => dispatch(setBillable(!isBillable)),
-    [isBillable]
-  );
+  const setIsBillable = useCallback(() => {
+    dispatch(setBillable(!isBillable));
+    currentEntryId &&
+      dispatch(updateEntry({ billable: !isBillable, _id: currentEntryId }));
+  }, [isBillable, currentEntryId]);
 
-  const currentProject = projects.find(
-    (project) => project.name === projectString
+  const currentProjectMatch = projects.find(
+    (project) => project.name === currentProject
   );
 
   const setCurrentProject = useCallback(
-    (project: string) => dispatch(setProject(project)),
-    []
+    (project: string) => {
+      dispatch(setProject(project));
+      currentEntryId && dispatch(updateEntry({ project, _id: currentEntryId }));
+    },
+    [currentEntryId]
   );
 
   const deleteEntry = useCallback(() => dispatch(deleteRunningEntry()), []);
@@ -144,7 +159,7 @@ export const TaskController = () => {
       <Task_timing>
         <ProjectDropdown
           projects={projects}
-          currentProject={currentProject}
+          currentProject={currentProjectMatch}
           onProjectSelect={setCurrentProject}
           isHovered={true}
           wrapperStyle={wrapperStyle}
