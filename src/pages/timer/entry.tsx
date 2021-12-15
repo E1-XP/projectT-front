@@ -210,7 +210,26 @@ export const Entry = (props: Props) => {
         />
       </Description_side>
       <Timing_side>
-        <Item_link_toggle isActive={isMouseOver}>
+        <Item_link_toggle
+          isActive={isMouseOver}
+          onClick={() =>
+            isRegularEntry
+              ? dispatch(
+                  updateEntry({
+                    billable: !props.data.billable,
+                    _id: props.data._id,
+                  })
+                )
+              : props.data.entries.forEach((entry) =>
+                  dispatch(
+                    updateEntry({
+                      billable: !entry.billable,
+                      _id: entry._id,
+                    })
+                  )
+                )
+          }
+        >
           <Icon
             name="attach_money"
             size="1.25rem"
