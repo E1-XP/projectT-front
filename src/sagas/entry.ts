@@ -169,3 +169,17 @@ export function* removeRunningEntry(action: PayloadAction<string | string[]>) {
     console.log(e);
   }
 }
+
+export function* createEntryFromExisting(action: PayloadAction<Entry>) {
+  try {
+    const { description, billable, project } = action.payload;
+
+    if (description) yield put(setDescription(description));
+    if (billable) yield put(setBillable(billable));
+    if (project) yield put(setProject(project));
+
+    yield put(setIsTimerRunning(true));
+  } catch (e) {
+    console.log(e);
+  }
+}

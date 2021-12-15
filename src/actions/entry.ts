@@ -6,6 +6,10 @@ import { Entry } from "./../store/interfaces";
 
 export const createEntry = createAction<Partial<Entry>>(types.ENTRY_CREATE);
 
+export const createEntryFromExisting = createAction<Entry>(
+  types.ENTRY_CREATE_FROM_EXISTING
+);
+
 export const updateEntry = createAction<Partial<Entry>>(types.ENTRY_UPDATE);
 
 export const insertEntry = createAction<Entry>(types.ENTRY_INSERT);

@@ -22,7 +22,11 @@ import { Icon } from "./../../components/icon";
 import { EntryDropdown } from "./entryDropdown";
 import { ProjectDropdown } from "./projectDropdown";
 
-import { initDeleteEntry, updateEntry } from "../../actions/entry";
+import {
+  createEntryFromExisting,
+  initDeleteEntry,
+  updateEntry,
+} from "../../actions/entry";
 
 interface StandardProps {
   data: IEntry;
@@ -164,6 +168,11 @@ export const Entry = (props: Props) => {
     []
   );
 
+  const startNewEntryFromExisting = useCallback(() => {
+    const entryData = isRegularEntry ? props.data : props.data.entries[0];
+    dispatch(createEntryFromExisting(entryData));
+  }, []);
+
   const [isMouseOver, setIsMouseOver] = useState(false);
 
   const onMouseOver = useCallback(() => setIsMouseOver(true), []);
@@ -256,7 +265,10 @@ export const Entry = (props: Props) => {
             )}
           </span>
         </Timing_side_inner>
-        <Item_link_toggle isActive={isMouseOver}>
+        <Item_link_toggle
+          isActive={isMouseOver}
+          onClick={startNewEntryFromExisting}
+        >
           <Icon_hover name="play_arrow" size="2rem" />
         </Item_link_toggle>
         <EntryDropdown
