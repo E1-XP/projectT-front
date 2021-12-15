@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from "react";
+import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import format from "date-fns/format";
 import intervalToDuration from "date-fns/intervalToDuration";
@@ -136,15 +136,22 @@ export const Entry = (props: Props) => {
       : ""
   );
 
+  useEffect(
+    () => {
+      isRegularEntry && setDescription(props.data.description);
+    },
+    isRegularEntry ? [props.data.description] : []
+  );
+
   const postEntry = useCallback(
     debounce(300)((description) => {
       isRegularEntry
         ? dispatch(updateEntry({ description, _id: props.data._id }))
-        : props.data.entries.forEach((entry) =>
-            dispatch(updateEntry({ description, _id: entry._id }))
-          );
+        : props.data.entries.forEach((entry) => {
+            dispatch(updateEntry({ description, _id: entry._id }));
+          });
     }),
-    []
+    [description, props.data]
   );
 
   const setEntryDescription = useCallback(

@@ -32,10 +32,11 @@ export const EntryGroup = ({ data }: Props) => {
   const setIsOpenCB = useCallback(() => setIsOpen(!isOpen), [isOpen]);
 
   return (
-    <Project_item key={data.start}>
+    <Project_item>
       <Entry_list>
         {data.entries.length > 1 && (
           <Entry
+            key={data.entries.length}
             asEntryHeader={true}
             size={data.entries.length}
             data={data}
