@@ -4,6 +4,7 @@ import styledNormalize from "styled-normalize";
 import { reset } from "./reset";
 import { getBP } from "./helpers";
 import { breakPoints, white } from "./variables";
+import { libraryStyles } from "./library";
 
 interface IGlobalStyle {
   isUserLoggedIn: boolean;
@@ -42,4 +43,6 @@ export const GlobalStyle = createGlobalStyle`
           `display: flex;
            height: 100%;`}
     }
+
+    ${libraryStyles}
 `;

@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import { TaskController } from "./taskController";
+import { WeekCounter } from "./weekCounter";
 import { Timeline } from "./timeline";
 
 const Timer_wrapper = styled.main`
@@ -13,6 +14,7 @@ const Timer_wrapper = styled.main`
 export const Timer = () => (
   <Timer_wrapper>
     <TaskController />
+    <WeekCounter />
     <Timeline />
   </Timer_wrapper>
 );
