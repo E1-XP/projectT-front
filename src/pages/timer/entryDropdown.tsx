@@ -1,5 +1,8 @@
+import { push } from "connected-react-router";
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
+
+import { useStoreDispatch } from "../../hooks";
 
 import {
   darkGrey,
@@ -64,10 +67,13 @@ const Item_link = styled.a`
 `;
 
 export const EntryDropdown = ({ isHovered, onDelete }: Props) => {
+  const dispatch = useStoreDispatch();
   const [isOpen, setIsOpen] = useState(false);
 
   const openMenu = useCallback(() => setIsOpen(true), []);
   const closeMenu = useCallback(() => setIsOpen(false), []);
+
+  const pushToProjects = useCallback(() => dispatch(push("/projects")), []);
 
   return (
     <>
@@ -78,7 +84,9 @@ export const EntryDropdown = ({ isHovered, onDelete }: Props) => {
         {isOpen && (
           <Dropdown>
             <Dropdown_item>
-              <Item_link fill={darkGrey}>Go to Projects</Item_link>
+              <Item_link fill={darkGrey} onClick={pushToProjects}>
+                Go to Projects
+              </Item_link>
             </Dropdown_item>
             <Dropdown_item onClick={onDelete}>
               <Item_link fill={red}>Delete</Item_link>

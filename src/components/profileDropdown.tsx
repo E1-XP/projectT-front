@@ -110,7 +110,7 @@ export const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const setIsClosed = useCallback(() => setIsOpen(false), []);
 
-  const pushToSettings = useCallback(() => push("/settings"), []);
+  const pushToSettings = useCallback(() => dispatch(push("/settings")), []);
 
   const username = useStoreSelector((state) => state.user.userData.username);
 
