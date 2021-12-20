@@ -4,6 +4,24 @@ import styled, { keyframes } from "styled-components";
 import { useStoreSelector } from "../hooks";
 import { darkGrey, white } from "../styles/variables";
 
+const rotateAnim = keyframes`
+    from{
+        transform:rotate(0deg);
+    }
+    to{
+        transform:rotate(360deg);
+    }
+`;
+
+export const Spinner = styled.div`
+  padding: 0.6rem;
+  border: 3px solid red;
+  border-right: 3px solid transparent;
+  border-radius: 50%;
+  transform: translateZ(0);
+  animation: ${rotateAnim} 0.5s linear infinite;
+`;
+
 const Main_preloader = styled.div`
   background-color: ${darkGrey};
   color: ${white};
@@ -14,25 +32,10 @@ const Main_preloader = styled.div`
   align-items: center;
   pointer-events: none;
   height: 100vh;
-`;
 
-const rotateAnim = keyframes`
-    from{
-        transform:rotate(0deg);
-    }
-    to{
-        transform:rotate(360deg);
-    }
-`;
-
-const Spinner = styled.div`
-  margin-top: 1rem;
-  padding: 0.6rem;
-  border: 3px solid red;
-  border-right: 3px solid transparent;
-  border-radius: 50%;
-  transform: translateZ(0);
-  animation: ${rotateAnim} 0.5s linear infinite;
+  & ${Spinner} {
+    margin-top: 1rem;
+  }
 `;
 
 export const Loader = (props: PropsWithChildren<{}>) => {

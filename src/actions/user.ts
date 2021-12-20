@@ -9,4 +9,6 @@ export const setUserData = createAction<UserData>(types.USER_SET_USER_DATA);
 
 export const setEntries = createAction<Entry[]>(types.USER_SET_ENTRIES);
 
+export const fetchEntries = createAction(types.USER_FETCH_ENTRIES);
+
 export const setProjects = createAction<Project[]>(types.USER_SET_PROJECTS);
