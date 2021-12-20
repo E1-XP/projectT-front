@@ -109,7 +109,7 @@ export const Sidebar = () => (
         <Navigation_item>
           <Navigation_link to="/dashboard" activeClassName="active">
             <Icon name="bar_chart" />
-            <Link_label>Dashboard</Link_label>
+            <Link_label>Reports</Link_label>
           </Navigation_link>
         </Navigation_item>
         <Navigation_item>

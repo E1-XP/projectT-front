@@ -28,7 +28,7 @@ export const Routes = () => {
       <ProtectedRoute path="/" component={Sidebar} />
       <Switch>
         <ProtectedRoute path="/timer" component={Timer} />
-        <ProtectedRoute path="/dashboard" component={Dashboard} />
+        <ProtectedRoute path="/reports" component={Dashboard} />
       </Switch>
     </Loader>
   );
