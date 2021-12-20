@@ -17,7 +17,9 @@ import {
 import { handleRunningEntry } from "../actions/timer";
 
 import { UserData, Entry, Project } from "./../store/interfaces";
-import { RootState } from "./../store";
+import { FetchResponse, StoreSelector } from "./helpers";
+
+import { request } from "../helpers/request";
 
 interface AuthData {
   message: string;
@@ -29,15 +31,12 @@ interface UserDataResponse extends UserData {
   projects: Project[];
 }
 
-type FetchResponse = SagaReturnType<() => Response>;
-type StoreSelector = SagaReturnType<() => RootState>;
-
 const authRequest = async (fields: Fields) => {
   const URL = `${
     config.API_URL
   }/auth${history.location.pathname.toLowerCase()}`;
 
-  return await fetch(URL, {
+  return await request(URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -50,7 +49,7 @@ const authRequest = async (fields: Fields) => {
 const reAuthRequest = async () => {
   const URL = `${config.API_URL}/auth/refresh`;
 
-  return await fetch(URL, {
+  return await request(URL, {
     method: "POST",
     credentials: "include",
   });
@@ -59,13 +58,13 @@ const reAuthRequest = async () => {
 const logOutRequest = async () => {
   const URL = `${config.API_URL}/auth/logout`;
 
-  return await fetch(URL, { method: "POST", credentials: "include" });
+  return await request(URL, { method: "POST", credentials: "include" });
 };
 
 const userDataRequest = async (userId: AuthData["userId"]) => {
   const URL = `${config.API_URL}/users/${userId}`;
 
-  return await fetch(URL, { credentials: "include" });
+  return await request(URL, { credentials: "include" });
 };
 
 export function* initAuth(action: PayloadAction<Fields>) {

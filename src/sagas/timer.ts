@@ -1,10 +1,4 @@
-import {
-  delay,
-  put,
-  select,
-  SagaReturnType,
-  call,
-} from "@redux-saga/core/effects";
+import { delay, put, select, call } from "@redux-saga/core/effects";
 import { Action } from "@reduxjs/toolkit";
 import compose from "lodash/fp/compose";
 
@@ -17,7 +11,6 @@ import addDays from "date-fns/addDays";
 
 import { formatDuration } from "./../helpers";
 
-import { RootState } from "../store";
 import {
   setBillable,
   setCurrentEntryId,
@@ -32,7 +25,7 @@ import {
   updateEntry as updateEntrySaga,
 } from "../sagas/entry";
 
-type StoreSelector = SagaReturnType<() => RootState>;
+import { StoreSelector } from "./helpers";
 
 const SECOND = 1000;
 

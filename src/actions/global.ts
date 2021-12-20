@@ -15,4 +15,8 @@ export const setIsLoggedIn = createAction<boolean>(
 
 export const setIsLoading = createAction<boolean>(types.GLOBAL_SET_IS_LOADING);
 
+export const setIsFetching = createAction<boolean>(
+  types.GLOBAL_SET_IS_FETCHING
+);
+
 export const fetchError = createAction<any>(types.GLOBAL_FETCH_ERROR);

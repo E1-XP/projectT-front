@@ -1,5 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { select, SagaReturnType, call, put } from "redux-saga/effects";
+import { select, call, put } from "redux-saga/effects";
 
 import { insertEntry, deleteEntry } from "../actions/entry";
 import {
@@ -11,13 +11,12 @@ import {
   setTimer,
 } from "../actions/timer";
 
-import { RootState } from "../store";
 import { Entry } from "../store/interfaces";
+import { FetchResponse, StoreSelector } from "./helpers";
 
 import { config } from "./../config";
 
-type StoreSelector = SagaReturnType<() => RootState>;
-type FetchResponse = SagaReturnType<() => Response>;
+import { request } from "../helpers/request";
 
 type NewEntryData = Pick<
   Entry,
@@ -39,7 +38,7 @@ const postNewEntry = async (entryData: NewEntryData, userId: string) => {
 
   const URL = `${config.API_URL}/users/${userId}/entries?${queryString}`;
 
-  return await fetch(URL, { method: "POST", credentials: "include" });
+  return await request(URL, { method: "POST", credentials: "include" });
 };
 
 const postEntryUpdate = async (
@@ -51,7 +50,7 @@ const postEntryUpdate = async (
 
   const URL = `${config.API_URL}/users/${userId}/entries/${currentEntryId}?${queryString}`;
 
-  return await fetch(URL, { method: "PUT", credentials: "include" });
+  return await request(URL, { method: "PUT", credentials: "include" });
 };
 
 const postEntryRemove = async (userId: string, entryId: string | string[]) => {
@@ -59,7 +58,7 @@ const postEntryRemove = async (userId: string, entryId: string | string[]) => {
 
   const URL = `${config.API_URL}/users/${userId}/entries/${entriesId}/`;
 
-  return await fetch(URL, { method: "DELETE", credentials: "include" });
+  return await request(URL, { method: "DELETE", credentials: "include" });
 };
 
 export function* createEntry(action: PayloadAction<NewEntryData>) {
