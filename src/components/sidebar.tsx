@@ -107,7 +107,7 @@ export const Sidebar = () => (
           </Navigation_link>
         </Navigation_item>
         <Navigation_item>
-          <Navigation_link to="/dashboard" activeClassName="active">
+          <Navigation_link to="/reports" activeClassName="active">
             <Icon name="bar_chart" />
             <Link_label>Reports</Link_label>
           </Navigation_link>
