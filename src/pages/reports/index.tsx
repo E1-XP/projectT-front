@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import styled from "styled-components";
+import startOfWeek from "date-fns/startOfWeek";
+import endOfWeek from "date-fns/endOfWeek";
+
 import { Icon } from "../../components/icon";
 
 import {
@@ -9,6 +12,21 @@ import {
   whiteGrey,
 } from "../../styles/variables";
 import { getBP } from "./../../styles/helpers";
+
+enum periods {
+  WEEK,
+}
+
+enum readable {
+  WEEK = "This Week",
+}
+
+export interface State {
+  startDate: Date;
+  endDate: Date;
+  readable: string;
+  type: number;
+}
 
 const Wrapper = styled.div`
   width: 100%;
@@ -78,19 +96,20 @@ const Period_selection = styled.div`
   display: flex;
 `;
 
-const Screen_blocker = styled.div`
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: transparent;
-  width: 100%;
-  height: 100%;
-  z-index: 50;
-`;
-
 export const Reports = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [state, setState] = useState({
+    startDate: startOfWeek(Date.now(), { weekStartsOn: 1 }),
+    endDate: endOfWeek(Date.now(), { weekStartsOn: 1 }),
+    readable: readable.WEEK,
+    type: periods.WEEK,
+  });
+
+  const toggleCalendar = useCallback(
+    () => setIsCalendarOpen(!isCalendarOpen),
+    [isCalendarOpen]
+  );
+  const closeCalendar = useCallback(() => setIsCalendarOpen(false), []);
 
   return (
     <Wrapper>
@@ -98,7 +117,8 @@ export const Reports = () => {
         <Header>
           <Heading>Reports</Heading>
           <Heading_section>
-            <Item_link_border>
+            <Item_link_border onClick={toggleCalendar}>
+              {state.readable}
               <Icon
                 name={isCalendarOpen ? "close" : "arrow_drop_down"}
                 fill={isCalendarOpen ? darkGrey : greyWhite}
@@ -113,7 +133,6 @@ export const Reports = () => {
                 <Icon name="keyboard_arrow_right" />
               </Item_link_hover>
             </Period_selection>
-            {isCalendarOpen && <Screen_blocker />}
           </Heading_section>
         </Header>
       </Chart_section>
