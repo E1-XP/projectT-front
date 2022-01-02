@@ -1,3 +1,6 @@
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+
 export const libraryStyles = `
 .rc-tooltip.rc-tooltip-zoom-enter,
 .rc-tooltip.rc-tooltip-zoom-leave {
