@@ -3,6 +3,9 @@ import styled from "styled-components";
 import startOfWeek from "date-fns/startOfWeek";
 import endOfWeek from "date-fns/endOfWeek";
 
+import { Calendar } from "./calendar";
+import { PeriodChart } from "./periodChart";
+import { ProjectChart } from "./projectChart";
 import { Icon } from "../../components/icon";
 
 import {
@@ -96,6 +99,17 @@ const Period_selection = styled.div`
   display: flex;
 `;
 
+const Screen_blocker = styled.div`
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+`;
+
 export const Reports = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [state, setState] = useState({
@@ -133,8 +147,12 @@ export const Reports = () => {
                 <Icon name="keyboard_arrow_right" />
               </Item_link_hover>
             </Period_selection>
+            {isCalendarOpen && <Screen_blocker onClick={closeCalendar} />}
+            {isCalendarOpen && <Calendar state={state} />}
           </Heading_section>
         </Header>
+        <PeriodChart periodState={state} />
+        <ProjectChart periodState={state} />
       </Chart_section>
     </Wrapper>
   );
