@@ -101,7 +101,7 @@ export const WeekCounter = ({}: Props) => {
   const projects = useStoreSelector((store) => store.user.projects);
   const getProjectColor = (name: string) => {
     const color = projects.find((project) => project.name === name)?.color;
-    return color ? `#${color}` : greyWhiteDarker;
+    return color || greyWhiteDarker;
   };
 
   const entriesByDays = useStoreSelector(groupEntriesByDays);

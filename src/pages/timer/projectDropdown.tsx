@@ -143,8 +143,8 @@ export const ProjectDropdown = ({
     <>
       {currentProject && (
         <Item_link onClick={openMenu}>
-          <Color_indicator color={`#${currentProject?.color}`} />
-          <Item_project color={`#${currentProject?.color}`}>
+          <Color_indicator color={currentProject?.color} />
+          <Item_project color={currentProject?.color}>
             {currentProject.name}
           </Item_project>
         </Item_link>
@@ -179,7 +179,7 @@ export const ProjectDropdown = ({
                     }}
                   >
                     <Item_link>
-                      <Color_indicator color={`#${project?.color}`} />
+                      <Color_indicator color={project?.color} />
                       {project.name}
                     </Item_link>
                   </Item>
