@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import {
   PieChart,
@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import intervalToDuration from "date-fns/intervalToDuration";
 
 import { useStoreSelector } from "../../hooks";
 import {
@@ -16,8 +17,14 @@ import {
   SingleDay,
 } from "../../selectors/groupEntriesByDays";
 import { State } from ".";
+import { formatDuration } from "./../../helpers";
 
-import { greyWhiteDarker } from "../../styles/variables";
+import {
+  greyWhite,
+  greyWhiteDarker,
+  white,
+  whiteGrey,
+} from "../../styles/variables";
 
 interface Props {
   periodState: State;
@@ -37,14 +44,14 @@ const List_item = styled.li`
   display: flex;
   justify-content: space-between;
   padding: 0.5rem;
-  background-color: ${(props: any) =>
-    props.value === props.state ? "#efeb97" : "#fff"};
+  background-color: ${(props: { isCurrentItem: boolean }) =>
+    props.isCurrentItem ? "#efeb97" : white};
 `;
 
 const Wrapper = styled.section`
   width: 100%;
   height: 300px;
-  background-color: #fff;
+  background-color: ${white};
   margin-top: 2rem;
   margin-bottom: 4rem;
   box-shadow: 0 1px 3px rgba(128, 128, 128, 0.2);
@@ -64,25 +71,26 @@ const Overlay = styled.div`
   justify-content: center;
   align-items: center;
   font-weight: 700;
-  color: #bbb;
-  font-size: 18px;
+  color: ${whiteGrey};
+  font-size: 1.125rem;
   opacity: ${(props: { isVisible: boolean }) => (props.isVisible ? 1 : 0)};
   pointer-events: none;
 `;
 
 const rotateAnim = keyframes`
-    from{
+    from {
         transform:rotate(0deg);
     }
-    to{
+
+    to {
         transform:rotate(360deg);
     }
 `;
 
 const Spinner = styled.span`
-  width: 50px;
-  height: 50px;
-  border: 3px solid #ddd;
+  width: 3.125rem;
+  height: 3.125rem;
+  border: 3px solid ${greyWhite};
   border-right: 3px solid transparent;
   border-radius: 50%;
   transform: translateZ(0);
@@ -92,32 +100,113 @@ const Spinner = styled.span`
 export const ProjectChart = ({ periodState }: Props) => {
   const { startDate, endDate } = periodState;
 
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const [hoveredProject, setHoveredProject] = useState("");
+
+  const onMouseEnter = useCallback((payload, idx) => {
+    setHoveredProject(payload.name);
+    setActiveIdx(idx);
+  }, []);
+  const onMouseLeave = useCallback(() => setHoveredProject(""), []);
+
+  const { isLoading, isFetching } = useStoreSelector((state) => state.global);
   const entriesByDays = useStoreSelector(groupEntriesByDays);
   const projects = useStoreSelector((store) => store.user.projects);
 
   const periodFilter = ({ start, stop }: SingleDay) =>
     start >= startDate.getTime() && stop <= endDate.getTime();
-  const entriesByDaysArr = Object.values(entriesByDays).filter(periodFilter);
+  const periodDaysArr = Object.values(entriesByDays).filter(periodFilter);
 
-  const periodProjectDurations = entriesByDaysArr.reduce((acc, day) => {
-    Object.entries(day.projects).map(([name, value]) => {
-      const getFill = () =>
-        projects.find((project) => project.name === name)?.color ||
-        greyWhiteDarker;
-      const foundProjectIdx = acc.findIndex((project) => project.name === name);
+  const getNoProjectDuration = () =>
+    periodDaysArr.reduce((acc, day) => {
+      return (acc += day.entries
+        .filter((entry) => !entry.project)
+        .reduce((acc, { start, stop }) => (acc += stop - start), 0));
+    }, 0);
 
-      if (foundProjectIdx !== -1) {
-        acc[foundProjectIdx].totalDuration += value.totalDuration;
-      } else {
-        acc.push({ ...value, name, fill: getFill() });
-      }
-    });
-    return acc;
-  }, [] as (GroupedEntries & { name: string; fill: string })[]);
+  const noProjectDuration = {
+    name: "no project",
+    fill: greyWhiteDarker,
+    totalDuration: getNoProjectDuration(),
+  };
+
+  const periodProjectDurations = periodDaysArr.reduce(
+    (acc, day) => {
+      Object.entries(day.projects).map(([name, value]) => {
+        const getFill = () =>
+          projects.find((project) => project.name === name)?.color ||
+          greyWhiteDarker;
+        const foundProjectIdx = acc.findIndex(
+          (project) => project.name === name
+        );
+
+        if (foundProjectIdx !== -1) {
+          acc[foundProjectIdx].totalDuration += value.totalDuration;
+        } else {
+          acc.push({ ...value, name, fill: getFill() });
+        }
+      });
+      return acc;
+    },
+    [noProjectDuration] as (GroupedEntries & { name: string; fill: string })[]
+  );
+
+  const totalPeriodDuration =
+    periodProjectDurations.reduce(
+      (acc, project) => (acc += project.totalDuration),
+      0
+    ) + noProjectDuration.totalDuration;
+
+  const periodContainsData = !!totalPeriodDuration;
+
+  const getSelectedDuration = () => {
+    const projectSelected = periodProjectDurations.find(
+      (project) => project.name === hoveredProject
+    );
+
+    return projectSelected
+      ? projectSelected.totalDuration
+      : totalPeriodDuration;
+  };
+
+  const customLegend = ({ payload }: any) => (
+    <ul>
+      {payload
+        .filter((item: any) => item.payload.totalDuration)
+        .map((item: any, i: number) => (
+          <List_item
+            isCurrentItem={hoveredProject === item.value}
+            value={item.value}
+            key={`${i}-${item.value}`}
+          >
+            <span>
+              <Color_Indicator color={item.color} />
+              {item.value}
+            </span>
+            <span>
+              {formatDuration(
+                intervalToDuration({
+                  start: 0,
+                  end: item.payload.totalDuration,
+                })
+              )}
+            </span>
+          </List_item>
+        ))}
+    </ul>
+  );
 
   return (
     <Wrapper>
-      <Overlay isVisible={false}></Overlay>
+      <Overlay isVisible={isLoading || isFetching || !periodContainsData}>
+        {isLoading ? (
+          <Spinner />
+        ) : periodContainsData ? (
+          ""
+        ) : (
+          "No data available"
+        )}
+      </Overlay>
       <ResponsiveContainer>
         <PieChart width={700} height={300}>
           <Pie
@@ -127,24 +216,28 @@ export const ProjectChart = ({ periodState }: Props) => {
             cx={"55%"}
             outerRadius={140}
             dataKey="totalDuration"
-            // onMouseEnter={handleMouseEnter}
-            // onMouseLeave={handleMouseLeave}
-            // activeIndex={activeIdx}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+            activeIndex={activeIdx}
           >
-            {periodProjectDurations.map((project, i) => (
+            {periodProjectDurations.map((project) => (
               <Cell
                 key={project.name}
-                // style={{ opacity: hoveredItem === itm.name ? ".7" : "1" }}
+                style={{
+                  opacity: hoveredProject === project.name ? ".7" : "1",
+                }}
               />
             ))}
             <Label
-              //   value={labelValue}
+              value={formatDuration(
+                intervalToDuration({ start: 0, end: getSelectedDuration() })
+              )}
               position="center"
               style={{ fontSize: "26px" }}
             />
           </Pie>
           <Legend
-            // content={}
+            content={customLegend}
             layout="vertical"
             align="left"
             verticalAlign="middle"
