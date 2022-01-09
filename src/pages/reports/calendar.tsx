@@ -1,6 +1,15 @@
-import React from "react";
+import React, { useCallback } from "react";
 import styled from "styled-components";
 import { DateRange } from "react-date-range";
+import startOfWeek from "date-fns/startOfWeek";
+import endOfWeek from "date-fns/endOfWeek";
+import startOfDay from "date-fns/startOfDay";
+import endOfDay from "date-fns/endOfDay";
+import startOfMonth from "date-fns/startOfMonth";
+import endOfMonth from "date-fns/endOfMonth";
+import startOfYear from "date-fns/startOfYear";
+import endOfYear from "date-fns/endOfYear";
+import sub from "date-fns/sub";
 
 import {
   black,
@@ -9,10 +18,12 @@ import {
   whiteGrey,
 } from "../../styles/variables";
 
-import { State } from ".";
+import { State } from "./";
+import { readable, getPeriodTime } from "./helpers";
 
 interface Props {
   state: State;
+  setState: (args: State) => void;
 }
 
 const Wrapper = styled.div`
@@ -86,16 +97,31 @@ const dateRangeTheme = {
   },
 };
 
-export const Calendar = ({ state }: Props) => {
+export const Calendar = ({ state, setState }: Props) => {
   const { startDate, endDate } = state;
-  const setToday = () => 0;
-  const setThisWeek = () => 0;
-  const setThisMonth = () => 0;
-  const setThisYear = () => 0;
-  const setYesterday = () => 0;
-  const setLastWeek = () => 0;
-  const setLastMonth = () => 0;
-  const setLastYear = () => 0;
+
+  const setPeriod = useCallback(
+    (period: readable) => {
+      const [startDate, endDate, type] = getPeriodTime()[period];
+
+      setState({
+        startDate,
+        endDate,
+        readable: period,
+        type,
+      });
+    },
+    [state]
+  );
+
+  const setToday = useCallback(() => setPeriod(readable.TODAY), []);
+  const setThisWeek = useCallback(() => setPeriod(readable.THIS_WEEK), []);
+  const setThisMonth = useCallback(() => setPeriod(readable.THIS_MONTH), []);
+  const setThisYear = useCallback(() => setPeriod(readable.THIS_YEAR), []);
+  const setYesterday = useCallback(() => setPeriod(readable.YESTERDAY), []);
+  const setLastWeek = useCallback(() => setPeriod(readable.LAST_WEEK), []);
+  const setLastMonth = useCallback(() => setPeriod(readable.LAST_MONTH), []);
+  const setLastYear = useCallback(() => setPeriod(readable.LAST_YEAR), []);
 
   return (
     <Wrapper>

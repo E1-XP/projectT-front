@@ -2,11 +2,20 @@ import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import startOfWeek from "date-fns/startOfWeek";
 import endOfWeek from "date-fns/endOfWeek";
+import add from "date-fns/add";
+import sub from "date-fns/sub";
 
 import { Calendar } from "./calendar";
 import { PeriodChart } from "./periodChart";
 import { ProjectChart } from "./projectChart";
 import { Icon } from "../../components/icon";
+
+import {
+  formatCustomReadable,
+  getMatchingPeriod,
+  periods,
+  readable,
+} from "./helpers";
 
 import {
   breakPoints,
@@ -16,19 +25,11 @@ import {
 } from "../../styles/variables";
 import { getBP } from "./../../styles/helpers";
 
-enum periods {
-  WEEK,
-}
-
-enum readable {
-  WEEK = "This Week",
-}
-
 export interface State {
   startDate: Date;
   endDate: Date;
-  readable: string;
-  type: number;
+  readable: readable | string;
+  type: periods;
 }
 
 const Wrapper = styled.div`
@@ -110,12 +111,14 @@ const Screen_blocker = styled.div`
   z-index: 50;
 `;
 
+export type PeriodTimes = Record<string, Date[]>;
+
 export const Reports = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [state, setState] = useState({
+  const [state, setState] = useState<State>({
     startDate: startOfWeek(Date.now(), { weekStartsOn: 1 }),
     endDate: endOfWeek(Date.now(), { weekStartsOn: 1 }),
-    readable: readable.WEEK,
+    readable: readable.THIS_WEEK,
     type: periods.WEEK,
   });
 
@@ -124,6 +127,48 @@ export const Reports = () => {
     [isCalendarOpen]
   );
   const closeCalendar = useCallback(() => setIsCalendarOpen(false), []);
+
+  const goToNextPeriod = useCallback(() => {
+    if (state.type === periods.CUSTOM) console.log("TODO");
+
+    const periodKey = `${state.type.toLowerCase()}s`;
+
+    const startDate = add(state.startDate, { [periodKey]: 1 });
+    const endDate = add(state.endDate, { [periodKey]: 1 });
+    const readable = formatCustomReadable(
+      { startDate, endDate },
+      getMatchingPeriod({ startDate, endDate })
+    );
+    const type = state.type;
+
+    setState({
+      startDate,
+      endDate,
+      readable,
+      type,
+    });
+  }, [state]);
+
+  const goToPreviousPeriod = useCallback(() => {
+    if (state.type === periods.CUSTOM) console.log("TODO");
+
+    const periodKey = `${state.type.toLowerCase()}s`;
+
+    const startDate = sub(state.startDate, { [periodKey]: 1 });
+    const endDate = sub(state.endDate, { [periodKey]: 1 });
+    const readable = formatCustomReadable(
+      { startDate, endDate },
+      getMatchingPeriod({ startDate, endDate })
+    );
+    const type = state.type;
+
+    setState({
+      startDate,
+      endDate,
+      readable,
+      type,
+    });
+  }, [state]);
 
   return (
     <Wrapper>
@@ -140,15 +185,15 @@ export const Reports = () => {
               />
             </Item_link_border>
             <Period_selection>
-              <Item_link_hover>
+              <Item_link_hover onClick={goToPreviousPeriod}>
                 <Icon name="keyboard_arrow_left" />
               </Item_link_hover>
-              <Item_link_hover>
+              <Item_link_hover onClick={goToNextPeriod}>
                 <Icon name="keyboard_arrow_right" />
               </Item_link_hover>
             </Period_selection>
             {isCalendarOpen && <Screen_blocker onClick={closeCalendar} />}
-            {isCalendarOpen && <Calendar state={state} />}
+            {isCalendarOpen && <Calendar state={state} setState={setState} />}
           </Heading_section>
         </Header>
         <PeriodChart periodState={state} />
