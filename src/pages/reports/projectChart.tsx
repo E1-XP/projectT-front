@@ -20,6 +20,7 @@ import { State } from ".";
 import { formatDuration } from "./../../helpers";
 
 import {
+  darkGrey,
   greyWhite,
   greyWhiteDarker,
   white,
@@ -71,7 +72,7 @@ const Overlay = styled.div`
   justify-content: center;
   align-items: center;
   font-weight: 700;
-  color: ${whiteGrey};
+  color: ${greyWhiteDarker};
   font-size: 1.125rem;
   opacity: ${(props: { isVisible: boolean }) => (props.isVisible ? 1 : 0)};
   pointer-events: none;
@@ -204,7 +205,7 @@ export const ProjectChart = ({ periodState }: Props) => {
         ) : periodContainsData ? (
           ""
         ) : (
-          "No data available"
+          "No data available for this period"
         )}
       </Overlay>
       <ResponsiveContainer>

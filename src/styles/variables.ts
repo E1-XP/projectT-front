@@ -14,3 +14,4 @@ export const darkGrey = `rgb(50, 50, 50)`;
 export const black = `rgb(0, 0, 0)`;
 export const red = `#e20505`;
 export const green = `#4bc800`;
+export const blue = `#45aaf2`;
