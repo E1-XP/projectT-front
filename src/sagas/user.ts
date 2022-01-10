@@ -12,15 +12,20 @@ import { groupEntriesByDays, SingleDay } from "../selectors/groupEntriesByDays";
 
 import { request } from "../helpers/request";
 
-const entriesRequest = async (userId: string, beginAt: number) => {
-  const URL = `${config.API_URL}/users/${userId}/entries?begin=${beginAt}`;
+const entriesRequest = async (
+  userId: string,
+  beginAt: number,
+  endAt?: number
+) => {
+  const queryStr = `?begin=${beginAt}`.concat(endAt ? `&end=${endAt}` : ``);
+  const URL = `${config.API_URL}/users/${userId}/entries${queryStr}`;
 
   return await request(URL, {
     credentials: "include",
   });
 };
 
-export function* fetchEntries(action: Action) {
+export function* fetchEntries(action: PayloadAction<number | undefined>) {
   try {
     const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
       (state) => state.user.userData
@@ -41,7 +46,8 @@ export function* fetchEntries(action: Action) {
     const response: FetchResponse = yield call(
       entriesRequest,
       userId,
-      startOfPreviousDay
+      startOfPreviousDay,
+      action.payload
     );
     if (response.status === 200) {
       const data: Entry[] = yield response.json();
