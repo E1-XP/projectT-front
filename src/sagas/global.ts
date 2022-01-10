@@ -1,6 +1,10 @@
 import { put, call, SagaReturnType, select } from "redux-saga/effects";
 import { PayloadAction, Action } from "@reduxjs/toolkit";
-import { push } from "connected-react-router";
+import {
+  push,
+  LOCATION_CHANGE,
+  LocationChangeAction,
+} from "connected-react-router";
 import pickBy from "lodash/fp/pickBy";
 import mapValues from "lodash/fp/mapValues";
 
@@ -20,6 +24,7 @@ import { UserData, Entry, Project } from "./../store/interfaces";
 import { FetchResponse, StoreSelector } from "./helpers";
 
 import { request } from "../helpers/request";
+import { groupEntriesByDays, SingleDay } from "../selectors/groupEntriesByDays";
 
 interface AuthData {
   message: string;
@@ -169,6 +174,29 @@ export function* initLogOut(action: Action) {
     yield put(setUserData(cleanedUserData));
     yield put(setEntries([]));
     yield put(setProjects([]));
+  } catch (e) {
+    yield put(fetchError(e));
+  }
+}
+
+export function* trimEntriesOnTimerRoute(action: LocationChangeAction) {
+  try {
+    if (action.payload.location.pathname !== "/timer") return;
+
+    const DAYS_TO_SHOW = 10;
+
+    const entriesByDays: Record<string, SingleDay> = yield select(
+      groupEntriesByDays
+    );
+    const entriesByDaysArr = Object.values(entriesByDays);
+
+    if (entriesByDaysArr.length <= DAYS_TO_SHOW) return;
+
+    const tenDaysOfEntriesAsArr = entriesByDaysArr
+      .slice(0, DAYS_TO_SHOW)
+      .reduce((acc, day) => acc.concat(day.entries), [] as Entry[]);
+
+    yield put(setEntries(tenDaysOfEntriesAsArr));
   } catch (e) {
     yield put(fetchError(e));
   }

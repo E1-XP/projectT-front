@@ -1,4 +1,5 @@
 import { takeEvery, takeLatest } from "redux-saga/effects";
+import { LOCATION_CHANGE } from "connected-react-router";
 
 import { types } from "../actions/types";
 import {
@@ -7,6 +8,7 @@ import {
   initReAuth,
   requestError,
   requestUserData,
+  trimEntriesOnTimerRoute,
 } from "./global";
 import { handleRunningEntry, startTimerInterval } from "./timer";
 import {
@@ -32,4 +34,5 @@ export function* rootSaga() {
   yield takeEvery(types.ENTRY_INIT_DELETE, removeEntry);
   yield takeEvery(types.ENTRY_DELETE_CURRENT, removeRunningEntry);
   yield takeLatest(types.TIMER_HANDLE_RUNNING_ENTRY, handleRunningEntry);
+  yield takeLatest(LOCATION_CHANGE, trimEntriesOnTimerRoute);
 }
