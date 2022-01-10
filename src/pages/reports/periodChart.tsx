@@ -12,44 +12,50 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import { ContentType } from "recharts/types/component/Label";
+import { ContentType as CType } from "recharts/types/component/DefaultLegendContent";
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import intervalToDuration from "date-fns/intervalToDuration";
 import addDays from "date-fns/addDays";
 import isSameDay from "date-fns/isSameDay";
+import isSameMonth from "date-fns/isSameMonth";
 import format from "date-fns/format";
 import pipe from "lodash/fp/pipe";
 
 import { formatDuration } from "./../../helpers";
+import { periods } from "./helpers";
 
 import { useStoreSelector } from "../../hooks";
 import {
   groupEntriesByDays,
   SingleDay,
 } from "../../selectors/groupEntriesByDays";
-
 import { State } from "./index";
-import { ContentType } from "recharts/types/component/Label";
-import { ContentType as CType } from "recharts/types/component/DefaultLegendContent";
+
+import {
+  blue,
+  darkGrey,
+  greyWhite,
+  greyWhiteDarker,
+  white,
+  whiteGrey,
+} from "../../styles/variables";
 
 interface Props {
   periodState: State;
 }
-
-const Chart_header = styled.div`
-  padding: 1rem;
-  float: right;
-`;
 
 const Wrapper = styled.section`
   margin-top: 1rem;
   width: 100%;
   height: 350px;
   position: relative;
+
   > div > div {
     box-shadow: 0 1px 3px rgba(128, 128, 128, 0.2);
     height: 281px !important;
-    border-bottom: 2px solid #888;
-    background-color: #fff;
+    border-bottom: 2px solid ${greyWhiteDarker};
+    background-color: ${white};
   }
 `;
 
@@ -66,8 +72,8 @@ const Overlay = styled.div`
   justify-content: center;
   align-items: center;
   font-weight: 700;
-  color: #bbb;
-  font-size: 18px;
+  color: ${greyWhiteDarker};
+  font-size: 1.125rem;
   opacity: ${(props: { isVisible: boolean }) => (props.isVisible ? 1 : 0)};
   pointer-events: none;
 `;
@@ -84,7 +90,7 @@ const rotateAnim = keyframes`
 const Spinner = styled.span`
   width: 50px;
   height: 50px;
-  border: 3px solid #ddd;
+  border: 3px solid ${whiteGrey};
   border-right: 3px solid transparent;
   border-radius: 50%;
   transform: translateZ(0);
@@ -92,11 +98,11 @@ const Spinner = styled.span`
 `;
 
 const Ttip = styled.div`
-  background-color: #fff;
-  border: 1px solid #ddd;
+  background-color: ${white};
+  border: 1px solid ${whiteGrey};
   padding: 0.3rem 0.6rem;
   color: ${(props: { hasValue: boolean }) =>
-    props.hasValue ? "#45aaf2" : "#333"};
+    props.hasValue ? blue : darkGrey};
 `;
 
 interface ICustomTooltip {
@@ -107,41 +113,39 @@ interface ICustomTooltip {
 const formatTotalDuration = (val: number) =>
   pipe(intervalToDuration, formatDuration)({ start: 0, end: val });
 
-const getCustomTick: CType = ({
-  x,
-  y,
-  width,
-  height,
-  stroke,
-  payload,
-}: any) => {
-  return (
-    <g>
-      <text
-        x={x}
-        y={(y as number) + 15}
-        textAnchor="middle"
-        style={{
-          fontSize: "13px",
-          fontWeight: 700,
-        }}
-      >
-        {format(payload.value, "E")}
-      </text>
-      <text
-        style={{
-          fontSize: "13px",
-          fontWeight: 400,
-        }}
-        x={x}
-        y={(y as number) + 35}
-        textAnchor="middle"
-      >
-        {format(payload.value, "M/d")}
-      </text>
-    </g>
-  );
-};
+const getCustomTick =
+  (type: periods) =>
+  (args: any): CType => {
+    const { x, y, width, height, stroke, payload } = args;
+    const isDisplayingYear = type === periods.YEAR;
+
+    return (
+      <g>
+        <text
+          x={x}
+          y={(y as number) + 15}
+          textAnchor="middle"
+          style={{
+            fontSize: "13px",
+            fontWeight: 700,
+          }}
+        >
+          {format(payload.value, isDisplayingYear ? "MMMM" : "E")}
+        </text>
+        <text
+          style={{
+            fontSize: "13px",
+            fontWeight: 400,
+          }}
+          x={x}
+          y={(y as number) + 35}
+          textAnchor="middle"
+        >
+          {format(payload.value, isDisplayingYear ? "Y" : "M/d")}
+        </text>
+      </g>
+    );
+  };
 
 const getCustomLabel: ContentType = ({ value, x, y, width, height }) =>
   value !== 0 && (
@@ -151,14 +155,14 @@ const getCustomLabel: ContentType = ({ value, x, y, width, height }) =>
         y={(y as number) - 40}
         width={width}
         height={25}
-        style={{ fill: "white", stroke: "#ddd" }}
+        style={{ fill: white, stroke: greyWhite }}
       />
       <text
         x={(x as number) + (width as number) / 2}
         y={(y as number) - 22.5}
         textAnchor="middle"
         style={{ fontSize: "13px" }}
-        fill={"#45aaf2"}
+        fill={blue}
       >
         {formatTotalDuration(value as number)}
       </text>
@@ -169,17 +173,18 @@ const CustomTooltip = ({ isActive, totalDuration }: ICustomTooltip) =>
   isActive ? <Ttip hasValue={!!totalDuration}>{totalDuration}</Ttip> : null;
 
 export const PeriodChart = ({ periodState }: Props) => {
-  const { startDate, endDate } = periodState;
+  const { startDate, endDate, type } = periodState;
 
+  const { isLoading, isFetching } = useStoreSelector((state) => state.global);
   const entriesByDays = useStoreSelector(groupEntriesByDays);
 
   const periodFilter = ({ start, stop }: SingleDay) =>
     start >= startDate.getTime() && stop <= endDate.getTime();
   const entriesByDaysArr = Object.values(entriesByDays).filter(periodFilter);
-  const periodDayDiff = differenceInCalendarDays(endDate, startDate);
-  console.log(periodDayDiff);
 
-  const periodDays = new Array(periodDayDiff + 1)
+  const periodDayDiff = differenceInCalendarDays(endDate, startDate);
+
+  const periodInDays = new Array(periodDayDiff + 1)
     .fill({})
     .map(() => ({
       totalDuration: 0,
@@ -193,24 +198,59 @@ export const PeriodChart = ({ periodState }: Props) => {
       return foundItem || { ...item, start: theoreticalDay.getTime() };
     });
 
+  const getPeriodInMonths = () =>
+    periodInDays.reduce((acc, day) => {
+      const existingMonthIdx = acc.findIndex((item) =>
+        isSameMonth(day.start, item.start)
+      );
+
+      if (existingMonthIdx > -1) {
+        const totalDuration = (acc[existingMonthIdx].totalDuration +=
+          day.totalDuration);
+
+        acc[existingMonthIdx] = { ...acc[existingMonthIdx], totalDuration };
+      } else acc.push(day);
+
+      return acc;
+    }, [] as typeof periodInDays);
+
+  const dataSrc = type === periods.YEAR ? getPeriodInMonths() : periodInDays;
+
+  const xAxisInterval = (numberOfDays: number) =>
+    numberOfDays > 7
+      ? type === periods.YEAR
+        ? 1
+        : numberOfDays > 14
+        ? 4
+        : (numberOfDays % 7) + 1
+      : 0;
+
+  const periodContainsData = !!periodInDays.length;
+
   return (
     <Wrapper>
-      <Overlay isVisible={false}>
-        {true ? <Spinner /> : "No data available"}
+      <Overlay isVisible={isLoading || isFetching || !periodContainsData}>
+        {isLoading ? (
+          <Spinner />
+        ) : periodContainsData ? (
+          ""
+        ) : (
+          "No data available"
+        )}
       </Overlay>
       <ResponsiveContainer>
         <BarChart
-          data={periodDays}
+          data={dataSrc}
           barCategoryGap={5}
           margin={{ top: 30, right: 30, left: 50, bottom: 10 }}
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis
-            interval={0}
+            interval={xAxisInterval(dataSrc.length)}
             tickLine={false}
             dataKey="start"
             height={60}
-            tick={getCustomTick as any}
+            tick={getCustomTick(type) as any}
           />
           {!false && (
             <Tooltip
@@ -221,7 +261,7 @@ export const PeriodChart = ({ periodState }: Props) => {
           )}
           <Bar
             dataKey="totalDuration"
-            // data={periodDays}
+            // data={dataSrc}
             isAnimationActive={false}
             maxBarSize={100}
             minPointSize={4}
@@ -233,15 +273,15 @@ export const PeriodChart = ({ periodState }: Props) => {
                 content={getCustomLabel}
               />
             )}
-            {periodDays.map((day, i) => (
+            {dataSrc.map((item, i) => (
               <Cell
-                fill={day.totalDuration ? "#45aaf2" : "#999"}
-                key={`${i}-${day.totalDuration}`}
+                fill={item.totalDuration ? blue : greyWhiteDarker}
+                key={`${i}-${item.totalDuration}`}
               />
             ))}
           </Bar>
           <YAxis
-            stroke="#ccc"
+            stroke={greyWhite}
             orientation="right"
             axisLine={false}
             mirror={false}
