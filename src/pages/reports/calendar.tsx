@@ -1,15 +1,8 @@
 import React, { useCallback } from "react";
 import styled from "styled-components";
 import { DateRange } from "react-date-range";
-import startOfWeek from "date-fns/startOfWeek";
-import endOfWeek from "date-fns/endOfWeek";
-import startOfDay from "date-fns/startOfDay";
-import endOfDay from "date-fns/endOfDay";
-import startOfMonth from "date-fns/startOfMonth";
-import endOfMonth from "date-fns/endOfMonth";
-import startOfYear from "date-fns/startOfYear";
-import endOfYear from "date-fns/endOfYear";
-import sub from "date-fns/sub";
+
+import { fetchEntries } from "../../actions/user";
 
 import {
   black,
@@ -21,9 +14,12 @@ import {
 import { State } from "./";
 import { readable, getPeriodTime } from "./helpers";
 
+import { useStoreDispatch } from "../../hooks";
+
 interface Props {
   state: State;
   setState: (args: State) => void;
+  closeCalendar: () => any;
 }
 
 const Wrapper = styled.div`
@@ -97,7 +93,9 @@ const dateRangeTheme = {
   },
 };
 
-export const Calendar = ({ state, setState }: Props) => {
+export const Calendar = ({ state, setState, closeCalendar }: Props) => {
+  const dispatch = useStoreDispatch();
+
   const { startDate, endDate } = state;
 
   const setPeriod = useCallback(
@@ -110,6 +108,9 @@ export const Calendar = ({ state, setState }: Props) => {
         readable: period,
         type,
       });
+
+      dispatch(fetchEntries(startDate.getTime()));
+      closeCalendar();
     },
     [state]
   );

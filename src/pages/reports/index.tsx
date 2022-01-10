@@ -17,12 +17,16 @@ import {
   readable,
 } from "./helpers";
 
+import { useStoreDispatch } from "../../hooks";
+import { fetchEntries } from "../../actions/user";
+
 import {
   breakPoints,
   darkGrey,
   greyWhite,
   whiteGrey,
 } from "../../styles/variables";
+
 import { getBP } from "./../../styles/helpers";
 
 export interface State {
@@ -114,6 +118,8 @@ const Screen_blocker = styled.div`
 export type PeriodTimes = Record<string, Date[]>;
 
 export const Reports = () => {
+  const dispatch = useStoreDispatch();
+
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [state, setState] = useState<State>({
     startDate: startOfWeek(Date.now(), { weekStartsOn: 1 }),
@@ -147,6 +153,8 @@ export const Reports = () => {
       readable,
       type,
     });
+
+    dispatch(fetchEntries(startDate.getTime()));
   }, [state]);
 
   const goToPreviousPeriod = useCallback(() => {
@@ -168,6 +176,8 @@ export const Reports = () => {
       readable,
       type,
     });
+
+    dispatch(fetchEntries(startDate.getTime()));
   }, [state]);
 
   return (
@@ -193,7 +203,13 @@ export const Reports = () => {
               </Item_link_hover>
             </Period_selection>
             {isCalendarOpen && <Screen_blocker onClick={closeCalendar} />}
-            {isCalendarOpen && <Calendar state={state} setState={setState} />}
+            {isCalendarOpen && (
+              <Calendar
+                state={state}
+                setState={setState}
+                closeCalendar={closeCalendar}
+              />
+            )}
           </Heading_section>
         </Header>
         <PeriodChart periodState={state} />
