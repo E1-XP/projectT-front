@@ -131,7 +131,8 @@ export const WeekCounter = ({}: Props) => {
     0
   );
 
-  const getWidth = (projectSum: number) => (projectSum / totalDuration) * 100;
+  const getWidth = (projectSum: number) =>
+    totalDuration ? (projectSum / totalDuration) * 100 : 100;
 
   return (
     <Week_counter>
