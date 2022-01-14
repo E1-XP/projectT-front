@@ -42,6 +42,11 @@ export const GlobalStyle = createGlobalStyle`
           props.isUserLoggedIn &&
           `display: flex;
            height: 100%;`}
+
+        ${getBP(breakPoints.verySmall)} {
+            flex-direction: column-reverse;
+            justify-content: space-between;
+         }
     }
 
     ${libraryStyles}

@@ -22,16 +22,27 @@ const Wrapper = styled.section`
   ${getBP(breakPoints.medium, "min")} {
     max-width: 15.62rem;
   }
+
+  ${getBP(breakPoints.verySmall)} {
+    flex-direction: row;
+    justify-content: space-evenly;
+    max-width: initial;
+    height: initial;
+  }
 `;
 
 const Sidebar_profile = styled.section`
-  margin-top: auto;
+  ${getBP(breakPoints.verySmall, "min")} {
+    margin-top: auto;
+  }
 `;
 
 const Sidebar_header = styled.header``;
 
 const Sidebar_navigation = styled.nav`
-  margin-top: 1rem;
+  ${getBP(breakPoints.verySmall, "min")} {
+    margin-top: 1rem;
+  }
 `;
 
 const Navigation_link = styled(NavLink)`
@@ -69,6 +80,15 @@ const Header_link = styled(Link)`
 const Link_label = styled.span`
   display: none;
 
+  ${getBP(breakPoints.verySmall)} {
+    display: block;
+    margin-left: 1rem;
+
+    &:first-of-type {
+      margin: 0;
+    }
+  }
+
   ${getBP(breakPoints.medium, "min")} {
     display: block;
     margin-left: 1rem;
@@ -79,7 +99,11 @@ const Link_label = styled.span`
   }
 `;
 
-const Navigation_list = styled.ul``;
+const Navigation_list = styled.ul`
+  ${getBP(breakPoints.verySmall)} {
+    display: flex;
+  }
+`;
 
 const Navigation_item = styled.li`
   margin: 0.1rem;
