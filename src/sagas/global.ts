@@ -146,7 +146,6 @@ export function* initReAuth(action: Action) {
       yield put(setProjects(userData.projects));
 
       yield put(setIsLoggedIn(true));
-      yield put(push("/timer"));
       yield put(setIsLoading(false));
     } else yield put(setIsLoading(false));
   } catch (e) {
