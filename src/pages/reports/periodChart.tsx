@@ -26,6 +26,8 @@ import { formatDuration } from "./../../helpers";
 import { periods } from "./helpers";
 
 import { useStoreSelector } from "../../hooks";
+import { useWindowSize, State as WindowState } from "../../hooks/useWindowSize";
+
 import {
   groupEntriesByDays,
   SingleDay,
@@ -39,7 +41,9 @@ import {
   greyWhiteDarker,
   white,
   whiteGrey,
+  breakPoints,
 } from "../../styles/variables";
+import { emToPx } from "../../styles/helpers";
 
 interface Props {
   periodState: State;
@@ -114,10 +118,13 @@ const formatTotalDuration = (val: number) =>
   pipe(intervalToDuration, formatDuration)({ start: 0, end: val });
 
 const getCustomTick =
-  (type: periods) =>
+  (type: periods, size: WindowState) =>
   (args: any): CType => {
     const { x, y, width, height, stroke, payload } = args;
     const isDisplayingYear = type === periods.YEAR;
+
+    const isMobile =
+      (size.width || window.innerWidth) < emToPx(breakPoints.small);
 
     return (
       <g>
@@ -130,7 +137,10 @@ const getCustomTick =
             fontWeight: 700,
           }}
         >
-          {format(payload.value, isDisplayingYear ? "MMMM" : "E")}
+          {format(
+            payload.value,
+            isDisplayingYear ? (isMobile ? "MMM" : "MMMM") : "E"
+          )}
         </text>
         <text
           style={{
@@ -174,6 +184,8 @@ const CustomTooltip = ({ isActive, totalDuration }: ICustomTooltip) =>
 
 export const PeriodChart = ({ periodState }: Props) => {
   const { startDate, endDate, type } = periodState;
+
+  const size = useWindowSize();
 
   const { isLoading, isFetching } = useStoreSelector((state) => state.global);
   const entriesByDays = useStoreSelector(groupEntriesByDays);
@@ -250,7 +262,7 @@ export const PeriodChart = ({ periodState }: Props) => {
             tickLine={false}
             dataKey="start"
             height={60}
-            tick={getCustomTick(type) as any}
+            tick={getCustomTick(type, size) as any}
           />
           {!false && (
             <Tooltip

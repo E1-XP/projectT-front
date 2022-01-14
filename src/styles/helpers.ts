@@ -1,6 +1,9 @@
 export const getBP = (width: string, direction = "max") =>
   `@media only screen and (${direction}-width: ${width})`;
 
+export const emToPx = (val: string) =>
+  Number(val.slice(undefined, val.length - 3)) * 16;
+
 export const visuallyHidden = `
   clip: rect(1px, 1px, 1px, 1px);
   clip-path: inset(50%);
