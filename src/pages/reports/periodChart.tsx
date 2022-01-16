@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import {
   BarChart,
@@ -42,6 +42,7 @@ import {
   white,
   whiteGrey,
   breakPoints,
+  black,
 } from "../../styles/variables";
 import { emToPx } from "../../styles/helpers";
 
@@ -60,6 +61,10 @@ const Wrapper = styled.section`
     height: 281px !important;
     border-bottom: 2px solid ${greyWhiteDarker};
     background-color: ${white};
+  }
+
+  .recharts-surface {
+    overflow: visible;
   }
 `;
 
@@ -100,19 +105,6 @@ const Spinner = styled.span`
   transform: translateZ(0);
   animation: ${rotateAnim} 0.5s linear infinite;
 `;
-
-const Ttip = styled.div`
-  background-color: ${white};
-  border: 1px solid ${whiteGrey};
-  padding: 0.3rem 0.6rem;
-  color: ${(props: { hasValue: boolean }) =>
-    props.hasValue ? blue : darkGrey};
-`;
-
-interface ICustomTooltip {
-  isActive: boolean;
-  totalDuration: number;
-}
 
 const formatTotalDuration = (val: number) =>
   pipe(intervalToDuration, formatDuration)({ start: 0, end: val });
@@ -157,34 +149,81 @@ const getCustomTick =
     );
   };
 
-const getCustomLabel: ContentType = ({ value, x, y, width, height }) =>
-  value !== 0 && (
+interface SingleDayExtract {
+  start: number;
+  totalDuration: number;
+}
+
+const getCustomLabel: (
+  hoveredBarStartDate: number,
+  dataSrc: SingleDayExtract[]
+) => ContentType = (hoveredBarStartDate, dataSrc) => (props: any) => {
+  const { value, x, y, width, height, index } = props;
+
+  const rectWidth = width * 2;
+  const idx = dataSrc.findIndex((data) => data.start === hoveredBarStartDate);
+  const isHovered = idx === index;
+
+  return isHovered ? (
     <>
       <rect
-        x={x}
-        y={(y as number) - 40}
-        width={width}
-        height={25}
+        x={x - width / 2}
+        y={y - 70}
+        width={rectWidth}
+        height={60}
+        rx="5px"
+        ry="5px"
+        strokeLinejoin="round"
         style={{ fill: white, stroke: greyWhite }}
       />
+      <foreignObject x={x + width / 2} y={y - 11} width={10} height={10}>
+        <div
+          style={{
+            width: 0,
+            height: 0,
+            borderStyle: "solid",
+            borderWidth: "10px 5px 0 5px",
+            borderColor: `${greyWhite} transparent transparent transparent`,
+          }}
+        />
+      </foreignObject>
+      <foreignObject x={x + width / 2} y={y - 13} width={10} height={10}>
+        <div
+          style={{
+            width: 0,
+            height: 0,
+            borderStyle: "solid",
+            borderWidth: "10px 5px 0 5px",
+            borderColor: `${white} transparent transparent transparent`,
+          }}
+        />
+      </foreignObject>
       <text
-        x={(x as number) + (width as number) / 2}
-        y={(y as number) - 22.5}
+        x={x + width / 2}
+        y={y - 48}
         textAnchor="middle"
-        style={{ fontSize: "13px" }}
-        fill={blue}
+        style={{ fontSize: "12px" }}
+        fill={black}
       >
-        {formatTotalDuration(value as number)}
+        {format(dataSrc[idx].start, "EEEE, LLLL do")}
+      </text>
+      <text
+        x={x + width / 2}
+        y={y - 25}
+        textAnchor="middle"
+        style={{ fontSize: "12px" }}
+        fill={black}
+      >
+        {`Total: ${formatTotalDuration(value)}`}
       </text>
     </>
-  );
-
-const CustomTooltip = ({ isActive, totalDuration }: ICustomTooltip) =>
-  isActive ? <Ttip hasValue={!!totalDuration}>{totalDuration}</Ttip> : null;
+  ) : null;
+};
 
 export const PeriodChart = ({ periodState }: Props) => {
   const { startDate, endDate, type } = periodState;
 
+  const [hoveredBarStartDate, setHoveredBarStartDate] = useState(0);
   const size = useWindowSize();
 
   const { isLoading, isFetching } = useStoreSelector((state) => state.global);
@@ -264,27 +303,21 @@ export const PeriodChart = ({ periodState }: Props) => {
             height={60}
             tick={getCustomTick(type, size) as any}
           />
-          {!false && (
-            <Tooltip
-              cursor={false}
-              isAnimationActive={false}
-              content={<CustomTooltip isActive={true} totalDuration={0} />}
-            />
-          )}
           <Bar
             dataKey="totalDuration"
-            // data={dataSrc}
             isAnimationActive={false}
             maxBarSize={100}
             minPointSize={4}
+            onMouseEnter={(p: any) => setHoveredBarStartDate(p.start)}
+            onMouseLeave={() => setHoveredBarStartDate(0)}
           >
-            {true && (
+            {
               <LabelList
                 dataKey="totalDuration"
                 position="top"
-                content={getCustomLabel}
+                content={getCustomLabel(hoveredBarStartDate, dataSrc)}
               />
-            )}
+            }
             {dataSrc.map((item, i) => (
               <Cell
                 fill={item.totalDuration ? blue : greyWhiteDarker}
