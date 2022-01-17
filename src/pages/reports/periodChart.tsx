@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import {
   BarChart,
@@ -109,7 +109,7 @@ const Spinner = styled.span`
 const formatTotalDuration = (val: number) =>
   pipe(intervalToDuration, formatDuration)({ start: 0, end: val });
 
-const getCustomTick =
+const getXAxisTick =
   (type: periods, size: WindowState) =>
   (args: any): CType => {
     const { x, y, width, height, stroke, payload } = args;
@@ -148,6 +148,28 @@ const getCustomTick =
       </g>
     );
   };
+
+const getYAxisTick = (props: any) => {
+  const { payload, x, y } = props;
+
+  const formatYAxisTicks = (value: number) => {
+    const { days, hours, minutes, seconds } = intervalToDuration({
+      start: 0,
+      end: payload.value,
+    });
+
+    if (days) return `${days * 24 + (hours || 0)} h`;
+    if (hours) return `${hours} h`;
+    if (minutes) return `${minutes} m`;
+    return `${seconds} s`;
+  };
+
+  return (
+    <text x={x} y={y}>
+      {formatYAxisTicks(props.payload.value)}
+    </text>
+  );
+};
 
 interface SingleDayExtract {
   start: number;
@@ -226,6 +248,17 @@ export const PeriodChart = ({ periodState }: Props) => {
   const [hoveredBarStartDate, setHoveredBarStartDate] = useState(0);
   const size = useWindowSize();
 
+  useEffect(() => {
+    const parent = document.querySelector(
+      ".recharts-cartesian-grid-horizontal"
+    ) as HTMLElement;
+    if (parent?.children && parent?.children.length === 7) {
+      const asArr = Array.from(parent.children) as HTMLHtmlElement[];
+      // hide unnecessary line from the top of chart
+      asArr[5].style.display = "none";
+    }
+  }, [startDate, endDate]);
+
   const { isLoading, isFetching } = useStoreSelector((state) => state.global);
   const entriesByDays = useStoreSelector(groupEntriesByDays);
 
@@ -276,6 +309,30 @@ export const PeriodChart = ({ periodState }: Props) => {
         : (numberOfDays % 7) + 1
       : 0;
 
+  const getYAxisTicks = () => {
+    const SECOND = 1000;
+    const MINUTE = SECOND * 60;
+    const HOUR = MINUTE * 60;
+
+    let multi = 1;
+
+    const highestValue = dataSrc.reduce(
+      (acc, { totalDuration }) => (acc < totalDuration ? totalDuration : acc),
+      0
+    );
+
+    const period =
+      [HOUR, MINUTE, SECOND].find((period) => period < highestValue) || SECOND;
+
+    while (highestValue > period * multi * 5) {
+      multi += 1;
+    }
+
+    return Array(5)
+      .fill(null)
+      .map((_, i) => period * multi * (i + 1));
+  };
+
   const periodContainsData = !!periodInDays.length;
 
   return (
@@ -301,7 +358,7 @@ export const PeriodChart = ({ periodState }: Props) => {
             tickLine={false}
             dataKey="start"
             height={60}
-            tick={getCustomTick(type, size) as any}
+            tick={getXAxisTick(type, size) as any}
           />
           <Bar
             dataKey="totalDuration"
@@ -333,8 +390,8 @@ export const PeriodChart = ({ periodState }: Props) => {
             tickLine={false}
             width={30}
             interval={0}
-            ticks={undefined}
-            tickFormatter={formatTotalDuration}
+            ticks={getYAxisTicks()}
+            tick={getYAxisTick}
           />
         </BarChart>
       </ResponsiveContainer>
