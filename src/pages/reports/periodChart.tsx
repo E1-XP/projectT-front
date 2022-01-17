@@ -216,6 +216,17 @@ export const PeriodChart = ({ periodState }: Props) => {
             height={60}
             tick={getXAxisTick(type, size) as any}
           />
+          <YAxis
+            stroke={greyWhite}
+            orientation="right"
+            axisLine={false}
+            mirror={false}
+            tickLine={false}
+            width={30}
+            interval={0}
+            ticks={getYAxisTicks()}
+            tick={getYAxisTick}
+          />
           <Bar
             dataKey="totalDuration"
             isAnimationActive={false}
@@ -238,17 +249,6 @@ export const PeriodChart = ({ periodState }: Props) => {
               />
             ))}
           </Bar>
-          <YAxis
-            stroke={greyWhite}
-            orientation="right"
-            axisLine={false}
-            mirror={false}
-            tickLine={false}
-            width={30}
-            interval={0}
-            ticks={getYAxisTicks()}
-            tick={getYAxisTick}
-          />
         </BarChart>
       </ResponsiveContainer>
     </Wrapper>
