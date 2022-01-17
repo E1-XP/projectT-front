@@ -88,14 +88,16 @@ export const getCustomLabel: (
 ) => ContentType = (hoveredBarStartDate, dataSrc) => (props: any) => {
   const { value, x, y, width, height, index } = props;
 
-  const rectWidth = width * 2;
+  console.log(props);
+
+  const rectWidth = 158;
   const idx = dataSrc.findIndex((data) => data.start === hoveredBarStartDate);
   const isHovered = idx === index;
 
   return isHovered ? (
     <>
       <rect
-        x={x - width / 2}
+        x={x + width / 2 - rectWidth / 2}
         y={y - 70}
         width={rectWidth}
         height={60}
@@ -104,7 +106,7 @@ export const getCustomLabel: (
         strokeLinejoin="round"
         style={{ fill: white, stroke: greyWhite }}
       />
-      <foreignObject x={x + width / 2} y={y - 11} width={10} height={10}>
+      <foreignObject x={x - 5 + width / 2} y={y - 11} width={10} height={10}>
         <div
           style={{
             width: 0,
@@ -115,7 +117,7 @@ export const getCustomLabel: (
           }}
         />
       </foreignObject>
-      <foreignObject x={x + width / 2} y={y - 13} width={10} height={10}>
+      <foreignObject x={x - 5 + width / 2} y={y - 13} width={10} height={10}>
         <div
           style={{
             width: 0,
