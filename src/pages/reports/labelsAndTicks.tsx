@@ -88,8 +88,6 @@ export const getCustomLabel: (
 ) => ContentType = (hoveredBarStartDate, dataSrc) => (props: any) => {
   const { value, x, y, width, height, index } = props;
 
-  console.log(props);
-
   const rectWidth = 158;
   const idx = dataSrc.findIndex((data) => data.start === hoveredBarStartDate);
   const isHovered = idx === index;

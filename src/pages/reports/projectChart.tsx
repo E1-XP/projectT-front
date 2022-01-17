@@ -152,11 +152,10 @@ export const ProjectChart = ({ periodState }: Props) => {
     [noProjectDuration] as (GroupedEntries & { name: string; fill: string })[]
   );
 
-  const totalPeriodDuration =
-    periodProjectDurations.reduce(
-      (acc, project) => (acc += project.totalDuration),
-      0
-    ) + noProjectDuration.totalDuration;
+  const totalPeriodDuration = periodProjectDurations.reduce(
+    (acc, project) => (acc += project.totalDuration),
+    0
+  );
 
   const periodContainsData = !!totalPeriodDuration;
 

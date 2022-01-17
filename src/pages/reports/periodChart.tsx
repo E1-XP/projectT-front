@@ -149,7 +149,7 @@ export const PeriodChart = ({ periodState }: Props) => {
           day.totalDuration);
 
         acc[existingMonthIdx] = { ...acc[existingMonthIdx], totalDuration };
-      } else acc.push(day);
+      } else acc.push({ ...day });
 
       return acc;
     }, [] as typeof periodInDays);
