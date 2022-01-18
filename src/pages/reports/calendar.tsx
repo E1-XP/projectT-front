@@ -1,21 +1,29 @@
 import React, { useCallback } from "react";
 import styled from "styled-components";
-import { DateRange } from "react-date-range";
+import { DateRange, RangeKeyDict } from "react-date-range";
 
 import { fetchEntries } from "../../actions/user";
+
+import { useStoreDispatch } from "../../hooks";
+import { useWindowSize } from "../../hooks/useWindowSize";
+
+import { State } from "./";
+import {
+  readable,
+  getPeriodTime,
+  periods,
+  formatCustomReadable,
+  getMatchingPeriod,
+} from "./helpers";
 
 import {
   black,
   green,
   greyWhiteDarker,
   whiteGrey,
+  breakPoints,
 } from "../../styles/variables";
-
-import { State } from "./";
-import { readable, getPeriodTime } from "./helpers";
-
-import { useStoreDispatch } from "../../hooks";
-
+import { getBP, emToPx } from "./../../styles/helpers";
 interface Props {
   state: State;
   setState: (args: State) => void;
@@ -25,20 +33,28 @@ interface Props {
 const Wrapper = styled.div`
   position: absolute;
   z-index: 100;
-  width: 35rem;
+  width: 664px;
   right: 48px;
   top: 35px;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
+  background-color: rgb(239, 242, 247);
+
+  ${getBP(breakPoints.medium)} {
+    width: 332px;
+  }
 `;
 
 const Period_selector = styled.nav`
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-  background-color: ${whiteGrey};
   color: ${greyWhiteDarker};
   padding: 0.8rem;
   font-size: 16px;
+
+  ${getBP(breakPoints.medium)} {
+    font-size: 12px;
+  }
 `;
 
 const Period_item = styled.a`
@@ -52,51 +68,30 @@ const Period_item = styled.a`
   }
 `;
 
-const dateRangeTheme = {
-  Calendar: {
-    background: "transparent",
-    color: "#95a5a6",
-  },
-  MonthAndYear: {
-    background: "#ddd",
-  },
-  MonthButton: {
-    background: "transparent",
-  },
-  MonthArrowPrev: {
-    color: "#333",
-    fontSize: "26px",
-    cursor: "pointer",
-  },
-  MonthArrowNext: {
-    color: "#333",
-    fontSize: "26px",
-    cursor: "pointer",
-  },
-  Weekday: {
-    backgroundColor: "#ddd",
-  },
-  DaySelected: {
-    background: "green",
-  },
-  DayActive: {
-    background: "#4bc800",
-    boxShadow: "none",
-  },
-  DayInRange: {
-    background: "#4bc800",
-    color: "#fff",
-  },
-  DayHover: {
-    background: "#ddd",
-    color: "#7f8c8d",
-  },
-};
-
 export const Calendar = ({ state, setState, closeCalendar }: Props) => {
   const dispatch = useStoreDispatch();
 
   const { startDate, endDate } = state;
+
+  const size = useWindowSize();
+
+  const onChange = useCallback(
+    (ranges: RangeKeyDict) => {
+      const {
+        range1: { startDate, endDate },
+      } = ranges;
+
+      if (startDate && endDate) {
+        const readable = formatCustomReadable(
+          { startDate, endDate },
+          getMatchingPeriod({ startDate, endDate })
+        );
+
+        setState({ type: periods.CUSTOM, startDate, endDate, readable });
+      }
+    },
+    [state]
+  );
 
   const setPeriod = useCallback(
     (period: readable) => {
@@ -124,12 +119,18 @@ export const Calendar = ({ state, setState, closeCalendar }: Props) => {
   const setLastMonth = useCallback(() => setPeriod(readable.LAST_MONTH), []);
   const setLastYear = useCallback(() => setPeriod(readable.LAST_YEAR), []);
 
+  const isMobile = size.width && size.width < emToPx(breakPoints.medium);
+
   return (
     <Wrapper>
       <DateRange
         ranges={[{ startDate, endDate }]}
         weekStartsOn={1}
-        color={green}
+        months={isMobile ? 1 : 2}
+        direction="horizontal"
+        showPreview={false}
+        rangeColors={[green]}
+        onChange={onChange}
       />
       <Period_selector>
         <Period_item onClick={setToday}>Today</Period_item>

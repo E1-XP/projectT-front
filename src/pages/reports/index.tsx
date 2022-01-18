@@ -2,6 +2,7 @@ import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import startOfWeek from "date-fns/startOfWeek";
 import endOfWeek from "date-fns/endOfWeek";
+import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import add from "date-fns/add";
 import sub from "date-fns/sub";
 
@@ -83,10 +84,13 @@ const Item_link = styled.a`
 
 const Item_link_border = styled(Item_link)`
   border-right: 1px solid ${whiteGrey};
+
   & span {
     width: 1.5rem;
     color: ${greyWhite};
+    margin-left: 0.3rem;
   }
+
   &:hover span {
     color: ${darkGrey} !important;
   }
@@ -135,12 +139,16 @@ export const Reports = () => {
   const closeCalendar = useCallback(() => setIsCalendarOpen(false), []);
 
   const goToNextPeriod = useCallback(() => {
-    if (state.type === periods.CUSTOM) console.log("TODO");
+    const isCustom = state.type === periods.CUSTOM;
 
-    const periodKey = `${state.type.toLowerCase()}s`;
+    const getDiff = () =>
+      differenceInCalendarDays(state.endDate, state.startDate) + 1;
 
-    const startDate = add(state.startDate, { [periodKey]: 1 });
-    const endDate = add(state.endDate, { [periodKey]: 1 });
+    const periodKey = isCustom ? "days" : `${state.type.toLowerCase()}s`;
+    const diff = isCustom ? getDiff() : 1;
+
+    const startDate = add(state.startDate, { [periodKey]: diff });
+    const endDate = add(state.endDate, { [periodKey]: diff });
     const readable = formatCustomReadable(
       { startDate, endDate },
       getMatchingPeriod({ startDate, endDate })
@@ -158,12 +166,16 @@ export const Reports = () => {
   }, [state]);
 
   const goToPreviousPeriod = useCallback(() => {
-    if (state.type === periods.CUSTOM) console.log("TODO");
+    const isCustom = state.type === periods.CUSTOM;
 
-    const periodKey = `${state.type.toLowerCase()}s`;
+    const getDiff = () =>
+      differenceInCalendarDays(state.endDate, state.startDate) + 1;
 
-    const startDate = sub(state.startDate, { [periodKey]: 1 });
-    const endDate = sub(state.endDate, { [periodKey]: 1 });
+    const periodKey = isCustom ? "days" : `${state.type.toLowerCase()}s`;
+    const diff = isCustom ? getDiff() : 1;
+
+    const startDate = sub(state.startDate, { [periodKey]: diff });
+    const endDate = sub(state.endDate, { [periodKey]: diff });
     const readable = formatCustomReadable(
       { startDate, endDate },
       getMatchingPeriod({ startDate, endDate })

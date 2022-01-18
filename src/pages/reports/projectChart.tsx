@@ -11,6 +11,8 @@ import {
 import intervalToDuration from "date-fns/intervalToDuration";
 
 import { useStoreSelector } from "../../hooks";
+import { useWindowSize } from "../../hooks/useWindowSize";
+
 import {
   GroupedEntries,
   groupEntriesByDays,
@@ -25,7 +27,11 @@ import {
   greyWhiteDarker,
   white,
   whiteGrey,
+  breakPoints,
 } from "../../styles/variables";
+import { emToPx, getBP } from "../../styles/helpers";
+
+import { formatDurationReadable } from "./helpers";
 
 interface Props {
   periodState: State;
@@ -47,6 +53,10 @@ const List_item = styled.li`
   padding: 0.5rem;
   background-color: ${(props: { isCurrentItem: boolean }) =>
     props.isCurrentItem ? "#efeb97" : white};
+
+  ${getBP(breakPoints.small)} {
+    width: 13rem;
+  }
 `;
 
 const Wrapper = styled.section`
@@ -103,6 +113,8 @@ export const ProjectChart = ({ periodState }: Props) => {
 
   const [activeIdx, setActiveIdx] = useState(-1);
   const [hoveredProject, setHoveredProject] = useState("");
+
+  const size = useWindowSize();
 
   const onMouseEnter = useCallback((payload, idx) => {
     setHoveredProject(payload.name);
@@ -169,6 +181,8 @@ export const ProjectChart = ({ periodState }: Props) => {
       : totalPeriodDuration;
   };
 
+  const isMobile = size.width && size.width < emToPx(breakPoints.small);
+
   const customLegend = ({ payload }: any) => (
     <ul>
       {payload
@@ -212,9 +226,9 @@ export const ProjectChart = ({ periodState }: Props) => {
           <Pie
             isAnimationActive={false}
             data={periodProjectDurations}
-            innerRadius={70}
+            innerRadius={isMobile ? 50 : 70}
             cx={"55%"}
-            outerRadius={140}
+            outerRadius={isMobile ? 100 : 140}
             dataKey="totalDuration"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
@@ -229,11 +243,11 @@ export const ProjectChart = ({ periodState }: Props) => {
               />
             ))}
             <Label
-              value={formatDuration(
+              value={formatDurationReadable(
                 intervalToDuration({ start: 0, end: getSelectedDuration() })
               )}
               position="center"
-              style={{ fontSize: "26px" }}
+              style={{ fontSize: "1.5rem" }}
             />
           </Pie>
           <Legend

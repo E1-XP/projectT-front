@@ -87,4 +87,58 @@ export const libraryStyles = `
   border: 1px solid #b1b1b1;  
   margin-bottom:.7rem;  
 }
+
+.recharts-wrapper {
+    box-shadow: 0 1px 3px rgba(128,128,128,0.2);
+}
+
+.rc-tooltip-inner {
+    width:105%;
+}
+
+.rdrDayEndOfMonth .rdrInRange,
+.rdrDayEndOfMonth .rdrStartEdge,
+.rdrDayEndOfWeek .rdrInRange,
+.rdrDayEndOfWeek .rdrStartEdge,
+ {
+    border-top-left-radius: 0.3em;
+    border-bottom-left-radius: 0.3em;
+}
+
+.rdrDayEndOfWeek .rdrStartEdge {
+    border-top-right-radius: 0.3em;
+    border-bottom-right-radius: 0.3em;
+}
+
+.rdrDayStartOfMonth .rdrInRange,
+.rdrDayStartOfMonth .rdrEndEdge,
+.rdrDayStartOfWeek .rdrInRange,
+.rdrDayStartOfWeek .rdrEndEdge {
+    border-top-left-radius: 0.3em;
+    border-bottom-left-radius: 0.3em;
+}
+
+.rdrDayEndOfMonth .rdrInRange,
+.rdrDayEndOfWeek .rdrInRange {
+    border-top-right-radius: 0.3em;
+    border-bottom-right-radius: 0.3em;
+}
+
+.rdrStartEdge {
+    border-top-left-radius: 0.3em;
+    border-bottom-left-radius: 0.3em;
+}
+
+.rdrEndEdge {
+    border-top-right-radius: 0.3em;
+    border-bottom-right-radius: 0.3em;
+}
+
+::-webkit-scrollbar {
+    width:6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background:#e20505;
+}
 `;
