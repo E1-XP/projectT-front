@@ -8,26 +8,14 @@ import { history } from "./routes/history";
 import { store } from "./store";
 import { GlobalStyle } from "./styles";
 
-export const App = () => {
-  const [isUserLoggedIn, setIsUserLoggedIn] = useState(
-    store.getState().global.isUserLoggedIn
-  );
-
-  useEffect(() => {
-    store.subscribe(() =>
-      setIsUserLoggedIn(store.getState().global.isUserLoggedIn)
-    );
-  }, []);
-
-  return (
-    <>
-      <Head />
-      <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <GlobalStyle isUserLoggedIn={isUserLoggedIn} />
-          <Routes />
-        </ConnectedRouter>
-      </Provider>
-    </>
-  );
-};
+export const App = () => (
+  <>
+    <Head />
+    <Provider store={store}>
+      <ConnectedRouter history={history}>
+        <GlobalStyle />
+        <Routes />
+      </ConnectedRouter>
+    </Provider>
+  </>
+);

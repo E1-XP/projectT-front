@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import {
   PieChart,
@@ -32,6 +32,7 @@ import {
 import { emToPx, getBP } from "../../styles/helpers";
 
 import { formatDurationReadable } from "./helpers";
+import { T } from "lodash/fp";
 
 interface Props {
   periodState: State;
@@ -67,6 +68,16 @@ const Wrapper = styled.section`
   margin-bottom: 4rem;
   box-shadow: 0 1px 3px rgba(128, 128, 128, 0.2);
   position: relative;
+
+  & > .recharts-legend-wrapper {
+    top: 0;
+    left: 2rem !important;
+    bottom: initial !important;
+
+    ${getBP("25em")} {
+      left: 0 !important;
+    }
+  }
 `;
 
 const Overlay = styled.div`
@@ -181,27 +192,41 @@ export const ProjectChart = ({ periodState }: Props) => {
       : totalPeriodDuration;
   };
 
-  const isMobile = size.width && size.width < emToPx(breakPoints.small);
+  useEffect(() => {
+    const legend = document.querySelector(
+      ".recharts-legend-wrapper"
+    ) as HTMLElement;
 
-  const customLegend = ({ payload }: any) => (
+    if (legend) {
+      const { height } = legend.getBoundingClientRect();
+      legend.style.top = `calc(50% - ${height / 2}px)`;
+    }
+  }, [periodProjectDurations.length]);
+
+  const isLargeSize = size.width && size.width >= emToPx(breakPoints.large);
+  const isSmallPhone = size.width && size.width < emToPx(breakPoints.verySmall);
+
+  const legendStyle = { top: 0, transform: "translateY(100%)" };
+
+  const customLegend = () => (
     <ul>
-      {payload
-        .filter((item: any) => item.payload.totalDuration)
-        .map((item: any, i: number) => (
+      {periodProjectDurations
+        .filter((item) => item.totalDuration)
+        .map((item, i) => (
           <List_item
-            isCurrentItem={hoveredProject === item.value}
-            value={item.value}
-            key={`${i}-${item.value}`}
+            isCurrentItem={hoveredProject === item.name}
+            value={item.name}
+            key={`${i}-${item.name}`}
           >
             <span>
-              <Color_Indicator color={item.color} />
-              {item.value}
+              <Color_Indicator color={item.fill} />
+              {item.name}
             </span>
             <span>
               {formatDuration(
                 intervalToDuration({
                   start: 0,
-                  end: item.payload.totalDuration,
+                  end: item.totalDuration,
                 })
               )}
             </span>
@@ -222,14 +247,14 @@ export const ProjectChart = ({ periodState }: Props) => {
         )}
       </Overlay>
       <ResponsiveContainer>
-        <PieChart width={700} height={300}>
+        <PieChart>
           <Pie
-            isAnimationActive={false}
+            animationDuration={300}
             data={periodProjectDurations}
-            innerRadius={isMobile ? 50 : 70}
-            cx={"55%"}
-            outerRadius={isMobile ? 100 : 140}
             dataKey="totalDuration"
+            innerRadius={isLargeSize ? "40%" : isSmallPhone ? "30%" : "35%"}
+            outerRadius={isLargeSize ? "80%" : isSmallPhone ? "63%" : "75%"}
+            cx={isSmallPhone ? "72%" : "70%"}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             activeIndex={activeIdx}
@@ -247,19 +272,19 @@ export const ProjectChart = ({ periodState }: Props) => {
                 intervalToDuration({ start: 0, end: getSelectedDuration() })
               )}
               position="center"
-              style={{ fontSize: "1.5rem" }}
+              style={{ fontSize: isLargeSize ? "1.2rem" : "1.5rem" }}
             />
           </Pie>
-          <Legend
-            content={customLegend}
-            layout="vertical"
-            align="left"
-            verticalAlign="middle"
-            iconSize={8}
-            iconType="circle"
-          />
         </PieChart>
       </ResponsiveContainer>
+      <Legend
+        style={legendStyle}
+        content={customLegend}
+        layout="vertical"
+        align="left"
+        iconSize={8}
+        iconType="circle"
+      />
     </Wrapper>
   );
 };

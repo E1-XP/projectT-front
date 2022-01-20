@@ -6,10 +6,6 @@ import { getBP } from "./helpers";
 import { breakPoints, white } from "./variables";
 import { libraryStyles } from "./library";
 
-interface IGlobalStyle {
-  isUserLoggedIn: boolean;
-}
-
 export const GlobalStyle = createGlobalStyle`
     ${styledNormalize}
     ${reset}
@@ -38,15 +34,24 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     .root {
-        ${(props: IGlobalStyle) =>
-          props.isUserLoggedIn &&
-          `display: flex;
-           height: 100%;`}
+        height:100%;
 
         ${getBP(breakPoints.verySmall)} {
-            flex-direction: column-reverse;
-            justify-content: space-between;
+            height: calc(100% - 54px);
          }
+
+        & main {
+           padding-left: 9.612rem;
+
+            ${getBP(breakPoints.medium)} {
+                padding-left: 4.25rem;
+            }
+
+            ${getBP(breakPoints.verySmall)} {
+                padding-bottom: 5.4rem;
+                padding-left: 1rem;
+            }
+        }
     }
 
     ${libraryStyles}

@@ -37,7 +37,7 @@ export interface State {
   type: periods;
 }
 
-const Wrapper = styled.div`
+const Wrapper = styled.main`
   width: 100%;
   max-width: ${breakPoints.large};
   margin: 1rem auto;
@@ -45,6 +45,15 @@ const Wrapper = styled.div`
   justify-content: space-between;
   padding: 1rem;
   padding-top: 0;
+
+  ${getBP(breakPoints.verySmall)} {
+    display: block;
+    width: 100%;
+    height: 100vh;
+    overflow-y: scroll;
+    margin: initial;
+    padding-top: 1rem;
+  }
 `;
 
 const Header = styled.header`
@@ -66,12 +75,19 @@ const Heading_section = styled.h3`
 
 const Chart_section = styled.section`
   flex-basis: 72%;
-  width: 0;
   min-width: 36.875rem;
   margin-right: 1rem;
 
   ${getBP("56.25rem")} {
     flex-basis: 100%;
+  }
+
+  ${getBP(breakPoints.small)} {
+    margin-right: initial;
+  }
+
+  ${getBP(breakPoints.verySmall)} {
+    min-width: initial;
   }
 `;
 

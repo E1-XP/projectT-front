@@ -38,9 +38,14 @@ const Wrapper = styled.div`
   top: 35px;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.25);
   background-color: rgb(239, 242, 247);
+  overflow: hidden;
 
   ${getBP(breakPoints.medium)} {
     width: 332px;
+  }
+
+  ${getBP("25em")} {
+    right: 0;
   }
 `;
 

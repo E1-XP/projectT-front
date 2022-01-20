@@ -229,7 +229,7 @@ export const PeriodChart = ({ periodState }: Props) => {
           />
           <Bar
             dataKey="totalDuration"
-            isAnimationActive={false}
+            isAnimationActive={true}
             maxBarSize={100}
             minPointSize={4}
             onMouseEnter={(p: any) => setHoveredBarStartDate(p.start)}

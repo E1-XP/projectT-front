@@ -13,11 +13,13 @@ const Wrapper = styled.section`
   box-shadow: 4px 0px 5px rgba(0, 0, 0, 0.2);
   max-width: 3.25rem;
   padding: 1rem;
-  order: -1;
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100%;
+  position: fixed;
+  z-index: 999;
+  top: 0;
 
   ${getBP(breakPoints.medium, "min")} {
     max-width: 15.62rem;
@@ -28,6 +30,9 @@ const Wrapper = styled.section`
     justify-content: space-evenly;
     max-width: initial;
     height: initial;
+    width: 100%;
+    bottom: 0;
+    top: initial;
   }
 `;
 
