@@ -274,7 +274,7 @@ export const Projects = () => {
       .map((p) => ({ ...p, isChecked: false }))
       .sort(sortFn("name", "desc")),
     isMainCheckBoxChecked: false,
-    sortOrder: "desc",
+    sortOrder: "asc",
     sortBy: "name",
   });
 
