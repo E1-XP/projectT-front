@@ -32,7 +32,6 @@ import {
 import { emToPx, getBP } from "../../styles/helpers";
 
 import { formatDurationReadable } from "./helpers";
-import { T } from "lodash/fp";
 
 interface Props {
   periodState: State;

@@ -32,7 +32,7 @@ interface Props {
 
 const Wrapper = styled.div`
   position: absolute;
-  z-index: 100;
+  z-index: 1000;
   width: 664px;
   right: 48px;
   top: 35px;
