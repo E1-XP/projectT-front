@@ -3,8 +3,9 @@ import { store } from "../store";
 
 export const request = function (path: RequestInfo, options: RequestInit) {
   store.dispatch(setIsFetching(true));
+
   return fetch(path, options).then((data) => {
-    store.dispatch(setIsFetching(false));
+    setTimeout(() => store.dispatch(setIsFetching(false)), 250);
     return data;
   });
 };
