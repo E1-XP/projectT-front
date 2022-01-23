@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import intervalToDuration from "date-fns/intervalToDuration";
 
@@ -10,6 +10,8 @@ import {
 import { formatDurationReadable } from "../reports/helpers";
 
 import { Project } from "../../store/interfaces";
+
+import { fetchEntries } from "../../actions/user";
 
 import { Icon } from "../../components/icon";
 
@@ -24,6 +26,9 @@ import {
   greyWhiteDarker,
 } from "../../styles/variables";
 import { getBP } from "./../../styles/helpers";
+import { ComponentLoader } from "../../components/loader";
+
+const SmallMobileBP = "25em";
 
 const Wrapper = styled.main`
   width: 100%;
@@ -82,6 +87,10 @@ const Button_Remove = styled(Button)`
   }
 `;
 
+const Table_section = styled.section`
+  position: relative;
+`;
+
 const Table = styled.table`
   border-collapse: collapse;
   table-layout: fixed;
@@ -117,6 +126,10 @@ const TH = styled.th`
   &:first-of-type {
     width: 4rem;
   }
+
+  ${getBP(SmallMobileBP)} {
+    padding: 0.7rem;
+  }
 `;
 
 const TD = styled.td`
@@ -129,6 +142,10 @@ const TD = styled.td`
 
   &:first-of-type {
     width: 4rem;
+  }
+
+  ${getBP(SmallMobileBP)} {
+    padding: 0.7rem;
   }
 `;
 
@@ -242,6 +259,11 @@ interface State {
 
 export const Projects = () => {
   const dispatch = useStoreDispatch();
+  const { isLoading, isFetching } = useStoreSelector((state) => state.global);
+
+  useEffect(() => {
+    dispatch(fetchEntries(0));
+  }, []);
 
   const projects = useStoreSelector((state) => state.user.projects);
   const entriesByDays = useStoreSelector(groupEntriesByDays);
@@ -345,7 +367,14 @@ export const Projects = () => {
         <Heading>Projects</Heading>
         <Button_Create>Create Project</Button_Create>
       </Header>
-      <section>
+      <Table_section>
+        <ComponentLoader
+          isVisible={isLoading || isFetching}
+          shouldShowSpinner={isLoading || isFetching}
+          shouldShowMessage={false}
+          message=""
+          fill={greyWhite}
+        />
         <Table>
           <tbody>
             <Table_Row_Header>
@@ -396,7 +425,7 @@ export const Projects = () => {
             )}
           </tbody>
         </Table>
-      </section>
+      </Table_section>
       <Footer>
         {!!projects.length && (
           <Button_Remove disabled={false ? false : true}>

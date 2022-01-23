@@ -17,7 +17,9 @@ const entriesRequest = async (
   beginAt: number,
   endAt?: number
 ) => {
-  const queryStr = `?begin=${beginAt}`.concat(endAt ? `&end=${endAt}` : ``);
+  const queryStr = `?begin=${beginAt}`.concat(
+    endAt !== undefined ? `&end=${endAt}` : ``
+  );
   const URL = `${config.API_URL}/users/${userId}/entries${queryStr}`;
 
   return await request(URL, {
@@ -49,6 +51,7 @@ export function* fetchEntries(action: PayloadAction<number | undefined>) {
       startOfPreviousDay,
       action.payload
     );
+
     if (response.status === 200) {
       const data: Entry[] = yield response.json();
 
