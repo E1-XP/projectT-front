@@ -6,8 +6,10 @@ import { history } from "./history";
 
 import { Loader } from "./../components/loader";
 import { ProtectedRoute } from "./protected";
+
 import { Timer } from "../pages/timer";
 import { Reports } from "../pages/reports";
+import { Projects } from "../pages/projects";
 import { Form } from "../pages/forms";
 import { Sidebar } from "../components/sidebar";
 
@@ -29,6 +31,7 @@ export const Routes = () => {
       <Switch>
         <ProtectedRoute path="/timer" component={Timer} />
         <ProtectedRoute path="/reports" component={Reports} />
+        <ProtectedRoute path="/projects" component={Projects} />{" "}
       </Switch>
     </Loader>
   );
