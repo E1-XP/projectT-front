@@ -32,6 +32,7 @@ import {
 import { emToPx, getBP } from "../../styles/helpers";
 
 import { formatDurationReadable } from "./helpers";
+import { ComponentLoader } from "../../components/loader";
 
 interface Props {
   periodState: State;
@@ -77,45 +78,6 @@ const Wrapper = styled.section`
       left: 0 !important;
     }
   }
-`;
-
-const Overlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.6);
-  transition: all 0.4s linear;
-  z-index: 50;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: 700;
-  color: ${greyWhiteDarker};
-  font-size: 1.125rem;
-  opacity: ${(props: { isVisible: boolean }) => (props.isVisible ? 1 : 0)};
-  pointer-events: none;
-`;
-
-const rotateAnim = keyframes`
-    from {
-        transform:rotate(0deg);
-    }
-
-    to {
-        transform:rotate(360deg);
-    }
-`;
-
-const Spinner = styled.span`
-  width: 3.125rem;
-  height: 3.125rem;
-  border: 3px solid ${greyWhite};
-  border-right: 3px solid transparent;
-  border-radius: 50%;
-  transform: translateZ(0);
-  animation: ${rotateAnim} 0.5s linear infinite;
 `;
 
 export const ProjectChart = ({ periodState }: Props) => {
@@ -236,15 +198,13 @@ export const ProjectChart = ({ periodState }: Props) => {
 
   return (
     <Wrapper>
-      <Overlay isVisible={isLoading || isFetching || !periodContainsData}>
-        {isLoading ? (
-          <Spinner />
-        ) : periodContainsData ? (
-          ""
-        ) : (
-          "No data available for this period"
-        )}
-      </Overlay>
+      <ComponentLoader
+        isVisible={isLoading || isFetching || !periodContainsData}
+        shouldShowSpinner={isLoading || isFetching}
+        shouldShowMessage={!isFetching && !periodContainsData}
+        message="No data available for this period"
+        fill={greyWhite}
+      />
       <ResponsiveContainer>
         <PieChart>
           <Pie

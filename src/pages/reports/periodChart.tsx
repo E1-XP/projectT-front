@@ -37,6 +37,7 @@ import {
   white,
   whiteGrey,
 } from "../../styles/variables";
+import { ComponentLoader } from "../../components/loader";
 
 interface Props {
   periodState: State;
@@ -48,7 +49,7 @@ const Wrapper = styled.section`
   height: 350px;
   position: relative;
 
-  > div > div {
+  & .recharts-wrapper {
     box-shadow: 0 1px 3px rgba(128, 128, 128, 0.2);
     height: 281px !important;
     border-bottom: 2px solid ${greyWhiteDarker};
@@ -58,44 +59,6 @@ const Wrapper = styled.section`
   .recharts-surface {
     overflow: visible;
   }
-`;
-
-const Overlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.6);
-  transition: all 0.2s linear;
-  z-index: 50;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: 700;
-  color: ${greyWhiteDarker};
-  font-size: 1.125rem;
-  opacity: ${(props: { isVisible: boolean }) => (props.isVisible ? 1 : 0)};
-  pointer-events: none;
-`;
-
-const rotateAnim = keyframes`
-    from{
-        transform:rotate(0deg);
-    }
-    to{
-        transform:rotate(360deg);
-    }
-`;
-
-const Spinner = styled.span`
-  width: 50px;
-  height: 50px;
-  border: 3px solid ${whiteGrey};
-  border-right: 3px solid transparent;
-  border-radius: 50%;
-  transform: translateZ(0);
-  animation: ${rotateAnim} 0.5s linear infinite;
 `;
 
 export const PeriodChart = ({ periodState }: Props) => {
@@ -193,15 +156,13 @@ export const PeriodChart = ({ periodState }: Props) => {
 
   return (
     <Wrapper>
-      <Overlay isVisible={isLoading || isFetching || !periodContainsData}>
-        {isLoading ? (
-          <Spinner />
-        ) : periodContainsData ? (
-          ""
-        ) : (
-          "No data available"
-        )}
-      </Overlay>
+      <ComponentLoader
+        isVisible={isLoading || isFetching || !periodContainsData}
+        shouldShowSpinner={isLoading || isFetching}
+        shouldShowMessage={!isFetching && !periodContainsData}
+        message="No data available for this period"
+        fill={greyWhite}
+      />
       <ResponsiveContainer>
         <BarChart
           data={dataSrc}

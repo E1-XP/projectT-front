@@ -76,7 +76,7 @@ export const Timeline = () => {
       </Timeline_list>
       <Loader_container>
         <Button_load onClick={loadMoreData}>
-          {isLoading ? <Spinner /> : "Load more"}
+          {isLoading ? <Spinner fill={red} /> : "Load more"}
         </Button_load>
       </Loader_container>
     </Timeline_wrapper>
