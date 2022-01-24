@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import {
   PieChart,
   Pie,
@@ -14,21 +14,17 @@ import { useStoreSelector } from "../../hooks";
 import { useWindowSize } from "../../hooks/useWindowSize";
 
 import {
-  GroupedEntries,
   groupEntriesByDays,
   SingleDay,
 } from "../../selectors/groupEntriesByDays";
 import { State } from ".";
-import { formatDuration } from "./../../helpers";
-
 import {
-  darkGrey,
-  greyWhite,
-  greyWhiteDarker,
-  white,
-  whiteGrey,
-  breakPoints,
-} from "../../styles/variables";
+  formatDuration,
+  getPeriodProjectDurations,
+  getTotalPeriodDuration,
+} from "./../../helpers";
+
+import { greyWhite, white, breakPoints } from "../../styles/variables";
 import { emToPx, getBP } from "../../styles/helpers";
 
 import { formatDurationReadable } from "./helpers";
@@ -102,44 +98,12 @@ export const ProjectChart = ({ periodState }: Props) => {
     start >= startDate.getTime() && stop <= endDate.getTime();
   const periodDaysArr = Object.values(entriesByDays).filter(periodFilter);
 
-  const getNoProjectDuration = () =>
-    periodDaysArr.reduce((acc, day) => {
-      return (acc += day.entries
-        .filter((entry) => !entry.project)
-        .reduce((acc, { start, stop }) => (acc += stop - start), 0));
-    }, 0);
-
-  const noProjectDuration = {
-    name: "no project",
-    fill: greyWhiteDarker,
-    totalDuration: getNoProjectDuration(),
-  };
-
-  const periodProjectDurations = periodDaysArr.reduce(
-    (acc, day) => {
-      Object.entries(day.projects).map(([name, value]) => {
-        const getFill = () =>
-          projects.find((project) => project.name === name)?.color ||
-          greyWhiteDarker;
-        const foundProjectIdx = acc.findIndex(
-          (project) => project.name === name
-        );
-
-        if (foundProjectIdx !== -1) {
-          acc[foundProjectIdx].totalDuration += value.totalDuration;
-        } else {
-          acc.push({ ...value, name, fill: getFill() });
-        }
-      });
-      return acc;
-    },
-    [noProjectDuration] as (GroupedEntries & { name: string; fill: string })[]
+  const periodProjectDurations = getPeriodProjectDurations(
+    periodDaysArr,
+    projects
   );
 
-  const totalPeriodDuration = periodProjectDurations.reduce(
-    (acc, project) => (acc += project.totalDuration),
-    0
-  );
+  const totalPeriodDuration = getTotalPeriodDuration(periodProjectDurations);
 
   const periodContainsData = !!totalPeriodDuration;
 
