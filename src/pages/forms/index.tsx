@@ -8,7 +8,7 @@ import { useStoreDispatch } from "../../hooks";
 import { initAuth } from "../../actions/global";
 
 import { NavBar } from "../../components/navbar";
-import { ActionButton } from "../../components/buttons";
+import { Button_action } from "../../components/buttons";
 import { visuallyHidden } from "../../styles/helpers";
 
 import { getSchema } from "./validation";
@@ -150,7 +150,7 @@ export const Form = () => {
               </HiddenLabel>
             </>
           )}
-          <ActionButton style={{ marginTop: "2rem" }}>Send</ActionButton>
+          <Button_action style={{ marginTop: "2rem" }}>Send</Button_action>
           <ErrorParagraph>{errorMessage}</ErrorParagraph>
         </FormContainer>
       </Main>
