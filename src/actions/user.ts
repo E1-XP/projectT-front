@@ -14,3 +14,9 @@ export const fetchEntries = createAction<number | undefined>(
 );
 
 export const setProjects = createAction<Project[]>(types.USER_SET_PROJECTS);
+
+export const createProject = createAction<Omit<Project, "_id">>(
+  types.USER_CREATE_PROJECT
+);
+
+export const removeProject = createAction<string>(types.USER_REMOVE_PROJECT);

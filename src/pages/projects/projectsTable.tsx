@@ -20,17 +20,13 @@ import {
   greyWhiteDarker,
 } from "../../styles/variables";
 import { getBP } from "./../../styles/helpers";
+import { State } from ".";
 
 interface Props {
   projects: Project[];
   periodProjectDurations: PeriodProjectDurations;
-}
-
-interface State {
-  sortedProjects: (Project & { isChecked: boolean })[];
-  isMainCheckBoxChecked: boolean;
-  sortOrder: SortOrder;
-  sortBy: SortBy;
+  state: State;
+  setState: any;
 }
 
 interface ICheckbox {
@@ -163,17 +159,13 @@ const Sortable_Panel = ({ stateFn, sortBy }: ISortable) => (
   </div>
 );
 
-export const ProjectsTable = ({ projects, periodProjectDurations }: Props) => {
+export const ProjectsTable = ({
+  projects,
+  periodProjectDurations,
+  state,
+  setState,
+}: Props) => {
   const { isLoading, isFetching } = useStoreSelector((state) => state.global);
-
-  const [state, setState] = useState<State>({
-    sortedProjects: projects
-      .map((p) => ({ ...p, isChecked: false }))
-      .sort(sortFn("name", "asc")),
-    isMainCheckBoxChecked: false,
-    sortOrder: "asc",
-    sortBy: "name",
-  });
 
   const setSortState = (sortOrder: SortOrder, sortBy: SortBy) => {
     const newState = { ...state, sortOrder, sortBy };
@@ -209,6 +201,9 @@ export const ProjectsTable = ({ projects, periodProjectDurations }: Props) => {
 
     setState(newState);
   };
+
+  const formatDuration = (readable: string) =>
+    readable.startsWith("0") ? "(Not started)" : readable;
 
   return (
     <Table_section>
@@ -258,10 +253,10 @@ export const ProjectsTable = ({ projects, periodProjectDurations }: Props) => {
                 </TD>
                 <TD>{item.client ? item.client : "(No Client)"}</TD>
                 <TD>
-                  {
+                  {formatDuration(
                     getProjectDuration(periodProjectDurations, item.name)
                       .readable
-                  }
+                  )}
                 </TD>
               </Table_Row>
             ))

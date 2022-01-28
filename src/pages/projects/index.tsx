@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 
 import { useStoreDispatch, useStoreSelector } from "../../hooks";
@@ -8,7 +8,9 @@ import {
   SingleDay,
 } from "../../selectors/groupEntriesByDays";
 
-import { fetchEntries } from "../../actions/user";
+import { Project } from "../../store/interfaces";
+
+import { fetchEntries, removeProject } from "../../actions/user";
 
 import { ProjectsTable } from "./projectsTable";
 
@@ -21,6 +23,16 @@ import {
 } from "../../styles/variables";
 import { getBP } from "./../../styles/helpers";
 import { getPeriodProjectDurations } from "../../helpers";
+import { CreationModal } from "./creationModal";
+import { Button_create, Button_remove } from "../../components/buttons";
+import { SortBy, sortFn, SortOrder } from "./helpers";
+
+export interface State {
+  sortedProjects: (Project & { isChecked: boolean })[];
+  isMainCheckBoxChecked: boolean;
+  sortOrder: SortOrder;
+  sortBy: SortBy;
+}
 
 const Wrapper = styled.main`
   width: 100%;
@@ -52,33 +64,6 @@ const Heading = styled.h2`
   font-weight: 500;
 `;
 
-const Button = styled.button`
-  cursor: pointer;
-  border: none;
-  padding: 0.8rem;
-  font-weight: 700;
-  font-size: 0.875rem;
-  transition: all 0.2s ease-in;
-  color: ${white};
-  min-width: 8rem;
-`;
-
-const Button_Create = styled(Button)`
-  background-color: ${green};
-
-  &:hover {
-    background-color: #3fa900;
-  }
-`;
-
-const Button_Remove = styled(Button)`
-  background-color: ${red};
-
-  &:hover {
-    background-color: #c20000;
-  }
-`;
-
 const Footer = styled.section`
   display: flex;
 `;
@@ -86,12 +71,42 @@ const Footer = styled.section`
 export const Projects = () => {
   const dispatch = useStoreDispatch();
 
+  const projects = useStoreSelector((state) => state.user.projects);
+  const entriesByDays = useStoreSelector(groupEntriesByDays);
+
+  const [state, setState] = useState<State>({
+    sortedProjects: projects.map((p) => ({ ...p, isChecked: false })),
+    isMainCheckBoxChecked: false,
+    sortOrder: "asc",
+    sortBy: "name",
+  });
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   useEffect(() => {
     dispatch(fetchEntries(0));
   }, []);
 
-  const projects = useStoreSelector((state) => state.user.projects);
-  const entriesByDays = useStoreSelector(groupEntriesByDays);
+  useEffect(() => {
+    const { sortBy, sortOrder } = state;
+
+    setState({
+      ...state,
+      sortedProjects: projects
+        .map((p) => ({ ...p, isChecked: false }))
+        .sort(sortFn(sortBy, sortOrder)),
+    });
+  }, [projects]);
+
+  const onButtonRemove = () => {
+    state.sortedProjects
+      .filter(({ isChecked }) => isChecked)
+      .forEach(({ name }) => dispatch(removeProject(name)));
+  };
+
+  const openModal = useCallback(() => setIsModalOpen(true), []);
+  const closeModal = useCallback(() => setIsModalOpen(false), []);
+
   const periodDaysArr = Object.values(entriesByDays);
 
   const periodProjectDurations = getPeriodProjectDurations(
@@ -103,19 +118,25 @@ export const Projects = () => {
     <Wrapper>
       <Header>
         <Heading>Projects</Heading>
-        <Button_Create>Create Project</Button_Create>
+        <Button_create onClick={openModal}>Create Project</Button_create>
       </Header>
       <ProjectsTable
         projects={projects}
         periodProjectDurations={periodProjectDurations}
+        state={state}
+        setState={setState}
       />
       <Footer>
         {!!projects.length && (
-          <Button_Remove disabled={false ? false : true}>
+          <Button_remove
+            onClick={onButtonRemove}
+            disabled={!state.sortedProjects.some(({ isChecked }) => isChecked)}
+          >
             Remove Selected
-          </Button_Remove>
+          </Button_remove>
         )}
       </Footer>
+      <CreationModal isOpen={isModalOpen} closeModal={closeModal} />
     </Wrapper>
   );
 };

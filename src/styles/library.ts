@@ -134,6 +134,63 @@ export const libraryStyles = `
     border-bottom-right-radius: 0.3em;
 }
 
+.ReactModal__Overlay {
+    opacity: 0;
+    transform: translateY(-400px);
+    transition: all .2s ease-in-out;
+}
+.ReactModal__Overlay--after-open {
+    opacity: 1;
+    transform: translateY(0);
+}
+.ReactModal__Overlay--before-close {
+    opacity: 0;
+    transform: translateY(-400px);
+}
+.ReactModal__Content.ReactModal__Content--after-open {
+    left: calc(40px + 52px) !important;
+    @media only screen and (min-width:1024px) {
+        left: calc(40px + 167.5px) !important;        
+    }
+}
+
+input[type=checkbox]:not(old) {
+    width: 2em;
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
+    opacity: 0;
+}
+input[type=checkbox]:not(old)+label {
+    display: inline-block;
+    margin-left: -2em;
+    line-height: 1.5em;
+}
+input[type=checkbox]:not(old)+label>span {
+    display: inline-block;
+    width: 0.875em;
+    height: 0.875em;
+    margin: 0.25em 0.5em 0.25em 0.25em;
+    border: 0.0625em solid rgb(192, 192, 192);
+    border-radius: 0.25em;
+    box-shadow: 0 2px 6px 0 rgba(0,0,0,.1);
+    background: #fff;
+    vertical-align: bottom;
+}
+input[type=checkbox]:not(old):checked+label>span {
+    background: #fff;
+}
+input[type=checkbox]:not(old):checked+label>span:before {
+    content: '✓';
+    display: block;
+    width: 1em;
+    color: #47be00;
+    font-size: 0.875em;
+    line-height: 1em;
+    text-align: center;
+    font-weight: bold;
+}
+
 ::-webkit-scrollbar {
     width:6px;
 }
