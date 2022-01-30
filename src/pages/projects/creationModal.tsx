@@ -11,11 +11,6 @@ import { useStoreDispatch } from "../../hooks";
 
 import { createProject } from "../../actions/user";
 
-interface Props {
-  isOpen: boolean;
-  closeModal: () => any;
-}
-
 const Section_heading = styled.h3`
   display: flex;
   align-items: center;
@@ -83,13 +78,23 @@ const colors = [
 const modalStyle = {
   overlay: {},
   content: {
-    width: "550px",
+    width: "34.375rem",
     margin: "0 auto",
-    height: "270px",
     padding: "0",
     boxShadow: `0 5px 15px rgba(128,128,128,0.5)`,
+    overflow: "hidden",
+    left: "50%",
+    right: "50%",
+    top: "initial",
+    bottom: "initial",
+    transform: "translate(-50%, 30%)",
   },
 };
+
+interface Props {
+  isOpen: boolean;
+  closeModal: () => any;
+}
 
 export const CreationModal = ({ isOpen, closeModal }: Props) => {
   const dispatch = useStoreDispatch();
@@ -122,6 +127,7 @@ export const CreationModal = ({ isOpen, closeModal }: Props) => {
 
   return (
     <Modal
+      id="creationModal"
       isOpen={isOpen}
       shouldCloseOnEsc={true}
       shouldCloseOnOverlayClick={true}
@@ -162,7 +168,7 @@ export const CreationModal = ({ isOpen, closeModal }: Props) => {
       </Modal_Section>
       <Modal_Footer>
         <Button_create
-          disabled={!name.length || !selectedColor}
+          disabled={!name.trim().length || !selectedColor}
           onClick={onButtonCreateClick}
         >
           Create Project

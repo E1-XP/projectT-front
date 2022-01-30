@@ -41,7 +41,7 @@ export const GlobalStyle = createGlobalStyle`
          }
 
         & main {
-           padding-left: 9.612rem;
+           padding-left: 9.326rem;
 
             ${getBP(breakPoints.medium)} {
                 padding-left: 4.25rem;

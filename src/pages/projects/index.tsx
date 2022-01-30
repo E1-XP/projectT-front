@@ -2,30 +2,22 @@ import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 
 import { useStoreDispatch, useStoreSelector } from "../../hooks";
-import {
-  GroupedEntries,
-  groupEntriesByDays,
-  SingleDay,
-} from "../../selectors/groupEntriesByDays";
+import { groupEntriesByDays } from "../../selectors/groupEntriesByDays";
 
 import { Project } from "../../store/interfaces";
 
 import { fetchEntries, removeProject } from "../../actions/user";
 
 import { ProjectsTable } from "./projectsTable";
-
-import {
-  breakPoints,
-  green,
-  red,
-  white,
-  greyWhiteDarker,
-} from "../../styles/variables";
-import { getBP } from "./../../styles/helpers";
-import { getPeriodProjectDurations } from "../../helpers";
 import { CreationModal } from "./creationModal";
+import { ConfirmationModal } from "./confirmationModal";
 import { Button_create, Button_remove } from "../../components/buttons";
+
+import { getPeriodProjectDurations } from "../../helpers";
 import { SortBy, sortFn, SortOrder } from "./helpers";
+
+import { breakPoints } from "../../styles/variables";
+import { getBP } from "./../../styles/helpers";
 
 export interface State {
   sortedProjects: (Project & { isChecked: boolean })[];
@@ -82,6 +74,7 @@ export const Projects = () => {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchEntries(0));
@@ -98,14 +91,19 @@ export const Projects = () => {
     });
   }, [projects]);
 
-  const onButtonRemove = () => {
+  const onButtonRemove = useCallback(() => {
     state.sortedProjects
       .filter(({ isChecked }) => isChecked)
       .forEach(({ name }) => dispatch(removeProject(name)));
-  };
+  }, [state.sortedProjects]);
 
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
+
+  const openConfirmationModal = useCallback(
+    () => setIsConfirmationModalOpen(true),
+    []
+  );
 
   const periodDaysArr = Object.values(entriesByDays);
 
@@ -129,7 +127,7 @@ export const Projects = () => {
       <Footer>
         {!!projects.length && (
           <Button_remove
-            onClick={onButtonRemove}
+            onClick={openConfirmationModal}
             disabled={!state.sortedProjects.some(({ isChecked }) => isChecked)}
           >
             Remove Selected
@@ -137,6 +135,11 @@ export const Projects = () => {
         )}
       </Footer>
       <CreationModal isOpen={isModalOpen} closeModal={closeModal} />
+      <ConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        setIsOpen={setIsConfirmationModalOpen}
+        handleRemove={onButtonRemove}
+      />
     </Wrapper>
   );
 };

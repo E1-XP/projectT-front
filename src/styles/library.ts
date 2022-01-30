@@ -1,5 +1,6 @@
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
+import { breakPoints } from "./variables";
 
 export const libraryStyles = `
 .rc-tooltip.rc-tooltip-zoom-enter,
@@ -138,20 +139,28 @@ export const libraryStyles = `
     opacity: 0;
     transform: translateY(-400px);
     transition: all .2s ease-in-out;
+
+    @media only screen and (min-width:${breakPoints.verySmall}) {
+        left: 3.25rem !important;
+     }
+
+     @media only screen and (min-width:${breakPoints.medium}) {
+        left: 9.326rem !important;
+     }
 }
+
 .ReactModal__Overlay--after-open {
     opacity: 1;
     transform: translateY(0);
 }
+
 .ReactModal__Overlay--before-close {
     opacity: 0;
     transform: translateY(-400px);
 }
-.ReactModal__Content.ReactModal__Content--after-open {
-    left: calc(40px + 52px) !important;
-    @media only screen and (min-width:1024px) {
-        left: calc(40px + 167.5px) !important;        
-    }
+
+#creationModal  .ReactModal__Content.ReactModal__Content--after-open  {
+   
 }
 
 input[type=checkbox]:not(old) {
@@ -161,11 +170,13 @@ input[type=checkbox]:not(old) {
     font-size: 1em;
     opacity: 0;
 }
+
 input[type=checkbox]:not(old)+label {
     display: inline-block;
     margin-left: -2em;
     line-height: 1.5em;
 }
+
 input[type=checkbox]:not(old)+label>span {
     display: inline-block;
     width: 0.875em;
@@ -177,9 +188,11 @@ input[type=checkbox]:not(old)+label>span {
     background: #fff;
     vertical-align: bottom;
 }
+
 input[type=checkbox]:not(old):checked+label>span {
     background: #fff;
 }
+
 input[type=checkbox]:not(old):checked+label>span:before {
     content: '✓';
     display: block;
