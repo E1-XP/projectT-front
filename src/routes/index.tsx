@@ -11,6 +11,7 @@ import { Timer } from "../pages/timer";
 import { Reports } from "../pages/reports";
 import { Projects } from "../pages/projects";
 import { Form } from "../pages/forms";
+import { Settings } from "../pages/settings";
 import { Sidebar } from "../components/sidebar";
 
 import { initReAuth } from "../actions/global";
@@ -31,7 +32,9 @@ export const Routes = () => {
       <Switch>
         <ProtectedRoute path="/timer" component={Timer} />
         <ProtectedRoute path="/reports" component={Reports} />
-        <ProtectedRoute path="/projects" component={Projects} />{" "}
+        <ProtectedRoute path="/projects" component={Projects} />
+        <ProtectedRoute path="/settings" component={Settings} />
+        <ProtectedRoute path="*" component={() => <Redirect to="/timer" />} />
       </Switch>
     </Loader>
   );

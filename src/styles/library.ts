@@ -163,6 +163,10 @@ export const libraryStyles = `
    
 }
 
+input[type="file"].inputfile-hidden {
+    display: none;
+}
+
 input[type=checkbox]:not(old) {
     width: 2em;
     margin: 0;
