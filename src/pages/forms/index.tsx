@@ -9,22 +9,18 @@ import { initAuth } from "../../actions/global";
 
 import { NavBar } from "../../components/navbar";
 import { Button_action } from "../../components/buttons";
-import { visuallyHidden } from "../../styles/helpers";
+import { Input } from "../../components/inputs";
 
 import { getSchema } from "./validation";
+
 import { greyWhiteDarker, red } from "../../styles/variables";
+import { visuallyHidden } from "../../styles/helpers";
 
 export interface Fields {
   email: string;
   username: string;
   password: string;
   passwordconfirm: string;
-}
-
-type LoginFields = Pick<Fields, "email" | "password">;
-
-interface InputProps {
-  valid: boolean;
 }
 
 const Heading = styled.h2`
@@ -51,14 +47,6 @@ const FormContainer = styled.form`
   & > input {
     width: 100%;
   }
-`;
-
-const Input = styled.input`
-  padding: 0.8rem;
-  margin: 0.5rem 0;
-  border: 1.5px solid
-    ${(props: InputProps) => (props.valid ? greyWhiteDarker : red)};
-  border-radius: 0.3rem;
 `;
 
 const ErrorParagraph = styled.p`
@@ -112,7 +100,7 @@ export const Form = () => {
             type="text"
             id="email"
             placeholder="email"
-            valid={!errors.email?.message}
+            isValid={!errors.email?.message}
             {...register("email")}
           />
           <HiddenLabel htmlFor="email">e-Mail</HiddenLabel>
@@ -122,7 +110,7 @@ export const Form = () => {
                 type="text"
                 id="username"
                 placeholder="username"
-                valid={!errors.username?.message}
+                isValid={!errors.username?.message}
                 {...register("username")}
               />
               <HiddenLabel htmlFor="username">Username</HiddenLabel>
@@ -132,7 +120,7 @@ export const Form = () => {
             type="password"
             id="password"
             placeholder="password"
-            valid={!errors.password?.message}
+            isValid={!errors.password?.message}
             {...register("password")}
           />
           <HiddenLabel htmlFor="password">Password</HiddenLabel>
@@ -142,7 +130,7 @@ export const Form = () => {
                 type="password"
                 id="passwordconfirm"
                 placeholder="confirm password"
-                valid={!errors.passwordconfirm?.message}
+                isValid={!errors.passwordconfirm?.message}
                 {...register("passwordconfirm")}
               />
               <HiddenLabel htmlFor="passwordconfirm">
