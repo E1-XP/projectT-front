@@ -6,6 +6,7 @@ import { getBP } from "../styles/helpers";
 import {
   black,
   breakPoints,
+  greyWhite,
   greyWhiteDarker,
   red,
   white,
@@ -44,6 +45,12 @@ const Icon_profile = styled.span`
   justify-content: center;
   align-items: center;
   font-weight: 700;
+
+  ${getBP(breakPoints.medium)} {
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 1.2rem;
+  }
 `;
 
 const Link_label = styled.span`
@@ -65,6 +72,12 @@ const Dropdown = styled.ul`
   top: -5.938rem;
   right: -18.438rem;
   border-radius: 7px;
+
+  ${getBP(breakPoints.verySmall)} {
+    top: -6.938rem;
+    right: 3rem;
+    font-size: 1.2rem;
+  }
 `;
 
 const Dropdown_item = styled.li`
@@ -73,7 +86,7 @@ const Dropdown_item = styled.li`
   text-align: left;
 
   &:hover {
-    background-color: ${greyWhiteDarker};
+    background-color: ${greyWhite};
   }
 
   &:last-child {

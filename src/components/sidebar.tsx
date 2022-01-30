@@ -42,7 +42,11 @@ const Sidebar_profile = styled.section`
   }
 `;
 
-const Sidebar_header = styled.header``;
+const Sidebar_header = styled.header`
+  ${getBP(breakPoints.verySmall)} {
+    font-size: 1.4rem;
+  }
+`;
 
 const Sidebar_navigation = styled.nav`
   ${getBP(breakPoints.verySmall, "min")} {
