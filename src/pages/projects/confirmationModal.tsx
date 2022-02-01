@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Modal from "react-modal";
 
 import { Icon } from "../../components/icon";
-import { Button_create, Button_remove } from "../../components/buttons";
+import { Button_success, Button_danger } from "../../components/buttons";
 
 import { whiteGrey } from "../../styles/variables";
 
@@ -73,8 +73,8 @@ export const ConfirmationModal = ({
         </Icon_Link>
       </Modal_Header>
       <Modal_Section>
-        <Button_create onClick={handleRemove}>Yes</Button_create>
-        <Button_remove onClick={closeModal}>No</Button_remove>
+        <Button_success onClick={handleRemove}>Yes</Button_success>
+        <Button_danger onClick={closeModal}>No</Button_danger>
       </Modal_Section>
     </Modal>
   );

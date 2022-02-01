@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Modal from "react-modal";
 
 import { Icon } from "../../components/icon";
-import { Button_create } from "./../../components/buttons";
+import { Button_success } from "./../../components/buttons";
 import { ColorPickerDropdown } from "./colorPickerDropdown";
 
 import { whiteGrey } from "../../styles/variables";
@@ -167,12 +167,12 @@ export const CreationModal = ({ isOpen, closeModal }: Props) => {
         />
       </Modal_Section>
       <Modal_Footer>
-        <Button_create
+        <Button_success
           disabled={!name.trim().length || !selectedColor}
           onClick={onButtonCreateClick}
         >
           Create Project
-        </Button_create>
+        </Button_success>
       </Modal_Footer>
     </Modal>
   );

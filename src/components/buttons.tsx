@@ -38,7 +38,7 @@ export const Button = styled.button`
   }
 `;
 
-export const Button_create = styled(Button)`
+export const Button_success = styled(Button)`
   background-color: ${green};
 
   &:hover {
@@ -46,7 +46,7 @@ export const Button_create = styled(Button)`
   }
 `;
 
-export const Button_remove = styled(Button)`
+export const Button_danger = styled(Button)`
   background-color: ${red};
 
   &:hover {

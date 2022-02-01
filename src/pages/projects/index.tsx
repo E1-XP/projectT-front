@@ -11,7 +11,7 @@ import { fetchEntries, removeProject } from "../../actions/user";
 import { ProjectsTable } from "./projectsTable";
 import { CreationModal } from "./creationModal";
 import { ConfirmationModal } from "./confirmationModal";
-import { Button_create, Button_remove } from "../../components/buttons";
+import { Button_success, Button_danger } from "../../components/buttons";
 
 import { getPeriodProjectDurations } from "../../helpers";
 import { SortBy, sortFn, SortOrder } from "./helpers";
@@ -116,7 +116,7 @@ export const Projects = () => {
     <Wrapper>
       <Header>
         <Heading>Projects</Heading>
-        <Button_create onClick={openModal}>Create Project</Button_create>
+        <Button_success onClick={openModal}>Create Project</Button_success>
       </Header>
       <ProjectsTable
         projects={projects}
@@ -126,12 +126,12 @@ export const Projects = () => {
       />
       <Footer>
         {!!projects.length && (
-          <Button_remove
+          <Button_danger
             onClick={openConfirmationModal}
             disabled={!state.sortedProjects.some(({ isChecked }) => isChecked)}
           >
             Remove Selected
-          </Button_remove>
+          </Button_danger>
         )}
       </Footer>
       <CreationModal isOpen={isModalOpen} closeModal={closeModal} />

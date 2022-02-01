@@ -221,7 +221,7 @@ export const ProjectsTable = ({
               <CheckBox
                 state={state}
                 handleFn={checkBoxesHandler}
-                name="mainCheckbox"
+                name={MAIN_CHECKBOX}
               />
             </TH>
             <TH>
