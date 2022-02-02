@@ -11,7 +11,7 @@ import { NavBar } from "../../components/navbar";
 import { Button_action } from "../../components/buttons";
 import { Input } from "../../components/inputs";
 
-import { getSchema } from "./validation";
+import { getSchema, validationTypes } from "./validation";
 
 import { greyWhiteDarker, red } from "../../styles/variables";
 import { visuallyHidden } from "../../styles/helpers";
@@ -20,7 +20,7 @@ export interface Fields {
   email: string;
   username: string;
   password: string;
-  passwordconfirm: string;
+  passwordConfirm: string;
 }
 
 const Heading = styled.h2`
@@ -63,12 +63,15 @@ export const Form = () => {
 
   const [wasOnSignUpPage, setState] = useState(onSignUpPage);
 
+  const { SIGN_UP, LOGIN } = validationTypes;
+  const schemaType = onSignUpPage ? SIGN_UP : LOGIN;
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({ resolver: yupResolver(getSchema(onSignUpPage)) });
+  } = useForm({ resolver: yupResolver(getSchema(schemaType)) });
 
   if (wasOnSignUpPage !== onSignUpPage) {
     reset();
@@ -128,12 +131,12 @@ export const Form = () => {
             <>
               <Input
                 type="password"
-                id="passwordconfirm"
+                id="passwordConfirm"
                 placeholder="confirm password"
-                isValid={!errors.passwordconfirm?.message}
-                {...register("passwordconfirm")}
+                isValid={!errors.passwordConfirm?.message}
+                {...register("passwordConfirm")}
               />
-              <HiddenLabel htmlFor="passwordconfirm">
+              <HiddenLabel htmlFor="passwordConfirm">
                 Confirm password
               </HiddenLabel>
             </>
