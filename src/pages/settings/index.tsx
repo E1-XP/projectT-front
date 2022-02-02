@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
 import { useStoreSelector } from "../../hooks";
 
 import { Icon } from "../../components/icon";
-import { Button, Button_create } from "../../components/buttons";
+import { Button, Button_success } from "../../components/buttons";
 import { Input } from "../../components/inputs";
 import placeholderAvatar from "./../../../public/assets/avatar-placeholder.gif";
 
@@ -18,6 +18,7 @@ import {
   whiteGrey,
 } from "../../styles/variables";
 import { getBP } from "../../styles/helpers";
+import { PasswordModal } from "./passwordModal";
 
 const Wrapper = styled.main`
   width: 100%;
@@ -195,6 +196,11 @@ export const Settings = () => {
   const { userData } = useStoreSelector((state) => state.user);
 
   const [isUploading, setIsUploading] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const closeModal = useCallback(() => setIsModalOpen(false), []);
+  const openModal = useCallback(() => setIsModalOpen(true), []);
+
   const [showOnTitleBar, setShowOnTitleBar] = useState(false);
   const [email, setEmail] = useState(userData.email);
   const [name, setName] = useState(userData.username);
@@ -204,17 +210,17 @@ export const Settings = () => {
       <Header>
         <Heading>My Profile</Heading>
         <Button_bar>
-          <Button_password>
+          <Button_password onClick={openModal}>
             <Icon_button name="settings" /> Change password
           </Button_password>
-          <Button_create
+          <Button_success
             disabled={
               name.trim() === userData.username &&
               email.trim() === userData.email
             }
           >
             <Icon_button name="done" /> Save
-          </Button_create>
+          </Button_success>
         </Button_bar>
       </Header>
       <Main_content>
@@ -276,6 +282,7 @@ export const Settings = () => {
           </Form_wrapper>
         </Settings_section>
       </Main_content>
+      <PasswordModal isOpen={isModalOpen} closeModal={closeModal} />
     </Wrapper>
   );
 };
