@@ -2,7 +2,13 @@ import React, { PropsWithChildren } from "react";
 import styled, { keyframes } from "styled-components";
 
 import { useStoreSelector } from "../hooks";
-import { darkGrey, greyWhiteDarker, red, white } from "../styles/variables";
+import {
+  darkGrey,
+  greyWhite,
+  greyWhiteDarker,
+  red,
+  white,
+} from "../styles/variables";
 
 const rotateAnim = keyframes`
     from{
@@ -70,7 +76,7 @@ interface ComponentLoaderProps {
   shouldShowSpinner: boolean;
   shouldShowMessage: boolean;
   message: string;
-  fill: string;
+  fill?: string;
 }
 
 export const ComponentLoader = ({
@@ -83,7 +89,7 @@ export const ComponentLoader = ({
   return (
     <Overlay isVisible={isVisible}>
       {shouldShowSpinner ? (
-        <Spinner fill={fill} showBigSpinner={true} />
+        <Spinner fill={fill || greyWhite} showBigSpinner={true} />
       ) : shouldShowMessage ? (
         message
       ) : (
