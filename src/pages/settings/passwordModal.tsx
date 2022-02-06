@@ -122,13 +122,17 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
     setConfirmNewPass("");
   };
 
+  const cleanupValidationMessages = () => {
+    setErrorMessage("");
+    dispatch(setFormMessage(["", true]));
+  };
+
   useEffect(() => {
     if (formMessage[0].length && formMessage[1]) {
       setTimeout(() => {
         closeModal();
-        setErrorMessage("");
-        dispatch(setFormMessage(["", true]));
 
+        cleanupValidationMessages();
         cleanUpFields();
       }, 3000);
     } else if (formMessage[0] === FORM_MESSAGE_ERROR) {
@@ -137,8 +141,7 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
   }, [formMessage]);
 
   const submitPasswordUpdate = useCallback(() => {
-    setErrorMessage("");
-    dispatch(setFormMessage(["", true]));
+    cleanupValidationMessages();
     setIsFieldValid([true, true, true]);
 
     if (isEqual(currentPass, newPass) && !formMessage.length) {
@@ -190,8 +193,7 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
     closeModal();
     cleanUpFields();
 
-    setErrorMessage("");
-    dispatch(setFormMessage(["", true]));
+    cleanupValidationMessages();
     setIsFieldValid([true, true, true]);
   }, [
     currentPass,
@@ -201,6 +203,26 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
     formMessage,
     isFieldValid,
   ]);
+
+  const onInputChange = useCallback(
+    (e: any) => {
+      const n = Number(e.target.attributes.id.value);
+      const fields = [...isFieldValid];
+      fields[n] = true;
+
+      setIsFieldValid(fields);
+
+      switch (n) {
+        case 0:
+          return setCurrentPass(e.target.value);
+        case 1:
+          return setNewPass(e.target.value);
+        case 2:
+          return setConfirmNewPass(e.target.value);
+      }
+    },
+    [isFieldValid]
+  );
 
   return (
     <Modal
@@ -234,43 +256,28 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
       </Modal_caption>
       <Modal_content>
         <Input
+          id="0"
           isValid={isFieldValid[0]}
           value={currentPass}
           placeholder="Current password"
           type="password"
-          onChange={(e: any) => {
-            const fields = [...isFieldValid];
-            fields[0] = true;
-
-            setIsFieldValid(fields);
-            setCurrentPass(e.target.value);
-          }}
+          onChange={onInputChange}
         />
         <Input
+          id="1"
           isValid={isFieldValid[1]}
           value={newPass}
           placeholder="New password"
           type="password"
-          onChange={(e: any) => {
-            const fields = [...isFieldValid];
-            fields[1] = true;
-
-            setIsFieldValid(fields);
-            setNewPass(e.target.value);
-          }}
+          onChange={onInputChange}
         />
         <Input
+          id="2"
           isValid={isFieldValid[2]}
           value={confirmNewPass}
           placeholder="New password again"
           type="password"
-          onChange={(e: any) => {
-            const fields = [...isFieldValid];
-            fields[2] = true;
-
-            setIsFieldValid(fields);
-            setConfirmNewPass(e.target.value);
-          }}
+          onChange={onInputChange}
         />
         <Button_container>
           <Button_danger onClick={cancelPasswordUpdate}> Cancel </Button_danger>
