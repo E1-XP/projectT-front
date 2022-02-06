@@ -1,9 +1,22 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import Modal from "react-modal";
 
-import { getSchema, validationTypes } from "./../forms/validation";
+import { useStoreDispatch, useStoreSelector } from "../../hooks";
 
+import {
+  EMPTY_PASSWORD_FIELD,
+  FORM_MESSAGE_ERROR,
+  getSchema,
+  PASSWORD_COMPARISION_FAILED,
+  PASSWORD_NOT_CHANGED,
+  PASSWORD_TOO_SHORT,
+  validationTypes,
+} from "./../forms/validation";
+
+import { changePassword, setFormMessage } from "../../actions/global";
+
+import { ComponentLoader } from "../../components/loader";
 import {
   Button,
   Button_danger,
@@ -12,7 +25,7 @@ import {
 import { Input } from "../../components/inputs";
 import { Icon } from "../../components/icon";
 
-import { red, white, whiteGrey } from "../../styles/variables";
+import { red, white, whiteGrey, green } from "../../styles/variables";
 
 interface Props {
   isOpen: boolean;
@@ -46,17 +59,23 @@ const Modal_content = styled.section`
   padding: 1rem;
 `;
 
+enum CAPTION_STATES {
+  ERROR = "ERROR",
+  SUCCESS = "SUCCESS",
+}
 interface IModalError {
   isVisible: boolean;
+  type: CAPTION_STATES;
 }
 
-const Modal_error = styled.div`
+const Modal_caption = styled.div`
   padding: 1rem;
-  background-color: ${({ isVisible }: IModalError) =>
-    isVisible ? red : white};
+  background-color: ${({ isVisible, type }: IModalError) =>
+    isVisible ? (type === CAPTION_STATES.ERROR ? red : green) : white};
   color: ${white};
   font-weight: 700;
   text-align: center;
+  transition: all 200ms ease-in-out;
 `;
 
 const Button_container = styled.div`
@@ -84,21 +103,104 @@ const modalStyle = {
 Modal.setAppElement("#app");
 
 export const PasswordModal = ({ isOpen, closeModal }: Props) => {
+  const dispatch = useStoreDispatch();
+  const isFetching = useStoreSelector((state) => state.global.isFetching);
+  const formMessage = useStoreSelector((state) => state.global.formMessage);
+
   const [currentPass, setCurrentPass] = useState("");
   const [newPass, setNewPass] = useState("");
   const [confirmNewPass, setConfirmNewPass] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isFieldValid, setIsFieldValid] = useState([true, true, true]);
 
   const isTouched = (s: string) => !!s.length;
+  const isEqual = (s1: string, s2: string) => s1 === s2;
 
-  const isNewPasswordConfirmed = () => {
-    const newPassword = newPass.trim();
-    const confirmNewPassword = confirmNewPass.trim();
-
-    const isSame = newPassword === confirmNewPassword;
-
-    return isTouched(newPassword) && isTouched(confirmNewPassword) && isSame;
+  const cleanUpFields = () => {
+    setCurrentPass("");
+    setNewPass("");
+    setConfirmNewPass("");
   };
+
+  useEffect(() => {
+    if (formMessage[0].length && formMessage[1]) {
+      setTimeout(() => {
+        closeModal();
+        setErrorMessage("");
+        dispatch(setFormMessage(["", true]));
+
+        cleanUpFields();
+      }, 3000);
+    } else if (formMessage[0] === FORM_MESSAGE_ERROR) {
+      setIsFieldValid([false, true, true]);
+    }
+  }, [formMessage]);
+
+  const submitPasswordUpdate = useCallback(() => {
+    setErrorMessage("");
+    dispatch(setFormMessage(["", true]));
+    setIsFieldValid([true, true, true]);
+
+    if (isEqual(currentPass, newPass) && !formMessage.length) {
+      setErrorMessage(PASSWORD_NOT_CHANGED);
+      setIsFieldValid([true, false, false]);
+      return;
+    }
+
+    try {
+      getSchema(validationTypes.PASS_CHANGE).validateSync({
+        password: newPass.trim(),
+        passwordConfirm: confirmNewPass.trim(),
+      });
+
+      dispatch(
+        changePassword({
+          current: currentPass,
+          newpass: newPass,
+          newpass2: confirmNewPass,
+        })
+      );
+    } catch (e: any) {
+      if (!isTouched(newPass.trim())) {
+        setErrorMessage(EMPTY_PASSWORD_FIELD);
+      } else if (e.message) {
+        setErrorMessage(e.message);
+
+        switch (e.message) {
+          case PASSWORD_COMPARISION_FAILED:
+          case PASSWORD_TOO_SHORT: {
+            return setIsFieldValid([true, false, false]);
+          }
+          case FORM_MESSAGE_ERROR: {
+            return setIsFieldValid([false, true, true]);
+          }
+        }
+      }
+    }
+  }, [
+    currentPass,
+    newPass,
+    confirmNewPass,
+    errorMessage,
+    formMessage,
+    isFieldValid,
+  ]);
+
+  const cancelPasswordUpdate = useCallback(() => {
+    closeModal();
+    cleanUpFields();
+
+    setErrorMessage("");
+    dispatch(setFormMessage(["", true]));
+    setIsFieldValid([true, true, true]);
+  }, [
+    currentPass,
+    newPass,
+    confirmNewPass,
+    errorMessage,
+    formMessage,
+    isFieldValid,
+  ]);
 
   return (
     <Modal
@@ -108,41 +210,78 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
       closeTimeoutMS={200}
       style={modalStyle}
     >
+      <ComponentLoader
+        isVisible={isFetching}
+        shouldShowSpinner={isFetching}
+        shouldShowMessage={false}
+        message=""
+      />
       <Modal_header>
         <Section_Heading>Change Password</Section_Heading>
-        <Icon_Link onClick={closeModal}>
+        <Icon_Link onClick={cancelPasswordUpdate}>
           <Icon name="close" />
         </Icon_Link>
       </Modal_header>
-      <Modal_error isVisible={!!errorMessage.length}>
-        {errorMessage}
-      </Modal_error>
+      <Modal_caption
+        type={
+          errorMessage.length || !formMessage[1]
+            ? CAPTION_STATES.ERROR
+            : CAPTION_STATES.SUCCESS
+        }
+        isVisible={[errorMessage, formMessage[0]].some((s) => s.length)}
+      >
+        {formMessage[0] || errorMessage}
+      </Modal_caption>
       <Modal_content>
         <Input
-          isValid={true}
+          isValid={isFieldValid[0]}
           value={currentPass}
           placeholder="Current password"
           type="password"
-          onChange={(e: any) => setCurrentPass(e.target.value)}
+          onChange={(e: any) => {
+            const fields = [...isFieldValid];
+            fields[0] = true;
+
+            setIsFieldValid(fields);
+            setCurrentPass(e.target.value);
+          }}
         />
         <Input
-          isValid={!isTouched(newPass) || isNewPasswordConfirmed()}
+          isValid={isFieldValid[1]}
           value={newPass}
           placeholder="New password"
           type="password"
-          onChange={(e: any) => setNewPass(e.target.value)}
+          onChange={(e: any) => {
+            const fields = [...isFieldValid];
+            fields[1] = true;
+
+            setIsFieldValid(fields);
+            setNewPass(e.target.value);
+          }}
         />
         <Input
-          isValid={!isTouched(confirmNewPass) || isNewPasswordConfirmed()}
+          isValid={isFieldValid[2]}
           value={confirmNewPass}
           placeholder="New password again"
           type="password"
-          onChange={(e: any) => setConfirmNewPass(e.target.value)}
-        />
+          onChange={(e: any) => {
+            const fields = [...isFieldValid];
+            fields[2] = true;
 
+            setIsFieldValid(fields);
+            setConfirmNewPass(e.target.value);
+          }}
+        />
         <Button_container>
-          <Button_danger> Cancel </Button_danger>
-          <Button_success> Save </Button_success>
+          <Button_danger onClick={cancelPasswordUpdate}> Cancel </Button_danger>
+          <Button_success
+            disabled={[currentPass, newPass, confirmNewPass].some(
+              (s) => !s.length
+            )}
+            onClick={submitPasswordUpdate}
+          >
+            Save
+          </Button_success>
         </Button_container>
       </Modal_content>
     </Modal>

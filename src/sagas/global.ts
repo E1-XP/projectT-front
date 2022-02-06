@@ -11,7 +11,14 @@ import mapValues from "lodash/fp/mapValues";
 import { config } from "./../config";
 import { history } from "./../routes/history";
 import { Fields } from "../pages/forms";
-import { setIsLoggedIn, setIsLoading, fetchError } from "./../actions/global";
+
+import {
+  setIsLoggedIn,
+  setIsLoading,
+  fetchError,
+  PasswordData,
+  setFormMessage,
+} from "./../actions/global";
 import {
   getUserData,
   setEntries,
@@ -22,9 +29,13 @@ import { handleRunningEntry } from "../actions/timer";
 
 import { UserData, Entry, Project } from "./../store/interfaces";
 import { FetchResponse, StoreSelector } from "./helpers";
-
 import { request } from "../helpers/request";
 import { groupEntriesByDays, SingleDay } from "../selectors/groupEntriesByDays";
+
+import {
+  FORM_MESSAGE_ERROR,
+  FORM_MESSAGE_SUCCESS,
+} from "../pages/forms/validation";
 
 interface AuthData {
   message: string;
@@ -70,6 +81,22 @@ const userDataRequest = async (userId: AuthData["userId"]) => {
   const URL = `${config.API_URL}/users/${userId}`;
 
   return await request(URL, { credentials: "include" });
+};
+
+const passwordChangeRequest = async (
+  userId: AuthData["userId"],
+  passwordData: PasswordData
+) => {
+  const URL = `${config.API_URL}/users/${userId}/password`;
+
+  return await request(URL, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(passwordData),
+  });
 };
 
 export function* initAuth(action: PayloadAction<Fields>) {
@@ -148,6 +175,31 @@ export function* initReAuth(action: Action) {
       yield put(setIsLoggedIn(true));
       yield put(setIsLoading(false));
     } else yield put(setIsLoading(false));
+  } catch (e) {
+    yield put(fetchError(e));
+  }
+}
+
+export function* changePassword({ payload }: PayloadAction<PasswordData>) {
+  try {
+    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
+      (state) => state.user.userData
+    );
+
+    const response: FetchResponse = yield call(
+      passwordChangeRequest,
+      userId,
+      payload
+    );
+
+    if (response.status === 200) {
+      const data: { result: boolean } = yield response.json();
+
+      if (!data.result) yield put(setFormMessage([FORM_MESSAGE_ERROR, false]));
+      else yield put(setFormMessage([FORM_MESSAGE_SUCCESS, true]));
+    } else if (response.status.toString().startsWith("4")) {
+      yield put(setFormMessage([FORM_MESSAGE_ERROR, false]));
+    }
   } catch (e) {
     yield put(fetchError(e));
   }

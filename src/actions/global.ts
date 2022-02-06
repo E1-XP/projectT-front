@@ -13,6 +13,20 @@ export const setIsLoggedIn = createAction<boolean>(
   types.GLOBAL_SET_IS_LOGGED_IN
 );
 
+export interface PasswordData {
+  current: string;
+  newpass: string;
+  newpass2: string;
+}
+
+export const changePassword = createAction<PasswordData>(
+  types.GLOBAL_CHANGE_PASSWORD
+);
+
+export const setFormMessage = createAction<[string, boolean]>(
+  types.GLOBAL_SET_FORM_MESSAGE
+);
+
 export const setIsLoading = createAction<boolean>(types.GLOBAL_SET_IS_LOADING);
 
 export const setIsFetching = createAction<boolean>(

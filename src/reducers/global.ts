@@ -4,12 +4,14 @@ import {
   setIsFetching,
   setIsLoading,
   setIsLoggedIn,
+  setFormMessage,
 } from "./../actions/global";
 
 const initialState = {
   isUserLoggedIn: false,
   isLoading: true,
   isFetching: true,
+  formMessage: ["", true] as [string, boolean],
 };
 
 export const globalReducer = createReducer(initialState, (builder) => {
@@ -21,5 +23,8 @@ export const globalReducer = createReducer(initialState, (builder) => {
   });
   builder.addCase(setIsLoading, (state, action) => {
     state.isLoading = action.payload;
+  });
+  builder.addCase(setFormMessage, (state, action) => {
+    state.formMessage = action.payload;
   });
 });

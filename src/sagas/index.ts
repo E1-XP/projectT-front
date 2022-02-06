@@ -6,6 +6,7 @@ import {
   initAuth,
   initLogOut,
   initReAuth,
+  changePassword,
   requestError,
   requestUserData,
   trimEntriesOnTimerRoute,
@@ -25,6 +26,7 @@ export function* rootSaga() {
   yield takeLatest(types.GLOBAL_INIT_RE_AUTH, initReAuth);
   yield takeLatest(types.USER_GET_USER_DATA, requestUserData);
   yield takeLatest(types.GLOBAL_INIT_LOGOUT, initLogOut);
+  yield takeLatest(types.GLOBAL_CHANGE_PASSWORD, changePassword);
   yield takeLatest(types.GLOBAL_FETCH_ERROR, requestError);
   yield takeLatest(types.TIMER_SET_IS_RUNNING, startTimerInterval);
   yield takeLatest(types.USER_FETCH_ENTRIES, fetchEntries);
