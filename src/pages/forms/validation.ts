@@ -13,6 +13,18 @@ export interface SignUpFields {
   passwordConfirm: string;
 }
 
+export const USERNAME_TOO_SHORT = "Username must have at least 2 characters";
+export const PASSWORD_TOO_SHORT = "Password must have at least 8 characters";
+export const PASSWORD_HINT =
+  "Password must have one number, one capitalized and lower case letter";
+export const CONFIRMATION_MISSING = "Please confirm your password";
+export const PASSWORD_NOT_CHANGED = "Please provide different password";
+export const PASSWORD_COMPARISION_FAILED = "Passwords are different";
+export const EMPTY_PASSWORD_FIELD = "Please fill password fields";
+
+export const FORM_MESSAGE_ERROR = "Wrong password provided";
+export const FORM_MESSAGE_SUCCESS = "Password succesfully changed";
+
 export type Loginfields = Pick<SignUpFields, "email" | "password">;
 export type PassChangeFields = Pick<
   SignUpFields,
@@ -21,23 +33,18 @@ export type PassChangeFields = Pick<
 
 export const getSchema = (actionType: validationTypes) => {
   const email = yup.string().required().email();
-  const username = yup
-    .string()
-    .min(2, "username must have at least 2 characters");
-
-  const passwordHint =
-    "password must have one number, one capitalized and lower case letter";
+  const username = yup.string().min(2, USERNAME_TOO_SHORT);
 
   const password = yup
     .string()
-    .required()
-    .min(8, "password must have at least 8 characters")
-    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, passwordHint);
+    .required(EMPTY_PASSWORD_FIELD)
+    .min(8, PASSWORD_TOO_SHORT)
+    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, PASSWORD_HINT);
 
   const passwordConfirm = yup
     .string()
-    .required("please confirm your password")
-    .test("password-comparison", "passwords are different", function (value) {
+    .required(CONFIRMATION_MISSING)
+    .test("password-comparison", PASSWORD_COMPARISION_FAILED, function (value) {
       return value === this.parent.password;
     });
 
