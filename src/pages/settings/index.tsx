@@ -1,12 +1,16 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
-import { useStoreSelector } from "../../hooks";
+import { useStoreDispatch, useStoreSelector } from "../../hooks";
 
+import { PasswordModal } from "./passwordModal";
 import { Icon } from "../../components/icon";
 import { Button, Button_success } from "../../components/buttons";
 import { Input } from "../../components/inputs";
+
 import placeholderAvatar from "./../../../public/assets/avatar-placeholder.gif";
+
+import { uploadAvatar } from "../../actions/user";
 
 import {
   breakPoints,
@@ -18,7 +22,6 @@ import {
   whiteGrey,
 } from "../../styles/variables";
 import { getBP } from "../../styles/helpers";
-import { PasswordModal } from "./passwordModal";
 
 const Wrapper = styled.main`
   width: 100%;
@@ -193,7 +196,9 @@ const Icon_button = (props: { name: string }) => (
 );
 
 export const Settings = () => {
+  const dispatch = useStoreDispatch();
   const { userData } = useStoreSelector((state) => state.user);
+  const isFetching = useStoreSelector((state) => state.global.isFetching);
 
   const [isUploading, setIsUploading] = useState(false);
 
@@ -204,6 +209,26 @@ export const Settings = () => {
   const [showOnTitleBar, setShowOnTitleBar] = useState(false);
   const [email, setEmail] = useState(userData.email);
   const [name, setName] = useState(userData.username);
+
+  useEffect(() => {
+    if (!isFetching && isUploading) {
+      const avatarInput = document.getElementById("avInput") as any;
+      if (avatarInput) avatarInput.value = null;
+
+      setIsUploading(false);
+    }
+  }, [isFetching, isUploading]);
+
+  const uploadImage = useCallback(() => {
+    const form = document.querySelector("#formAvatar") as HTMLFormElement;
+    if (!form) return;
+
+    const data = new FormData(form);
+
+    setIsUploading(true);
+
+    dispatch(uploadAvatar(data));
+  }, []);
 
   return (
     <Wrapper>
@@ -239,7 +264,7 @@ export const Settings = () => {
                   className="inputfile-hidden"
                   type="file"
                   name="avatar"
-                  onChange={undefined}
+                  onChange={uploadImage}
                   id="avInput"
                 />
               </form>

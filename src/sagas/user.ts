@@ -2,6 +2,7 @@ import { call, put, select } from "redux-saga/effects";
 import { PayloadAction, Action } from "@reduxjs/toolkit";
 import startOfDay from "date-fns/startOfDay";
 import subDays from "date-fns/subDays";
+import pickBy from "lodash/fp/pickBy";
 
 import { FetchResponse, StoreSelector } from "./helpers";
 import { request } from "../helpers/request";
@@ -11,7 +12,7 @@ import { config } from "../config";
 import { Entry, Project, UserData } from "../store/interfaces";
 
 import { batchInsertEntry } from "../actions/entry";
-import { setProjects } from "../actions/user";
+import { setProjects, setUserData } from "../actions/user";
 
 import { groupEntriesByDays, SingleDay } from "../selectors/groupEntriesByDays";
 
@@ -50,6 +51,16 @@ const projectRemovalRequest = async (userId: string, name: string) => {
   const URL = `${config.API_URL}/users/${userId}/projects/?name=${sName}`;
 
   return await request(URL, { method: "DELETE", credentials: "include" });
+};
+
+const sendAvatarRequest = async (userId: string, data: any) => {
+  const URL = `${config.API_URL}/users/${userId}/avatar`;
+
+  return await request(URL, {
+    method: "PUT",
+    credentials: "include",
+    body: data,
+  });
 };
 
 export function* fetchEntries(action: PayloadAction<number | undefined>) {
@@ -125,6 +136,33 @@ export function* removeProject(action: PayloadAction<string>) {
       const userData: UserDataResponse = yield response.json();
 
       yield put(setProjects(userData.projects));
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export function* sendAvatar({ payload }: PayloadAction<any>) {
+  try {
+    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
+      (state) => state.user.userData
+    );
+
+    const response: FetchResponse = yield call(
+      sendAvatarRequest,
+      userId,
+      payload
+    );
+
+    if (response.status === 200) {
+      const data: UserDataResponse = yield response.json();
+
+      const keys = ["settings", "entries", "projects"];
+      const userDataFiltered = pickBy((_, key) => !keys.includes(key))(
+        data
+      ) as UserData;
+
+      yield put(setUserData(userDataFiltered));
     }
   } catch (e) {
     console.log(e);
