@@ -10,13 +10,11 @@ import { Input } from "../../components/inputs";
 
 import placeholderAvatar from "./../../../public/assets/avatar-placeholder.gif";
 
-import { uploadAvatar } from "../../actions/user";
+import { uploadAvatar, removeAvatar } from "../../actions/user";
 
 import {
   breakPoints,
   darkGrey,
-  green,
-  greyWhite,
   red,
   white,
   whiteGrey,
@@ -201,6 +199,7 @@ export const Settings = () => {
   const isFetching = useStoreSelector((state) => state.global.isFetching);
 
   const [isUploading, setIsUploading] = useState(false);
+  const uploadCompleted = useCallback(() => setIsUploading(false), []);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
@@ -213,9 +212,10 @@ export const Settings = () => {
   useEffect(() => {
     if (!isFetching && isUploading) {
       const avatarInput = document.getElementById("avInput") as any;
-      if (avatarInput) avatarInput.value = null;
+      const avatarImg = document.getElementById("avatar") as any;
 
-      setIsUploading(false);
+      if (avatarInput) avatarInput.value = null;
+      if (avatarImg && avatarImg.complete) uploadCompleted();
     }
   }, [isFetching, isUploading]);
 
@@ -228,6 +228,10 @@ export const Settings = () => {
     setIsUploading(true);
 
     dispatch(uploadAvatar(data));
+  }, []);
+
+  const onAvatarRemove = useCallback(() => {
+    dispatch(removeAvatar());
   }, []);
 
   return (
@@ -251,7 +255,11 @@ export const Settings = () => {
       <Main_content>
         <Side>
           <Avatar_section>
-            <Avatar_img src={userData.avatar || placeholderAvatar} />
+            <Avatar_img
+              id="avatar"
+              onLoad={uploadCompleted}
+              src={userData.avatar || placeholderAvatar}
+            />
             {isUploading && (
               <Avatar_inProgress>
                 <span></span>
@@ -271,7 +279,7 @@ export const Settings = () => {
             </Avatar_settings>
           </Avatar_section>
           {userData.avatar && (
-            <Avatar_remove onClick={undefined}>
+            <Avatar_remove onClick={onAvatarRemove}>
               <Icon name="close" />
             </Avatar_remove>
           )}

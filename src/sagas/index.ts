@@ -19,7 +19,13 @@ import {
   removeEntry,
   removeRunningEntry,
 } from "./entry";
-import { createProject, fetchEntries, removeProject, sendAvatar } from "./user";
+import {
+  createProject,
+  deleteAvatar,
+  fetchEntries,
+  removeProject,
+  sendAvatar,
+} from "./user";
 
 export function* rootSaga() {
   yield takeLatest(types.GLOBAL_INIT_AUTH, initAuth);
@@ -33,6 +39,7 @@ export function* rootSaga() {
   yield takeLatest(types.USER_CREATE_PROJECT, createProject);
   yield takeLatest(types.USER_REMOVE_PROJECT, removeProject);
   yield takeLatest(types.USER_UPLOAD_AVATAR, sendAvatar);
+  yield takeLatest(types.USER_REMOVE_AVATAR, deleteAvatar);
   yield takeEvery(types.ENTRY_CREATE_FROM_EXISTING, createEntryFromExisting);
   yield takeEvery(types.ENTRY_CREATE, createEntry);
   yield takeEvery(types.ENTRY_UPDATE, updateEntry);

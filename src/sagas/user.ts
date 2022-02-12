@@ -63,6 +63,19 @@ const sendAvatarRequest = async (userId: string, data: any) => {
   });
 };
 
+const avatarRemovalRequest = async (userId: string, avatarURL: string) => {
+  const URL = `${config.API_URL}/users/${userId}/avatar`;
+
+  return await request(URL, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ avatarURL }),
+  });
+};
+
 export function* fetchEntries(action: PayloadAction<number | undefined>) {
   try {
     const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
@@ -152,6 +165,40 @@ export function* sendAvatar({ payload }: PayloadAction<any>) {
       sendAvatarRequest,
       userId,
       payload
+    );
+
+    if (response.status === 200) {
+      const data: UserDataResponse = yield response.json();
+
+      const keys = ["settings", "entries", "projects"];
+      const userDataFiltered = pickBy((_, key) => !keys.includes(key))(
+        data
+      ) as UserData;
+
+      yield put(setUserData(userDataFiltered));
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export function* deleteAvatar(action: Action) {
+  try {
+    const {
+      _id: userId,
+      avatar: avatarURL,
+    }: StoreSelector["user"]["userData"] = yield select(
+      (state) => state.user.userData
+    );
+
+    const avatarFileURL = avatarURL.split(config.API_URL)[1];
+
+    if (!avatarURL || !avatarFileURL) return;
+
+    const response: FetchResponse = yield call(
+      avatarRemovalRequest,
+      userId,
+      avatarFileURL
     );
 
     if (response.status === 200) {

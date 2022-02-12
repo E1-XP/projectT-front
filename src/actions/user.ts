@@ -22,3 +22,5 @@ export const createProject = createAction<Omit<Project, "_id">>(
 export const removeProject = createAction<string>(types.USER_REMOVE_PROJECT);
 
 export const uploadAvatar = createAction<any>(types.USER_UPLOAD_AVATAR);
+
+export const removeAvatar = createAction(types.USER_REMOVE_AVATAR);

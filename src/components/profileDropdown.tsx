@@ -125,7 +125,7 @@ export const ProfileDropdown = () => {
 
   const pushToSettings = useCallback(() => dispatch(push("/settings")), []);
 
-  const username = useStoreSelector((state) => state.user.userData.username);
+  const { username, avatar } = useStoreSelector((state) => state.user.userData);
 
   const getShortUserName = useCallback(
     (userName: string) =>
@@ -142,7 +142,9 @@ export const ProfileDropdown = () => {
         <Link_label>
           {username.length > 12 ? username.substring(0, 10) + "..." : username}
         </Link_label>
-        <Icon_profile url={null}>{getShortUserName(username)}</Icon_profile>
+        <Icon_profile url={avatar || null}>
+          {!avatar && getShortUserName(username)}
+        </Icon_profile>
         {isOpen && (
           <Dropdown>
             <Dropdown_item_noclick>
