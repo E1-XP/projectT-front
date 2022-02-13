@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
+import uniq from "lodash/fp/uniq";
 
 import { useStoreDispatch, useStoreSelector } from "../../hooks";
 
@@ -20,6 +21,8 @@ import {
   whiteGrey,
 } from "../../styles/variables";
 import { getBP } from "../../styles/helpers";
+import { push } from "connected-react-router";
+import { getSchema, validationTypes } from "../forms/validation";
 
 const Wrapper = styled.main`
   width: 100%;
@@ -189,6 +192,11 @@ const Label_check = styled.label`
   margin-left: 1rem;
 `;
 
+const Form_message = styled.p`
+  color: ${red};
+  text-align: center;
+`;
+
 const Icon_button = (props: { name: string }) => (
   <Icon fill={whiteGrey} size="1rem" {...props} />
 );
@@ -207,7 +215,10 @@ export const Settings = () => {
 
   const [showOnTitleBar, setShowOnTitleBar] = useState(false);
   const [email, setEmail] = useState(userData.email);
-  const [name, setName] = useState(userData.username);
+  const [username, setUsername] = useState(userData.username);
+
+  const [formMessage, setFormMessage] = useState("");
+  const [isFieldValid, setIsFieldValid] = useState([true, true]);
 
   useEffect(() => {
     if (!isFetching && isUploading) {
@@ -234,6 +245,46 @@ export const Settings = () => {
     dispatch(removeAvatar());
   }, []);
 
+  const saveUserData = useCallback(() => {
+    const messages: string[] = [];
+    const fields = isFieldValid.map(() => true);
+    const getMessage = () => uniq(messages).join(", ");
+
+    setIsFieldValid([true, true]);
+
+    try {
+      getSchema(validationTypes.USER_NAME)!.validateSync({
+        username,
+      });
+
+      setFormMessage("");
+    } catch (e: any) {
+      if (e.message) {
+        messages.push(e.message);
+        setFormMessage(getMessage());
+
+        fields[0] = false;
+        setIsFieldValid(fields);
+      }
+    }
+
+    try {
+      getSchema(validationTypes.EMAIL)!.validateSync({
+        email,
+      });
+
+      setFormMessage("");
+    } catch (e: any) {
+      if (e.message) {
+        messages.push(e.message);
+        setFormMessage(getMessage());
+
+        fields[1] = false;
+        setIsFieldValid(fields);
+      }
+    }
+  }, [email, username, formMessage, isFieldValid]);
+
   return (
     <Wrapper>
       <Header>
@@ -244,9 +295,10 @@ export const Settings = () => {
           </Button_password>
           <Button_success
             disabled={
-              name.trim() === userData.username &&
+              username.trim() === userData.username &&
               email.trim() === userData.email
             }
+            onClick={saveUserData}
           >
             <Icon_button name="done" /> Save
           </Button_success>
@@ -288,18 +340,19 @@ export const Settings = () => {
           <Form_wrapper>
             <Label htmlFor="username">Your name</Label>
             <Input_label
-              isValid={true}
+              isValid={isFieldValid[0]}
               name="username"
-              value={name}
-              onChange={(e: any) => setName(e.target.value)}
+              value={username}
+              onChange={(e: any) => setUsername(e.target.value)}
             />
             <Label htmlFor="email">Email</Label>
             <Input_label
-              isValid={true}
+              isValid={isFieldValid[1]}
               name="email"
               value={email}
               onChange={(e: any) => setEmail(e.target.value)}
             />
+            <Form_message>{formMessage}</Form_message>
             <Input_group>
               <Input
                 isValid={true}
