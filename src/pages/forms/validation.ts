@@ -4,6 +4,9 @@ export enum validationTypes {
   SIGN_UP = "SIGN_UP",
   LOGIN = "LOGIN",
   PASS_CHANGE = "PASS_CHANGE",
+  EMAIL = "EMAIL",
+  USER_NAME = "USER_NAME",
+  USER_DATA = "USER_DATA",
 }
 
 export interface SignUpFields {
@@ -48,7 +51,8 @@ export const getSchema = (actionType: validationTypes) => {
       return value === this.parent.password;
     });
 
-  const { SIGN_UP, LOGIN, PASS_CHANGE } = validationTypes;
+  const { SIGN_UP, LOGIN, PASS_CHANGE, EMAIL, USER_NAME, USER_DATA } =
+    validationTypes;
 
   switch (actionType) {
     case SIGN_UP:
@@ -62,5 +66,13 @@ export const getSchema = (actionType: validationTypes) => {
       return yup.object({ email, password });
     case PASS_CHANGE:
       return yup.object({ password, passwordConfirm });
+    case EMAIL:
+      return yup.object({ email });
+    case USER_NAME:
+      return yup.object({ username });
+    case USER_DATA:
+      return yup.object({ email, username });
+    default:
+      console.error("case not implemented!");
   }
 };

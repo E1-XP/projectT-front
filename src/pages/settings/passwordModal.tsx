@@ -151,7 +151,7 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
     }
 
     try {
-      getSchema(validationTypes.PASS_CHANGE).validateSync({
+      getSchema(validationTypes.PASS_CHANGE)!.validateSync({
         password: newPass.trim(),
         passwordConfirm: confirmNewPass.trim(),
       });

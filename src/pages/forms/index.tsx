@@ -71,7 +71,7 @@ export const Form = () => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({ resolver: yupResolver(getSchema(schemaType)) });
+  } = useForm({ resolver: yupResolver(getSchema(schemaType)!) });
 
   if (wasOnSignUpPage !== onSignUpPage) {
     reset();
