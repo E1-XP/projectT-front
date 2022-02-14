@@ -3,8 +3,12 @@ export interface UserData {
   email: string;
   username: string;
   _id: string;
+  settings: Settings;
 }
 
+interface Settings {
+  shouldShowTimerOnTitle: boolean;
+}
 export interface Entry {
   billable: boolean;
   description: string;

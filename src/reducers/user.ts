@@ -2,7 +2,12 @@ import { createReducer } from "@reduxjs/toolkit";
 
 import { Entry, Project, UserData } from "../store/interfaces";
 
-import { setUserData, setEntries, setProjects } from "./../actions/user";
+import {
+  setUserData,
+  setEntries,
+  setProjects,
+  setShouldShowTimerOnTitle,
+} from "./../actions/user";
 import { insertEntry, deleteEntry, batchInsertEntry } from "../actions/entry";
 
 const initialState = {
@@ -11,6 +16,9 @@ const initialState = {
     email: "",
     username: "",
     _id: "",
+    settings: {
+      shouldShowTimerOnTitle: false,
+    },
   },
   entries: [] as Entry[],
   projects: [] as Project[],
@@ -49,5 +57,8 @@ export const userReducer = createReducer(initialState, (builder) => {
   });
   builder.addCase(setProjects, (state, action) => {
     state.projects = action.payload;
+  });
+  builder.addCase(setShouldShowTimerOnTitle, (state, action) => {
+    state.userData.settings.shouldShowTimerOnTitle = action.payload;
   });
 });

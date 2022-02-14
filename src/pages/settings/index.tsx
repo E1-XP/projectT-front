@@ -8,10 +8,12 @@ import { PasswordModal } from "./passwordModal";
 import { Icon } from "../../components/icon";
 import { Button, Button_success } from "../../components/buttons";
 import { Input } from "../../components/inputs";
+import { ComponentLoader } from "../../components/loader";
 
 import placeholderAvatar from "./../../../public/assets/avatar-placeholder.gif";
 
-import { uploadAvatar, removeAvatar } from "../../actions/user";
+import { uploadAvatar, removeAvatar, sendUserData } from "../../actions/user";
+import { getSchema, validationTypes } from "../forms/validation";
 
 import {
   breakPoints,
@@ -21,8 +23,6 @@ import {
   whiteGrey,
 } from "../../styles/variables";
 import { getBP } from "../../styles/helpers";
-import { push } from "connected-react-router";
-import { getSchema, validationTypes } from "../forms/validation";
 
 const Wrapper = styled.main`
   width: 100%;
@@ -213,7 +213,9 @@ export const Settings = () => {
   const closeModal = useCallback(() => setIsModalOpen(false), []);
   const openModal = useCallback(() => setIsModalOpen(true), []);
 
-  const [showOnTitleBar, setShowOnTitleBar] = useState(false);
+  const [shouldShowTimerOnTitle, setShouldShowTimerOnTitle] = useState(
+    userData.settings.shouldShowTimerOnTitle
+  );
   const [email, setEmail] = useState(userData.email);
   const [username, setUsername] = useState(userData.username);
 
@@ -283,6 +285,18 @@ export const Settings = () => {
         setIsFieldValid(fields);
       }
     }
+
+    if (!messages.length && fields.every((f) => !!f)) {
+      dispatch(
+        sendUserData({
+          email,
+          username,
+          settings: {
+            shouldShowTimerOnTitle,
+          },
+        })
+      );
+    }
   }, [email, username, formMessage, isFieldValid]);
 
   return (
@@ -296,7 +310,9 @@ export const Settings = () => {
           <Button_success
             disabled={
               username.trim() === userData.username &&
-              email.trim() === userData.email
+              email.trim() === userData.email &&
+              shouldShowTimerOnTitle ===
+                userData.settings.shouldShowTimerOnTitle
             }
             onClick={saveUserData}
           >
@@ -337,6 +353,10 @@ export const Settings = () => {
           )}
         </Side>
         <Settings_section>
+          <ComponentLoader
+            isVisible={isFetching}
+            shouldShowSpinner={isFetching}
+          />
           <Form_wrapper>
             <Label htmlFor="username">Your name</Label>
             <Input_label
@@ -358,8 +378,10 @@ export const Settings = () => {
                 isValid={true}
                 type="checkbox"
                 name="showtitletimer"
-                checked={showOnTitleBar}
-                onChange={() => setShowOnTitleBar(!showOnTitleBar)}
+                checked={shouldShowTimerOnTitle}
+                onChange={() =>
+                  setShouldShowTimerOnTitle(!shouldShowTimerOnTitle)
+                }
               />
               <Label_check htmlFor="showtitletimer">
                 <span></span>Show running time on the title bar

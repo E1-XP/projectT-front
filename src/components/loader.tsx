@@ -74,8 +74,8 @@ const Main_preloader = styled.div`
 interface ComponentLoaderProps {
   isVisible: boolean;
   shouldShowSpinner: boolean;
-  shouldShowMessage: boolean;
-  message: string;
+  shouldShowMessage?: boolean;
+  message?: string;
   fill?: string;
 }
 
@@ -91,7 +91,7 @@ export const ComponentLoader = ({
       {shouldShowSpinner ? (
         <Spinner fill={fill || greyWhite} showBigSpinner={true} />
       ) : shouldShowMessage ? (
-        message
+        message || ""
       ) : (
         ""
       )}

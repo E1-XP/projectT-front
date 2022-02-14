@@ -76,6 +76,19 @@ const avatarRemovalRequest = async (userId: string, avatarURL: string) => {
   });
 };
 
+const requestSendUserData = async (data: Partial<UserData>, userId: string) => {
+  const URL = `${config.API_URL}/users/${userId}/`;
+
+  return await request(URL, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+};
+
 export function* fetchEntries(action: PayloadAction<number | undefined>) {
   try {
     const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
@@ -210,6 +223,30 @@ export function* deleteAvatar(action: Action) {
       ) as UserData;
 
       yield put(setUserData(userDataFiltered));
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export function* sendUserData(action: PayloadAction<Partial<UserData>>) {
+  try {
+    console.log(action.payload);
+
+    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
+      (state) => state.user.userData
+    );
+
+    const response: FetchResponse = yield call(
+      requestSendUserData,
+      action.payload,
+      userId
+    );
+
+    if (response.status === 200) {
+      const data: UserDataResponse = yield response.json();
+
+      yield put(setUserData(data));
     }
   } catch (e) {
     console.log(e);

@@ -7,6 +7,10 @@ export const getUserData = createAction<string>(types.USER_GET_USER_DATA);
 
 export const setUserData = createAction<UserData>(types.USER_SET_USER_DATA);
 
+export const sendUserData = createAction<Partial<UserData>>(
+  types.USER_SEND_USER_DATA
+);
+
 export const setEntries = createAction<Entry[]>(types.USER_SET_ENTRIES);
 
 export const fetchEntries = createAction<number | undefined>(
@@ -24,3 +28,7 @@ export const removeProject = createAction<string>(types.USER_REMOVE_PROJECT);
 export const uploadAvatar = createAction<any>(types.USER_UPLOAD_AVATAR);
 
 export const removeAvatar = createAction(types.USER_REMOVE_AVATAR);
+
+export const setShouldShowTimerOnTitle = createAction<boolean>(
+  types.USER_SHOW_TIMER_ON_TITLE_BAR
+);

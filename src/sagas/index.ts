@@ -25,12 +25,14 @@ import {
   fetchEntries,
   removeProject,
   sendAvatar,
+  sendUserData,
 } from "./user";
 
 export function* rootSaga() {
   yield takeLatest(types.GLOBAL_INIT_AUTH, initAuth);
   yield takeLatest(types.GLOBAL_INIT_RE_AUTH, initReAuth);
   yield takeLatest(types.USER_GET_USER_DATA, requestUserData);
+  yield takeLatest(types.USER_SEND_USER_DATA, sendUserData);
   yield takeLatest(types.GLOBAL_INIT_LOGOUT, initLogOut);
   yield takeLatest(types.GLOBAL_CHANGE_PASSWORD, changePassword);
   yield takeLatest(types.GLOBAL_FETCH_ERROR, requestError);
