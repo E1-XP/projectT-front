@@ -58,3 +58,22 @@ export const getTotalPeriodDuration = (
   projectDurations: PeriodProjectDurations
 ) =>
   projectDurations.reduce((acc, project) => (acc += project.totalDuration), 0);
+
+export const formatDurationReadable = (
+  { days, hours, minutes, seconds }: Duration,
+  shortForm = false
+) => {
+  if (hours || days) {
+    const total = (days || 0) * 24 + (hours || 0);
+    return `${total} hour${total > 1 ? "s" : ""}`;
+  }
+
+  if (minutes)
+    return `${minutes} ${"minute".slice(0, shortForm ? 3 : undefined)} ${
+      minutes > 1 ? "s" : ""
+    }`;
+
+  return `${seconds || 0} ${"second".slice(0, shortForm ? 3 : undefined)}${
+    (seconds || 0) > 1 ? "s" : ""
+  }`;
+};

@@ -1,8 +1,7 @@
 import intervalToDuration from "date-fns/intervalToDuration";
-import { PeriodProjectDurations } from "../../helpers";
+import { PeriodProjectDurations, formatDurationReadable } from "../../helpers";
 
 import { GroupedEntries } from "../../selectors/groupEntriesByDays";
-import { formatDurationReadable } from "../reports/helpers";
 
 export type ProjectDurations = (GroupedEntries & {
   name: string;
