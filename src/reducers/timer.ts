@@ -3,6 +3,7 @@ import { Entry } from "../store/interfaces";
 
 import {
   setTimer,
+  setDuration,
   setIsTimerRunning,
   setBillable,
   setProject,
@@ -13,6 +14,7 @@ import {
 const initialState = {
   isRunning: false,
   timer: "0:00:00",
+  duration: 0,
   description: "",
   isBillable: false,
   project: "",
@@ -25,6 +27,9 @@ export const timerReducer = createReducer(initialState, (builder) => {
   });
   builder.addCase(setTimer, (state, action) => {
     state.timer = action.payload;
+  });
+  builder.addCase(setDuration, (state, action) => {
+    state.duration = action.payload;
   });
   builder.addCase(setDescription, (state, action) => {
     state.description = action.payload;

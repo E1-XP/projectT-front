@@ -8,6 +8,8 @@ export const setIsTimerRunning = createAction<boolean>(
 
 export const setTimer = createAction<string>(types.TIMER_SET_TIMER);
 
+export const setDuration = createAction<number>(types.TIMER_SET_DURATION);
+
 export const setDescription = createAction<string>(types.TIMER_SET_DESCRIPTION);
 
 export const setBillable = createAction<boolean>(types.TIMER_SET_BILLABLE);
