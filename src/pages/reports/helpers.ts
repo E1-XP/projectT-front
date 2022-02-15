@@ -150,19 +150,3 @@ export const formatCustomReadable = (
     format(endDate, "dd LLL y")
   );
 };
-
-export const formatDurationReadable = ({
-  days,
-  hours,
-  minutes,
-  seconds,
-}: Duration) => {
-  if (hours || days) {
-    const total = (days || 0) * 24 + (hours || 0);
-    return `${total} hour${total > 1 ? "s" : ""}`;
-  }
-
-  if (minutes) return `${minutes} minute${minutes > 1 ? "s" : ""}`;
-
-  return `${seconds || 0} second${(seconds || 0) > 1 ? "s" : ""}`;
-};

@@ -27,7 +27,7 @@ import {
 import { greyWhite, white, breakPoints } from "../../styles/variables";
 import { emToPx, getBP } from "../../styles/helpers";
 
-import { formatDurationReadable } from "./helpers";
+import { formatDurationReadable } from "./../../helpers";
 import { ComponentLoader } from "../../components/loader";
 
 interface Props {
