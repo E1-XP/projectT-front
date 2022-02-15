@@ -297,7 +297,7 @@ export const Settings = () => {
         })
       );
     }
-  }, [email, username, formMessage, isFieldValid]);
+  }, [email, username, formMessage, isFieldValid, shouldShowTimerOnTitle]);
 
   return (
     <Wrapper>
