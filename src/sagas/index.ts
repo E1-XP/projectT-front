@@ -11,7 +11,11 @@ import {
   requestUserData,
   trimEntriesOnTimerRoute,
 } from "./global";
-import { handleRunningEntry, startTimerInterval } from "./timer";
+import {
+  handleRunningEntry,
+  startTimerInterval,
+  updateTitleBar,
+} from "./timer";
 import {
   createEntry,
   createEntryFromExisting,
@@ -36,7 +40,6 @@ export function* rootSaga() {
   yield takeLatest(types.GLOBAL_INIT_LOGOUT, initLogOut);
   yield takeLatest(types.GLOBAL_CHANGE_PASSWORD, changePassword);
   yield takeLatest(types.GLOBAL_FETCH_ERROR, requestError);
-  yield takeLatest(types.TIMER_SET_IS_RUNNING, startTimerInterval);
   yield takeLatest(types.USER_FETCH_ENTRIES, fetchEntries);
   yield takeLatest(types.USER_CREATE_PROJECT, createProject);
   yield takeLatest(types.USER_REMOVE_PROJECT, removeProject);
@@ -47,6 +50,8 @@ export function* rootSaga() {
   yield takeEvery(types.ENTRY_UPDATE, updateEntry);
   yield takeEvery(types.ENTRY_INIT_DELETE, removeEntry);
   yield takeEvery(types.ENTRY_DELETE_CURRENT, removeRunningEntry);
+  yield takeEvery(types.TIMER_SET_IS_RUNNING, startTimerInterval);
+  yield takeLatest(types.TIMER_SET_TIMER, updateTitleBar);
   yield takeLatest(types.TIMER_HANDLE_RUNNING_ENTRY, handleRunningEntry);
   yield takeLatest(LOCATION_CHANGE, trimEntriesOnTimerRoute);
 }

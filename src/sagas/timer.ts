@@ -9,12 +9,13 @@ import startOfDay from "date-fns/startOfDay";
 import endOfDay from "date-fns/endOfDay";
 import addDays from "date-fns/addDays";
 
-import { formatDuration } from "./../helpers";
+import { formatDuration, formatDurationReadable } from "./../helpers";
 
 import {
   setBillable,
   setCurrentEntryId,
   setDescription,
+  setDuration,
   setIsTimerRunning,
   setProject,
   setTimer,
@@ -32,6 +33,7 @@ const SECOND = 1000;
 export function* startTimerInterval(action: Action) {
   try {
     const {
+      duration,
       isRunning,
       description,
       isBillable: billable,
@@ -40,7 +42,7 @@ export function* startTimerInterval(action: Action) {
     }: StoreSelector["timer"] = yield select((state) => state.timer);
 
     const runningEntryMode = !!currentEntryId;
-    let duration = 0;
+
     let currentRunningEntry;
 
     if (runningEntryMode) {
@@ -52,7 +54,7 @@ export function* startTimerInterval(action: Action) {
         (entry) => entry._id === currentEntryId
       );
       if (currentRunningEntry)
-        duration = Date.now() - currentRunningEntry.start;
+        yield put(setDuration(Date.now() - currentRunningEntry.start));
     }
 
     let isYielding = true;
@@ -71,6 +73,10 @@ export function* startTimerInterval(action: Action) {
         );
 
       while (isYielding) {
+        const duration: StoreSelector["timer"]["duration"] = yield select(
+          (state) => state.timer.duration
+        );
+
         const displayValue = compose(
           formatDuration,
           intervalToDuration
@@ -81,7 +87,7 @@ export function* startTimerInterval(action: Action) {
 
         yield put(setTimer(displayValue));
         yield delay(SECOND);
-        duration += SECOND;
+        yield put(setDuration(duration + SECOND));
 
         isYielding = yield select((state) => state.timer.isRunning);
       }
@@ -133,6 +139,7 @@ export function* startTimerInterval(action: Action) {
         });
 
       yield put(setTimer(`0:00:00`));
+      yield put(setDuration(0));
       yield put(setCurrentEntryId(undefined));
       yield put(setDescription(``));
       yield put(setProject(``));
@@ -160,6 +167,35 @@ export function* handleRunningEntry(action: Action) {
       yield put(setCurrentEntryId(_id));
       yield put(setIsTimerRunning(true));
     }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export function* updateTitleBar(action: Action) {
+  const STANDARD_TITLE = "Project-T";
+
+  try {
+    const settings: StoreSelector["user"]["userData"]["settings"] =
+      yield select((state) => state.user.userData.settings);
+    const { timer, duration, isRunning, project }: StoreSelector["timer"] =
+      yield select((state) => state.timer);
+
+    if (settings.shouldShowTimerOnTitle && isRunning) {
+      const readable = formatDurationReadable(
+        intervalToDuration({
+          start: 0,
+          end: duration,
+        }),
+        true
+      );
+
+      document.title = `${readable} ${
+        project ? "- " + project : ""
+      } | ${STANDARD_TITLE}`;
+    } else if (document.title !== STANDARD_TITLE)
+      document.title = STANDARD_TITLE;
+    else if (!isRunning) document.title = STANDARD_TITLE;
   } catch (e) {
     console.log(e);
   }
