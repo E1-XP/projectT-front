@@ -31,6 +31,13 @@ export const GlobalStyle = createGlobalStyle`
         font-weight: 500;
         background-color: ${white};
         height: 100%;
+
+        
+        ${getBP("370px")} {
+            min-width: 370px;
+            height: 100vh;
+        }
+
     }
 
     .root {
@@ -50,6 +57,11 @@ export const GlobalStyle = createGlobalStyle`
             ${getBP(breakPoints.verySmall)} {
                 padding-bottom: 5.4rem;
                 padding-left: 1rem;
+            }
+
+            ${getBP("370px")} {
+                overflow-y: initial;
+                height: initial;
             }
         }
     }
