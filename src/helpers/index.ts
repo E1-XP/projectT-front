@@ -65,15 +65,19 @@ export const formatDurationReadable = (
 ) => {
   if (hours || days) {
     const total = (days || 0) * 24 + (hours || 0);
-    return `${total} hour${total > 1 ? "s" : ""}`;
+    return `${total}${(shortForm && ":" + normalize(minutes)) || ""} hour${
+      total > 1 ? "s" : ""
+    }`;
   }
 
   if (minutes)
-    return `${minutes} ${"minute".slice(0, shortForm ? 3 : undefined)} ${
-      minutes > 1 ? "s" : ""
+    return `${shortForm ? normalize(minutes) : minutes}${
+      (shortForm && ":" + normalize(seconds)) || ""
+    } ${"minute".slice(0, shortForm ? 3 : undefined)} ${
+      !shortForm && minutes > 1 ? "s" : ""
     }`;
 
   return `${seconds || 0} ${"second".slice(0, shortForm ? 3 : undefined)}${
-    (seconds || 0) > 1 ? "s" : ""
+    (!shortForm && (seconds || 0)) > 1 ? "s" : ""
   }`;
 };
