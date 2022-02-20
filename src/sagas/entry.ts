@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { select, call, put } from "redux-saga/effects";
 
-import { insertEntry, deleteEntry } from "../actions/entry";
+import { insertEntry, deleteEntry, batchInsertEntry } from "../actions/entry";
 import {
   setBillable,
   setCurrentEntryId,
@@ -42,11 +42,15 @@ const postNewEntry = async (entryData: NewEntryData, userId: string) => {
 };
 
 const postEntryUpdate = async (
-  entryData: Partial<NewEntryData>,
+  entryData: Partial<NewEntryData> | Partial<NewEntryData>[],
   userId: string,
   currentEntryId: string
 ) => {
-  const queryString = getQueryString(entryData);
+  const isSingleEntry = !Array.isArray(entryData);
+
+  const queryString = getQueryString(isSingleEntry ? entryData : entryData[0], [
+    "_id",
+  ]);
 
   const URL = `${config.API_URL}/users/${userId}/entries/${currentEntryId}?${queryString}`;
 
@@ -85,7 +89,9 @@ export function* createEntry(action: PayloadAction<NewEntryData>) {
   }
 }
 
-export function* updateEntry(action: PayloadAction<Partial<NewEntryData>>) {
+export function* updateEntry(
+  action: PayloadAction<Partial<NewEntryData> | Partial<NewEntryData>[]>
+) {
   try {
     const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
       (state) => state.user.userData
@@ -93,7 +99,9 @@ export function* updateEntry(action: PayloadAction<Partial<NewEntryData>>) {
     const currentEntryId: StoreSelector["timer"]["currentEntryId"] =
       yield select((state) => state.timer.currentEntryId);
 
-    const entryId = [currentEntryId, action.payload._id].find(Boolean);
+    const entryId = Array.isArray(action.payload)
+      ? JSON.stringify(action.payload.map((entry) => entry._id))
+      : [currentEntryId, action.payload._id].find(Boolean);
 
     if (!entryId) {
       console.log("check this");
@@ -108,8 +116,9 @@ export function* updateEntry(action: PayloadAction<Partial<NewEntryData>>) {
     );
 
     if (response.status === 200) {
-      const entryData: Entry = yield response.json();
-      yield put(insertEntry(entryData));
+      const entryData: Entry | Entry[] = yield response.json();
+      if (Array.isArray(entryData)) yield put(batchInsertEntry(entryData));
+      else yield put(insertEntry(entryData));
     }
   } catch (e) {
     console.log(e);

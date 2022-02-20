@@ -40,17 +40,16 @@ export const userReducer = createReducer(initialState, (builder) => {
     else state.entries.unshift(action.payload);
   });
   builder.addCase(batchInsertEntry, (state, action) => {
-    const uniqueEntries = [] as Entry[];
-
     action.payload.forEach((entry) => {
       const foundIdx = state.entries.findIndex(
         (item) => entry._id === item._id
       );
 
-      if (foundIdx === -1) uniqueEntries.push(entry);
+      if (foundIdx === -1) state.entries.unshift(entry);
+      else if (foundIdx > -1) state.entries[foundIdx] = entry;
     });
 
-    state.entries.push(...uniqueEntries);
+    state.entries = [...state.entries];
   });
   builder.addCase(deleteEntry, (state, action) => {
     state.entries = state.entries.filter(({ _id }) => _id !== action.payload);

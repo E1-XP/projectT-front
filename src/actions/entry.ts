@@ -10,7 +10,9 @@ export const createEntryFromExisting = createAction<Entry>(
   types.ENTRY_CREATE_FROM_EXISTING
 );
 
-export const updateEntry = createAction<Partial<Entry>>(types.ENTRY_UPDATE);
+export const updateEntry = createAction<Partial<Entry> | Partial<Entry>[]>(
+  types.ENTRY_UPDATE
+);
 
 export const insertEntry = createAction<Entry>(types.ENTRY_INSERT);
 

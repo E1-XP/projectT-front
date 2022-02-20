@@ -142,7 +142,10 @@ export const Entry = (props: Props) => {
 
   useEffect(
     () => {
-      isRegularEntry && setDescription(props.data.description);
+      if (isRegularEntry) {
+        setDescription(props.data.description);
+        console.log(props.data.description, "reg");
+      }
     },
     isRegularEntry ? [props.data.description] : []
   );
@@ -151,9 +154,11 @@ export const Entry = (props: Props) => {
     debounce(300)((description) => {
       isRegularEntry
         ? dispatch(updateEntry({ description, _id: props.data._id }))
-        : props.data.entries.forEach((entry) => {
-            dispatch(updateEntry({ description, _id: entry._id }));
-          });
+        : dispatch(
+            updateEntry(
+              props.data.entries.map(({ _id }) => ({ _id, description }))
+            )
+          );
     }),
     [description, props.data]
   );
