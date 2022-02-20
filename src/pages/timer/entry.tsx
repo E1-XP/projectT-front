@@ -144,14 +144,13 @@ export const Entry = (props: Props) => {
     () => {
       if (isRegularEntry) {
         setDescription(props.data.description);
-        console.log(props.data.description, "reg");
       }
     },
     isRegularEntry ? [props.data.description] : []
   );
 
   const postEntry = useCallback(
-    debounce(300)((description) => {
+    debounce(500)((description) => {
       isRegularEntry
         ? dispatch(updateEntry({ description, _id: props.data._id }))
         : dispatch(
