@@ -1,5 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { select, call, put } from "redux-saga/effects";
+import { select, call, put, take } from "redux-saga/effects";
 
 import { insertEntry, deleteEntry, batchInsertEntry } from "../actions/entry";
 import {
@@ -17,6 +17,7 @@ import { FetchResponse, StoreSelector } from "./helpers";
 import { config } from "./../config";
 
 import { request } from "../helpers/request";
+import { types } from "../actions/types";
 
 type NewEntryData = Pick<
   Entry,
@@ -181,6 +182,14 @@ export function* removeRunningEntry(action: PayloadAction<string | string[]>) {
 export function* createEntryFromExisting(action: PayloadAction<Entry>) {
   try {
     const { description, billable, project } = action.payload;
+    const { isRunning }: StoreSelector["timer"] = yield select(
+      (state) => state.timer
+    );
+
+    if (isRunning) {
+      yield put(setIsTimerRunning(false));
+      yield take(types.TIMER_SET_CURRENT_ENTRY_ID);
+    }
 
     if (description) yield put(setDescription(description));
     if (billable) yield put(setBillable(billable));

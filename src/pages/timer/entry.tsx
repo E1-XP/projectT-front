@@ -175,7 +175,7 @@ export const Entry = (props: Props) => {
   const startNewEntryFromExisting = useCallback(() => {
     const entryData = isRegularEntry ? props.data : props.data.entries[0];
     dispatch(createEntryFromExisting(entryData));
-  }, []);
+  }, [isRegularEntry ? props.data : props.data.entries[0]]);
 
   const [isMouseOver, setIsMouseOver] = useState(false);
 

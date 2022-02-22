@@ -1,5 +1,5 @@
 import { delay, put, select, call } from "@redux-saga/core/effects";
-import { Action } from "@reduxjs/toolkit";
+import { Action, PayloadAction } from "@reduxjs/toolkit";
 import compose from "lodash/fp/compose";
 
 import isSameDay from "date-fns/isSameDay";
@@ -30,7 +30,7 @@ import { StoreSelector } from "./helpers";
 
 const SECOND = 1000;
 
-export function* startTimerInterval(action: Action) {
+export function* startTimerInterval(action: PayloadAction<boolean>) {
   try {
     const {
       duration,
@@ -57,7 +57,7 @@ export function* startTimerInterval(action: Action) {
         yield put(setDuration(Date.now() - currentRunningEntry.start));
     }
 
-    let isYielding = true;
+    let isYielding = isRunning;
 
     if (isRunning) {
       const start = Date.now();
@@ -94,6 +94,7 @@ export function* startTimerInterval(action: Action) {
     } else {
       const stop = Date.now();
 
+      // should handle multiple days between start/stop
       if (
         runningEntryMode &&
         currentRunningEntry &&
@@ -140,10 +141,10 @@ export function* startTimerInterval(action: Action) {
 
       yield put(setTimer(`0:00:00`));
       yield put(setDuration(0));
-      yield put(setCurrentEntryId(undefined));
       yield put(setDescription(``));
       yield put(setProject(``));
       yield put(setBillable(false));
+      yield put(setCurrentEntryId(undefined));
     }
   } catch (e) {
     console.log(e);
@@ -193,9 +194,9 @@ export function* updateTitleBar(action: Action) {
       document.title = `${readable} ${
         project ? "- " + project : ""
       } | ${STANDARD_TITLE}`;
-    } else if (document.title !== STANDARD_TITLE)
+    } else if (document.title !== STANDARD_TITLE || !isRunning) {
       document.title = STANDARD_TITLE;
-    else if (!isRunning) document.title = STANDARD_TITLE;
+    }
   } catch (e) {
     console.log(e);
   }
