@@ -110,7 +110,7 @@ export const TaskController = () => {
   const projects = useStoreSelector((store) => store.user.projects);
 
   const handleStartStopBtn = useCallback(
-    () => dispatch(setIsTimerRunning(!isRunning)),
+    debounce(200)(() => dispatch(setIsTimerRunning(!isRunning))),
     [isRunning]
   );
 
