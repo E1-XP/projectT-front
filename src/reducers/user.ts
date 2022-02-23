@@ -45,7 +45,7 @@ export const userReducer = createReducer(initialState, (builder) => {
         (item) => entry._id === item._id
       );
 
-      if (foundIdx === -1) state.entries.unshift(entry);
+      if (foundIdx === -1) state.entries.push(entry);
       else if (foundIdx > -1) state.entries[foundIdx] = entry;
     });
 
