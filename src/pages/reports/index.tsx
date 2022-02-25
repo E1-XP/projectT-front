@@ -246,3 +246,5 @@ export const Reports = () => {
     </Wrapper>
   );
 };
+
+export default Reports;

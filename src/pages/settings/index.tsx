@@ -394,3 +394,5 @@ export const Settings = () => {
     </Wrapper>
   );
 };
+
+export default Settings;

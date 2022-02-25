@@ -18,3 +18,5 @@ export const Timer = () => (
     <Timeline />
   </Timer_wrapper>
 );
+
+export default Timer;

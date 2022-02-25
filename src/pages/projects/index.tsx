@@ -143,3 +143,5 @@ export const Projects = () => {
     </Wrapper>
   );
 };
+
+export default Projects;
