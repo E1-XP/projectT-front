@@ -15,7 +15,7 @@ import { Fields } from "../pages/forms";
 import {
   setIsLoggedIn,
   setIsLoading,
-  fetchError,
+  requestError as networkError,
   PasswordData,
   setFormMessage,
 } from "./../actions/global";
@@ -114,7 +114,7 @@ export function* initAuth(action: PayloadAction<Fields>) {
       yield put(getUserData(data.userId));
     }
   } catch (e) {
-    yield put(fetchError(e));
+    yield put(networkError(e));
   }
 }
 
@@ -145,7 +145,7 @@ export function* requestUserData(action: PayloadAction<string>) {
       yield put(setIsLoading(false));
     }
   } catch (e) {
-    yield put(fetchError(e));
+    yield put(networkError(e));
   }
 }
 
@@ -176,7 +176,7 @@ export function* initReAuth(action: Action) {
       yield put(setIsLoading(false));
     } else yield put(setIsLoading(false));
   } catch (e) {
-    yield put(fetchError(e));
+    yield put(networkError(e));
   }
 }
 
@@ -201,7 +201,7 @@ export function* changePassword({ payload }: PayloadAction<PasswordData>) {
       yield put(setFormMessage([FORM_MESSAGE_ERROR, false]));
     }
   } catch (e) {
-    yield put(fetchError(e));
+    yield put(networkError(e));
   }
 }
 
@@ -226,7 +226,7 @@ export function* initLogOut(action: Action) {
     yield put(setEntries([]));
     yield put(setProjects([]));
   } catch (e) {
-    yield put(fetchError(e));
+    yield put(networkError(e));
   }
 }
 
@@ -249,12 +249,12 @@ export function* trimEntriesOnTimerRoute(action: LocationChangeAction) {
 
     yield put(setEntries(tenDaysOfEntriesAsArr));
   } catch (e) {
-    yield put(fetchError(e));
+    yield put(networkError(e));
   }
 }
 
 export function* requestError(action: PayloadAction<any>) {
-  console.log("fetchError", action.payload);
+  console.log("request error", action.payload);
 
   yield put(push("/500"));
 }

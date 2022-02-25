@@ -18,6 +18,7 @@ import { config } from "./../config";
 
 import { request } from "../helpers/request";
 import { types } from "../actions/types";
+import { requestError } from "../actions/global";
 
 type NewEntryData = Pick<
   Entry,
@@ -86,7 +87,7 @@ export function* createEntry(action: PayloadAction<NewEntryData>) {
       yield put(insertEntry(entryData));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -122,7 +123,7 @@ export function* updateEntry(
       else yield put(insertEntry(entryData));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -148,7 +149,7 @@ export function* removeEntry(action: PayloadAction<string | string[]>) {
       }
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -175,7 +176,7 @@ export function* removeRunningEntry(action: PayloadAction<string | string[]>) {
       yield put(setIsTimerRunning(false));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -197,6 +198,6 @@ export function* createEntryFromExisting(action: PayloadAction<Entry>) {
 
     yield put(setIsTimerRunning(true));
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }

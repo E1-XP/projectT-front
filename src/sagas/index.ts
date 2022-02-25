@@ -39,7 +39,7 @@ export function* rootSaga() {
   yield takeLatest(types.USER_SEND_USER_DATA, sendUserData);
   yield takeLatest(types.GLOBAL_INIT_LOGOUT, initLogOut);
   yield takeLatest(types.GLOBAL_CHANGE_PASSWORD, changePassword);
-  yield takeLatest(types.GLOBAL_FETCH_ERROR, requestError);
+  yield takeLatest(types.GLOBAL_REQUEST_ERROR, requestError);
   yield takeLatest(types.USER_FETCH_ENTRIES, fetchEntries);
   yield takeLatest(types.USER_CREATE_PROJECT, createProject);
   yield takeLatest(types.USER_REMOVE_PROJECT, removeProject);

@@ -27,6 +27,7 @@ import {
 } from "../sagas/entry";
 
 import { StoreSelector } from "./helpers";
+import { requestError } from "../actions/global";
 
 const SECOND = 1000;
 
@@ -147,7 +148,7 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
       yield put(setCurrentEntryId(undefined));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -169,7 +170,7 @@ export function* handleRunningEntry(action: Action) {
       yield put(setIsTimerRunning(true));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -198,6 +199,6 @@ export function* updateTitleBar(action: Action) {
       document.title = STANDARD_TITLE;
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }

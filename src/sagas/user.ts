@@ -11,6 +11,7 @@ import { config } from "../config";
 
 import { Entry, Project, UserData } from "../store/interfaces";
 
+import { requestError } from "../actions/global";
 import { batchInsertEntry } from "../actions/entry";
 import { setProjects, setUserData } from "../actions/user";
 
@@ -120,7 +121,7 @@ export function* fetchEntries(action: PayloadAction<number | undefined>) {
       yield put(batchInsertEntry(data));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -142,7 +143,7 @@ export function* createProject(action: PayloadAction<Omit<Project, "_id">>) {
       yield put(setProjects(userData.projects));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -164,7 +165,7 @@ export function* removeProject(action: PayloadAction<string>) {
       yield put(setProjects(userData.projects));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -191,7 +192,7 @@ export function* sendAvatar({ payload }: PayloadAction<any>) {
       yield put(setUserData(userDataFiltered));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -225,7 +226,7 @@ export function* deleteAvatar(action: Action) {
       yield put(setUserData(userDataFiltered));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
 
@@ -249,6 +250,6 @@ export function* sendUserData(action: PayloadAction<Partial<UserData>>) {
       yield put(setUserData(data));
     }
   } catch (e) {
-    console.log(e);
+    yield put(requestError(e));
   }
 }
