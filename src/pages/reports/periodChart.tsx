@@ -34,12 +34,14 @@ import { getXAxisTick, getYAxisTick, getCustomLabel } from "./labelsAndTicks";
 
 import {
   blue,
+  breakPoints,
   greyWhite,
   greyWhiteDarker,
   white,
   whiteGrey,
 } from "../../styles/variables";
 import { ComponentLoader } from "../../components/loader";
+import { emToPx } from "../../styles/helpers";
 
 interface Props {
   periodState: State;
@@ -157,6 +159,9 @@ export const PeriodChart = ({ periodState, range }: Props) => {
   };
 
   const periodContainsData = !!periodInDays.length;
+
+  const isMobile =
+    (size.width || window.innerWidth) < emToPx(breakPoints.small);
   const isMonthLikeView = type === periods.MONTH || dataSrc.length > 15;
 
   return (
@@ -174,8 +179,8 @@ export const PeriodChart = ({ periodState, range }: Props) => {
           barCategoryGap={5}
           margin={{
             top: 30,
-            right: isMonthLikeView ? 0 : 30,
-            left: isMonthLikeView ? 0 : 50,
+            right: isMobile && isMonthLikeView ? 0 : 30,
+            left: isMobile && isMonthLikeView ? 0 : 50,
             bottom: 10,
           }}
         >
