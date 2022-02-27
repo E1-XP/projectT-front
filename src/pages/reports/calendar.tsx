@@ -1,20 +1,14 @@
 import React, { useCallback } from "react";
 import styled from "styled-components";
 import { DateRange, RangeKeyDict } from "react-date-range";
+import endOfDay from "date-fns/endOfDay";
 
-import { fetchEntries } from "../../actions/user";
-
-import { useStoreDispatch } from "../../hooks";
 import { useWindowSize } from "../../hooks/useWindowSize";
 
 import { State } from "./";
-import {
-  readable,
-  getPeriodTime,
-  periods,
-  formatCustomReadable,
-  getMatchingPeriod,
-} from "./helpers";
+import { Range } from "./hooks";
+
+import { readable, getPeriodTime } from "./helpers";
 
 import {
   black,
@@ -25,8 +19,8 @@ import {
 } from "../../styles/variables";
 import { getBP, emToPx } from "./../../styles/helpers";
 interface Props {
-  state: State;
-  setState: (args: State) => void;
+  range: Range;
+  syncRange: (args: Range) => any;
   closeCalendar: () => any;
 }
 
@@ -73,47 +67,33 @@ const Period_item = styled.a`
   }
 `;
 
-export const Calendar = ({ state, setState, closeCalendar }: Props) => {
-  const dispatch = useStoreDispatch();
-
-  const { startDate, endDate } = state;
+export const Calendar = ({ range, syncRange, closeCalendar }: Props) => {
+  const { startDate, endDate } = range;
 
   const size = useWindowSize();
 
-  const onChange = useCallback(
-    (ranges: RangeKeyDict) => {
-      const {
-        range1: { startDate, endDate },
-      } = ranges;
+  const onChange = useCallback((ranges: RangeKeyDict) => {
+    const {
+      range1: { startDate, endDate },
+    } = ranges;
 
-      if (startDate && endDate) {
-        const readable = formatCustomReadable(
-          { startDate, endDate },
-          getMatchingPeriod({ startDate, endDate })
-        );
+    if (startDate && endDate) {
+      const isSameDate = startDate === endDate;
 
-        setState({ type: periods.CUSTOM, startDate, endDate, readable });
-      }
-    },
-    [state]
-  );
-
-  const setPeriod = useCallback(
-    (period: readable) => {
-      const [startDate, endDate, type] = getPeriodTime()[period];
-
-      setState({
+      syncRange({
         startDate,
-        endDate,
-        readable: period,
-        type,
+        endDate: isSameDate ? endOfDay(endDate) : endDate,
       });
+    }
+  }, []);
 
-      dispatch(fetchEntries(startDate.getTime()));
-      closeCalendar();
-    },
-    [state]
-  );
+  const setPeriod = (period: readable) => {
+    const [startDate, endDate, type] = getPeriodTime()[period];
+
+    syncRange({ startDate, endDate });
+
+    closeCalendar();
+  };
 
   const setToday = useCallback(() => setPeriod(readable.TODAY), []);
   const setThisWeek = useCallback(() => setPeriod(readable.THIS_WEEK), []);

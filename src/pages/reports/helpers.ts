@@ -7,11 +7,18 @@ import endOfMonth from "date-fns/endOfMonth";
 import startOfYear from "date-fns/startOfYear";
 import endOfYear from "date-fns/endOfYear";
 import sub from "date-fns/sub";
-import isThisYearDFns from "date-fns/isThisYear";
 import isSameDay from "date-fns/isSameDay";
+import isSameWeek from "date-fns/isSameWeek";
+import isMonday from "date-fns/isMonday";
+import isSunday from "date-fns/isSunday";
+import isSameMonth from "date-fns/isSameMonth";
+import isFirstDayOfMonth from "date-fns/isFirstDayOfMonth";
+import isLastDayOfMonth from "date-fns/isLastDayOfMonth";
+import isSameYear from "date-fns/isSameYear";
 import format from "date-fns/format";
 
 import { State } from ".";
+import { Range } from "./hooks";
 
 export enum periods {
   DAY = "DAY",
@@ -33,8 +40,7 @@ export enum readable {
   CUSTOM = "CUSTOM",
 }
 
-type stateDates = Pick<State, "startDate" | "endDate">;
-type checkFn = (paramObj: stateDates) => boolean;
+type checkFn = (paramObj: Range) => boolean;
 
 export const getPeriodTime = (
   date = Date.now()
@@ -86,39 +92,39 @@ export const getPeriodTime = (
   ],
 });
 
-export const isToday = ({ startDate, endDate }: stateDates) =>
+export const isToday = ({ startDate, endDate }: Range) =>
   startDate.getTime() === getPeriodTime()[readable.TODAY][0].getTime() &&
   endDate.getTime() === getPeriodTime()[readable.TODAY][1].getTime();
 
-export const isYesterday = ({ startDate, endDate }: stateDates) =>
+export const isYesterday = ({ startDate, endDate }: Range) =>
   startDate.getTime() === getPeriodTime()[readable.YESTERDAY][0].getTime() &&
   endDate.getTime() === getPeriodTime()[readable.YESTERDAY][1].getTime();
 
-export const isThisWeek = ({ startDate, endDate }: stateDates) =>
+export const isThisWeek = ({ startDate, endDate }: Range) =>
   startDate.getTime() === getPeriodTime()[readable.THIS_WEEK][0].getTime() &&
   endDate.getTime() === getPeriodTime()[readable.THIS_WEEK][1].getTime();
 
-export const isLastWeek = ({ startDate, endDate }: stateDates) =>
+export const isLastWeek = ({ startDate, endDate }: Range) =>
   startDate.getTime() === getPeriodTime()[readable.LAST_WEEK][0].getTime() &&
   endDate.getTime() === getPeriodTime()[readable.LAST_WEEK][1].getTime();
 
-export const isThisMonth = ({ startDate, endDate }: stateDates) =>
+export const isThisMonth = ({ startDate, endDate }: Range) =>
   startDate.getTime() === getPeriodTime()[readable.THIS_MONTH][0].getTime() &&
   endDate.getTime() === getPeriodTime()[readable.THIS_MONTH][1].getTime();
 
-export const isLastMonth = ({ startDate, endDate }: stateDates) =>
+export const isLastMonth = ({ startDate, endDate }: Range) =>
   startDate.getTime() === getPeriodTime()[readable.LAST_MONTH][0].getTime() &&
   endDate.getTime() === getPeriodTime()[readable.LAST_MONTH][1].getTime();
 
-export const isThisYear = ({ startDate, endDate }: stateDates) =>
+export const isThisYear = ({ startDate, endDate }: Range) =>
   startDate.getTime() === getPeriodTime()[readable.THIS_YEAR][0].getTime() &&
-  endDate.getTime() === getPeriodTime()[readable.LAST_YEAR][1].getTime();
+  endDate.getTime() === getPeriodTime()[readable.THIS_YEAR][1].getTime();
 
-export const isLastYear = ({ startDate, endDate }: stateDates) =>
+export const isLastYear = ({ startDate, endDate }: Range) =>
   startDate.getTime() === getPeriodTime()[readable.LAST_YEAR][0].getTime() &&
   endDate.getTime() === getPeriodTime()[readable.LAST_YEAR][1].getTime();
 
-export const getMatchingPeriod = ({ startDate, endDate }: stateDates) => {
+export const getMatchingReadableType = ({ startDate, endDate }: Range) => {
   const match = Object.keys(readable)
     .filter((k) => k !== "CUSTOM")
     .find((key) => {
@@ -131,8 +137,32 @@ export const getMatchingPeriod = ({ startDate, endDate }: stateDates) => {
   return match ? readable[match] : readable.CUSTOM;
 };
 
+export const getMatchingPeriodType = ({ startDate, endDate }: Range) => {
+  if (isSameDay(startDate, endDate)) return periods.DAY;
+  if (
+    isSameWeek(startDate, endDate, { weekStartsOn: 1 }) &&
+    isMonday(startDate) &&
+    isSunday(endDate)
+  )
+    return periods.WEEK;
+  if (
+    isSameMonth(startDate, endDate) &&
+    isFirstDayOfMonth(startDate) &&
+    isLastDayOfMonth(endDate)
+  )
+    return periods.MONTH;
+  if (
+    isSameYear(startDate, endDate) &&
+    isSameDay(startOfYear(startDate), startDate) &&
+    isSameDay(endOfYear(endDate), endDate)
+  )
+    return periods.YEAR;
+
+  return periods.CUSTOM;
+};
+
 export const formatCustomReadable = (
-  { startDate, endDate }: stateDates,
+  { startDate, endDate }: Range,
   printable: readable
 ) => {
   if (printable !== readable.CUSTOM) return printable;
@@ -140,8 +170,26 @@ export const formatCustomReadable = (
   // same day case
   if (isSameDay(startDate, endDate)) return format(startDate, "dd LLL");
 
-  // same year, don't display it
-  if (isThisYearDFns(startDate)) {
+  // show full month
+  if (
+    isSameMonth(startDate, endDate) &&
+    isFirstDayOfMonth(startDate) &&
+    isLastDayOfMonth(endDate)
+  ) {
+    return format(startDate, "MMMM y");
+  }
+
+  // full year
+  if (
+    isSameYear(startDate, endDate) &&
+    isSameDay(startOfYear(startDate), startDate) &&
+    isSameDay(endOfYear(endDate), endDate)
+  ) {
+    return format(startDate, "y");
+  }
+
+  if (isSameYear(startDate, endDate)) {
+    // same year, don't display it
     return format(startDate, "dd LLL").concat(" - ", format(endDate, "dd LLL"));
   }
 

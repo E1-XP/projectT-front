@@ -17,7 +17,10 @@ import {
   groupEntriesByDays,
   SingleDay,
 } from "../../selectors/groupEntriesByDays";
+
 import { State } from ".";
+import { Range } from "./hooks";
+
 import {
   formatDuration,
   getPeriodProjectDurations,
@@ -32,6 +35,7 @@ import { ComponentLoader } from "../../components/loader";
 
 interface Props {
   periodState: State;
+  range: Range;
 }
 
 const Color_Indicator = styled.span`
@@ -76,8 +80,8 @@ const Wrapper = styled.section`
   }
 `;
 
-export const ProjectChart = ({ periodState }: Props) => {
-  const { startDate, endDate } = periodState;
+export const ProjectChart = ({ range }: Props) => {
+  const { startDate, endDate } = range;
 
   const [activeIdx, setActiveIdx] = useState(-1);
   const [hoveredProject, setHoveredProject] = useState("");

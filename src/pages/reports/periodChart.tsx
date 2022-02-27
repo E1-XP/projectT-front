@@ -26,7 +26,9 @@ import {
   groupEntriesByDays,
   SingleDay,
 } from "../../selectors/groupEntriesByDays";
+
 import { State } from "./index";
+import { Range } from "./hooks";
 
 import { getXAxisTick, getYAxisTick, getCustomLabel } from "./labelsAndTicks";
 
@@ -41,6 +43,7 @@ import { ComponentLoader } from "../../components/loader";
 
 interface Props {
   periodState: State;
+  range: Range;
 }
 
 const Wrapper = styled.section`
@@ -61,8 +64,9 @@ const Wrapper = styled.section`
   }
 `;
 
-export const PeriodChart = ({ periodState }: Props) => {
-  const { startDate, endDate, type } = periodState;
+export const PeriodChart = ({ periodState, range }: Props) => {
+  const { type } = periodState;
+  const { startDate, endDate } = range;
 
   const [hoveredBarStartDate, setHoveredBarStartDate] = useState(0);
   const size = useWindowSize();

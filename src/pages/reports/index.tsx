@@ -1,7 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import startOfWeek from "date-fns/startOfWeek";
 import endOfWeek from "date-fns/endOfWeek";
+import startOfMonth from "date-fns/startOfMonth";
+import endOfMonth from "date-fns/endOfMonth";
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import add from "date-fns/add";
 import sub from "date-fns/sub";
@@ -13,10 +15,14 @@ import { Icon } from "../../components/icon";
 
 import {
   formatCustomReadable,
-  getMatchingPeriod,
+  getMatchingPeriodType,
+  getMatchingReadableType,
+  getPeriodTime,
   periods,
   readable,
 } from "./helpers";
+
+import { useQuerySync } from "./hooks";
 
 import { useStoreDispatch } from "../../hooks";
 import { fetchEntries } from "../../actions/user";
@@ -31,8 +37,6 @@ import {
 import { getBP } from "./../../styles/helpers";
 
 export interface State {
-  startDate: Date;
-  endDate: Date;
   readable: readable | string;
   type: periods;
 }
@@ -140,13 +144,27 @@ export type PeriodTimes = Record<string, Date[]>;
 export const Reports = () => {
   const dispatch = useStoreDispatch();
 
+  const { range, syncRange } = useQuerySync();
+
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [state, setState] = useState<State>({
-    startDate: startOfWeek(Date.now(), { weekStartsOn: 1 }),
-    endDate: endOfWeek(Date.now(), { weekStartsOn: 1 }),
-    readable: readable.THIS_WEEK,
-    type: periods.WEEK,
-  });
+
+  const getState = () => {
+    const readableVal = getMatchingReadableType(range);
+
+    const type =
+      readableVal === readable.CUSTOM
+        ? getMatchingPeriodType(range)
+        : getPeriodTime()[readableVal][2];
+
+    return { readable: formatCustomReadable(range, readableVal), type };
+  };
+
+  const [state, setState] = useState<State>(getState());
+
+  useEffect(() => {
+    setState(getState());
+    dispatch(fetchEntries(range.startDate.getTime()));
+  }, [range]);
 
   const toggleCalendar = useCallback(
     () => setIsCalendarOpen(!isCalendarOpen),
@@ -158,55 +176,43 @@ export const Reports = () => {
     const isCustom = state.type === periods.CUSTOM;
 
     const getDiff = () =>
-      differenceInCalendarDays(state.endDate, state.startDate) + 1;
+      differenceInCalendarDays(range.endDate, range.startDate) + 1;
 
     const periodKey = isCustom ? "days" : `${state.type.toLowerCase()}s`;
     const diff = isCustom ? getDiff() : 1;
 
-    const startDate = add(state.startDate, { [periodKey]: diff });
-    const endDate = add(state.endDate, { [periodKey]: diff });
-    const readable = formatCustomReadable(
-      { startDate, endDate },
-      getMatchingPeriod({ startDate, endDate })
-    );
-    const type = state.type;
+    const startDate =
+      state.type === periods.MONTH
+        ? startOfMonth(add(range.endDate, { days: 1 }))
+        : add(range.startDate, { [periodKey]: diff });
+    const endDate =
+      state.type === periods.MONTH
+        ? endOfMonth(add(range.endDate, { days: 1 }))
+        : add(range.endDate, { [periodKey]: diff });
 
-    setState({
-      startDate,
-      endDate,
-      readable,
-      type,
-    });
-
-    dispatch(fetchEntries(startDate.getTime()));
-  }, [state]);
+    syncRange({ startDate, endDate });
+  }, [state, range]);
 
   const goToPreviousPeriod = useCallback(() => {
     const isCustom = state.type === periods.CUSTOM;
 
     const getDiff = () =>
-      differenceInCalendarDays(state.endDate, state.startDate) + 1;
+      differenceInCalendarDays(range.endDate, range.startDate) + 1;
 
     const periodKey = isCustom ? "days" : `${state.type.toLowerCase()}s`;
     const diff = isCustom ? getDiff() : 1;
 
-    const startDate = sub(state.startDate, { [periodKey]: diff });
-    const endDate = sub(state.endDate, { [periodKey]: diff });
-    const readable = formatCustomReadable(
-      { startDate, endDate },
-      getMatchingPeriod({ startDate, endDate })
-    );
-    const type = state.type;
+    const startDate =
+      state.type === periods.MONTH
+        ? startOfMonth(sub(range.startDate, { days: 1 }))
+        : sub(range.startDate, { [periodKey]: diff });
+    const endDate =
+      state.type === periods.MONTH
+        ? endOfMonth(sub(range.startDate, { days: 1 }))
+        : sub(range.endDate, { [periodKey]: diff });
 
-    setState({
-      startDate,
-      endDate,
-      readable,
-      type,
-    });
-
-    dispatch(fetchEntries(startDate.getTime()));
-  }, [state]);
+    syncRange({ startDate, endDate });
+  }, [state, range]);
 
   return (
     <Wrapper>
@@ -233,15 +239,15 @@ export const Reports = () => {
             {isCalendarOpen && <Screen_blocker onClick={closeCalendar} />}
             {isCalendarOpen && (
               <Calendar
-                state={state}
-                setState={setState}
+                range={range}
+                syncRange={syncRange}
                 closeCalendar={closeCalendar}
               />
             )}
           </Heading_section>
         </Header>
-        <PeriodChart periodState={state} />
-        <ProjectChart periodState={state} />
+        <PeriodChart periodState={state} range={range} />
+        <ProjectChart periodState={state} range={range} />
       </Chart_section>
     </Wrapper>
   );
