@@ -7,12 +7,13 @@ import { Icon } from "./../components/icon";
 import { getBP } from "../styles/helpers";
 import { breakPoints, darkGrey, greyWhite, white } from "../styles/variables";
 
-const Wrapper = styled.section`
+const Wrapper = styled.aside`
   color: ${white};
   background-color: ${darkGrey};
   box-shadow: 4px 0px 5px rgba(0, 0, 0, 0.2);
   max-width: 3.25rem;
   padding: 1rem;
+  padding-top: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,6 +34,7 @@ const Wrapper = styled.section`
     width: 100%;
     bottom: 0;
     top: initial;
+    padding-top: 1rem;
   }
 `;
 
@@ -74,6 +76,11 @@ const Navigation_link = styled(NavLink)`
   &.active {
     background-color: rgba(255, 255, 255, 0.2);
   }
+`;
+
+const Header = styled.h1`
+  font-size: inherit;
+  font-family: "Open Sans", sans-serif;
 `;
 
 const Header_link = styled(Link)`
@@ -127,9 +134,11 @@ const Navigation_item = styled.li`
 export const Sidebar = () => (
   <Wrapper>
     <Sidebar_header>
-      <Header_link to="/timer">
-        <Link_label>Project</Link_label>T
-      </Header_link>
+      <Header>
+        <Header_link to="/timer">
+          <Link_label>Project</Link_label>T
+        </Header_link>
+      </Header>
     </Sidebar_header>
     <Sidebar_navigation>
       <Navigation_list>
