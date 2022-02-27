@@ -73,7 +73,7 @@ export const formatDurationReadable = (
   if (minutes)
     return `${shortForm ? normalize(minutes) : minutes}${
       (shortForm && ":" + normalize(seconds)) || ""
-    } ${"minute".slice(0, shortForm ? 3 : undefined)} ${
+    } ${"minute".slice(0, shortForm ? 3 : undefined)}${
       !shortForm && minutes > 1 ? "s" : ""
     }`;
 
