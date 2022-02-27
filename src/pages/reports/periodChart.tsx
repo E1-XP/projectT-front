@@ -157,6 +157,7 @@ export const PeriodChart = ({ periodState, range }: Props) => {
   };
 
   const periodContainsData = !!periodInDays.length;
+  const isMonthLikeView = type === periods.MONTH || dataSrc.length > 15;
 
   return (
     <Wrapper>
@@ -171,7 +172,12 @@ export const PeriodChart = ({ periodState, range }: Props) => {
         <BarChart
           data={dataSrc}
           barCategoryGap={5}
-          margin={{ top: 30, right: 30, left: 50, bottom: 10 }}
+          margin={{
+            top: 30,
+            right: isMonthLikeView ? 0 : 30,
+            left: isMonthLikeView ? 0 : 50,
+            bottom: 10,
+          }}
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis
