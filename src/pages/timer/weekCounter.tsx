@@ -12,7 +12,7 @@ import {
   SingleDay,
 } from "./../../selectors/groupEntriesByDays";
 
-import { formatDuration } from "./../../helpers";
+import { formatDuration, NO_PROJECT_PLACEHOLDER } from "./../../helpers";
 
 import Tooltip from "rc-tooltip";
 
@@ -98,6 +98,9 @@ const showInfoOnHover = (
 export const WeekCounter = ({}: Props) => {
   const weekStart = startOfWeek(Date.now(), { weekStartsOn: 1 }).getTime();
 
+  const { duration: timerDuration, project } = useStoreSelector(
+    (store) => store.timer
+  );
   const projects = useStoreSelector((store) => store.user.projects);
   const getProjectColor = (name: string) => {
     const color = projects.find((project) => project.name === name)?.color;
@@ -116,20 +119,24 @@ export const WeekCounter = ({}: Props) => {
         acc[projectKey] += data.totalDuration;
       });
 
-      acc["no project"] += data.entries.reduce(
+      acc[NO_PROJECT_PLACEHOLDER] += data.entries.reduce(
         (acc, data) => (acc += !data.project ? data.stop - data.start : 0),
         0
       );
 
       return acc;
     },
-    { ["no project"]: 0 } as Record<string, number>
+    {
+      [NO_PROJECT_PLACEHOLDER]: !project ? timerDuration : 0,
+      [project]: project ? timerDuration : 0,
+    } as Record<string, number>
   );
 
-  const totalDuration = Object.values(weekEntriesByDays).reduce(
-    (acc, { totalDuration }) => (acc += totalDuration),
-    0
-  );
+  const totalDuration =
+    Object.values(weekEntriesByDays).reduce(
+      (acc, { totalDuration }) => acc + totalDuration,
+      0
+    ) + timerDuration;
 
   const getWidth = (projectSum: number) =>
     totalDuration ? (projectSum / totalDuration) * 100 : 100;

@@ -64,6 +64,10 @@ export const Projects = () => {
   const dispatch = useStoreDispatch();
 
   const projects = useStoreSelector((state) => state.user.projects);
+  const { duration: timerDuration, project } = useStoreSelector(
+    (store) => store.timer
+  );
+
   const entriesByDays = useStoreSelector(groupEntriesByDays);
 
   const [state, setState] = useState<State>({
@@ -109,7 +113,9 @@ export const Projects = () => {
 
   const periodProjectDurations = getPeriodProjectDurations(
     periodDaysArr,
-    projects
+    projects,
+    timerDuration,
+    project
   );
 
   return (

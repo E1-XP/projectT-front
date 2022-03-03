@@ -71,17 +71,25 @@ export const PeriodChart = ({ periodState, range }: Props) => {
   const { startDate, endDate } = range;
 
   const [hoveredBarStartDate, setHoveredBarStartDate] = useState(0);
+  const [shouldAnimateBars, setShouldAnimateBars] = useState(true);
   const size = useWindowSize();
+
+  useEffect(() => {
+    shouldAnimateBars && setTimeout(() => setShouldAnimateBars(false), 600);
+  }, [shouldAnimateBars]);
 
   useEffect(() => {
     const parent = document.querySelector(
       ".recharts-cartesian-grid-horizontal"
     ) as HTMLElement;
+
     if (parent?.children && parent?.children.length === 7) {
       const asArr = Array.from(parent.children) as HTMLHtmlElement[];
       // hide unnecessary line from the top of chart
       asArr[5].style.display = "none";
     }
+
+    setShouldAnimateBars(true);
   }, [startDate, endDate]);
 
   const { isLoading, isFetching } = useStoreSelector((state) => state.global);
@@ -104,7 +112,8 @@ export const PeriodChart = ({ periodState, range }: Props) => {
         isSameDay(theoreticalDay, day.start)
       );
 
-      return foundItem || { ...item, start: theoreticalDay.getTime() };
+      const day = foundItem || { ...item, start: theoreticalDay.getTime() };
+      return day;
     });
 
   const getPeriodInMonths = () =>
@@ -205,19 +214,17 @@ export const PeriodChart = ({ periodState, range }: Props) => {
           />
           <Bar
             dataKey="totalDuration"
-            isAnimationActive={true}
+            isAnimationActive={shouldAnimateBars}
             maxBarSize={100}
             minPointSize={4}
             onMouseEnter={(p: any) => setHoveredBarStartDate(p.start)}
             onMouseLeave={() => setHoveredBarStartDate(0)}
           >
-            {
-              <LabelList
-                dataKey="totalDuration"
-                position="top"
-                content={getCustomLabel(hoveredBarStartDate, dataSrc)}
-              />
-            }
+            <LabelList
+              dataKey="totalDuration"
+              position="top"
+              content={getCustomLabel(hoveredBarStartDate, dataSrc)}
+            />
             {dataSrc.map((item, i) => (
               <Cell
                 fill={item.totalDuration ? blue : greyWhiteDarker}

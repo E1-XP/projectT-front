@@ -95,6 +95,9 @@ export const ProjectChart = ({ range }: Props) => {
   const onMouseLeave = useCallback(() => setHoveredProject(""), []);
 
   const { isLoading, isFetching } = useStoreSelector((state) => state.global);
+  const { duration: timerDuration, project } = useStoreSelector(
+    (store) => store.timer
+  );
   const entriesByDays = useStoreSelector(groupEntriesByDays);
   const projects = useStoreSelector((store) => store.user.projects);
 
@@ -104,7 +107,9 @@ export const ProjectChart = ({ range }: Props) => {
 
   const periodProjectDurations = getPeriodProjectDurations(
     periodDaysArr,
-    projects
+    projects,
+    timerDuration,
+    project
   );
 
   const totalPeriodDuration = getTotalPeriodDuration(periodProjectDurations);

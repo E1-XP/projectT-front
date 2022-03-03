@@ -10,48 +10,68 @@ export const formatDuration = ({ days, hours, minutes, seconds }: Duration) =>
     seconds
   )}`;
 
-const getNoProjectDuration = (daysArr: SingleDay[]) =>
+const getNoProjectDuration = (
+  daysArr: SingleDay[],
+  timerDuration: number,
+  currentProject: string
+) =>
   daysArr.reduce((acc, day) => {
     return (acc += day.entries
       .filter((entry) => !entry.project)
       .reduce((acc, { start, stop }) => (acc += stop - start), 0));
-  }, 0);
+  }, 0) + (!currentProject ? timerDuration : 0);
 
 export type PeriodProjectDurations = (GroupedEntries & {
   name: string;
   fill: string;
 })[];
 
+export const NO_PROJECT_PLACEHOLDER = "no project";
+
 export const getPeriodProjectDurations = (
   daysArr: SingleDay[],
-  projects: Project[]
+  projects: Project[],
+  timerDuration: number,
+  currentProject: string
 ) => {
   const noProjectDuration = {
-    name: "no project",
+    name: NO_PROJECT_PLACEHOLDER,
     fill: greyWhiteDarker,
-    totalDuration: getNoProjectDuration(daysArr),
+    totalDuration: getNoProjectDuration(daysArr, timerDuration, currentProject),
   };
 
-  return daysArr.reduce(
-    (acc, day) => {
-      Object.entries(day.projects).map(([name, value]) => {
-        const getFill = () =>
-          projects.find((project) => project.name === name)?.color ||
-          greyWhiteDarker;
-        const foundProjectIdx = acc.findIndex(
-          (project) => project.name === name
-        );
+  return daysArr
+    .reduce(
+      (acc, day) => {
+        Object.entries(day.projects).map(([name, value]) => {
+          const getFill = () =>
+            projects.find((project) => project.name === name)?.color ||
+            greyWhiteDarker;
+          const foundProjectIdx = acc.findIndex(
+            (project) => project.name === name
+          );
 
-        if (foundProjectIdx !== -1) {
-          acc[foundProjectIdx].totalDuration += value.totalDuration;
-        } else {
-          acc.push({ ...value, name, fill: getFill() });
-        }
-      });
-      return acc;
-    },
-    [noProjectDuration] as PeriodProjectDurations
-  );
+          if (foundProjectIdx !== -1) {
+            acc[foundProjectIdx].totalDuration += value.totalDuration;
+          } else {
+            acc.push({
+              ...value,
+              name,
+              fill: getFill(),
+              totalDuration: value.totalDuration,
+            });
+          }
+        });
+        return acc;
+      },
+      [noProjectDuration] as PeriodProjectDurations
+    )
+    .map((project) => {
+      if (project.name === currentProject)
+        project.totalDuration += timerDuration;
+
+      return project;
+    });
 };
 
 export const getTotalPeriodDuration = (
