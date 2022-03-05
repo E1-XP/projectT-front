@@ -23,7 +23,7 @@ export const PASSWORD_HINT =
 export const CONFIRMATION_MISSING = "Please confirm your password";
 export const PASSWORD_NOT_CHANGED = "Please provide different password";
 export const PASSWORD_COMPARISION_FAILED = "Passwords are different";
-export const EMPTY_PASSWORD_FIELD = "Please fill password fields";
+export const EMPTY_PASSWORD_FIELD = "Please provide password";
 
 export const FORM_MESSAGE_ERROR = "Wrong password provided";
 export const FORM_MESSAGE_SUCCESS = "Password succesfully changed";

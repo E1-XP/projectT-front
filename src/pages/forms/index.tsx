@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styled from "styled-components";
 
-import { useStoreDispatch } from "../../hooks";
-import { initAuth } from "../../actions/global";
+import { useStoreDispatch, useStoreSelector } from "../../hooks";
+import { initAuth, setIsFetching } from "../../actions/global";
 
 import { NavBar } from "../../components/navbar";
 import { Button_action } from "../../components/buttons";
@@ -61,6 +61,7 @@ export const Form = () => {
 
   const onSignUpPage = location.pathname.toLowerCase() === "/signup";
 
+  const { isFetching } = useStoreSelector((state) => state.global);
   const [wasOnSignUpPage, setState] = useState(onSignUpPage);
 
   const { SIGN_UP, LOGIN } = validationTypes;
@@ -78,13 +79,18 @@ export const Form = () => {
     setState(onSignUpPage);
   }
 
+  useEffect(() => {
+    dispatch(setIsFetching(false));
+  }, []);
+
   const errorMessage = Object.values(errors)
-    .map(({ message }, i) =>
-      i
-        ? message
-        : message[0].toUpperCase() + message.split("").slice(1).join("")
-    )
-    .join(", ");
+    .map(({ message }, i) => {
+      const m = message.toLowerCase();
+
+      return i ? m : m[0].toUpperCase() + m.split("").slice(1).join("");
+    })
+    .join(", ")
+    .concat(".");
 
   const onSubmit: SubmitHandler<Fields> = (fields) =>
     dispatch(initAuth(fields));
@@ -141,7 +147,9 @@ export const Form = () => {
               </HiddenLabel>
             </>
           )}
-          <Button_action style={{ marginTop: "2rem" }}>Send</Button_action>
+          <Button_action style={{ marginTop: "2rem" }} isLoading={isFetching}>
+            Send
+          </Button_action>
           <ErrorParagraph>{errorMessage}</ErrorParagraph>
         </FormContainer>
       </Main>

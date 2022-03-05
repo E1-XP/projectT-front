@@ -1,6 +1,7 @@
-import React from "react";
-import styled from "styled-components";
+import React, { PropsWithChildren } from "react";
+import styled, { CSSProperties } from "styled-components";
 
+import { Spinner } from "./loader";
 import { darkGrey, green, greyWhite, red, white } from "../styles/variables";
 
 export const Button = styled.button`
@@ -54,7 +55,12 @@ export const Button_danger = styled(Button)`
   }
 `;
 
-export const Button_action = styled.button`
+interface ButtonActionProps {
+  isLoading?: boolean;
+  style?: CSSProperties;
+}
+
+const Btn_action = styled.button`
   padding: 0.8rem 0.5rem;
   background-color: ${red};
   cursor: pointer;
@@ -62,8 +68,22 @@ export const Button_action = styled.button`
   margin: none;
   color: ${white};
   border-radius: 0.3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2.75rem;
 
   &:hover {
     opacity: 0.8;
   }
 `;
+
+export const Button_action = ({
+  isLoading = false,
+  style,
+  children,
+}: PropsWithChildren<ButtonActionProps>) => (
+  <Btn_action style={style}>
+    {isLoading ? <Spinner fill={white} /> : children}
+  </Btn_action>
+);
