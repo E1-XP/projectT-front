@@ -20,7 +20,7 @@ export const GlobalStyle = createGlobalStyle`
         }
     
         ${getBP(breakPoints.verySmall)} {
-            font-size: 62.5%;
+            font-size: 68.8%;
         }
   
         height: 100%;
