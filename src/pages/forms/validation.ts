@@ -35,14 +35,24 @@ export type PassChangeFields = Pick<
 >;
 
 export const getSchema = (actionType: validationTypes) => {
-  const email = yup.string().required().email();
+  const email =
+    actionType === validationTypes.LOGIN
+      ? yup.string().required()
+      : yup.string().required().email();
+
   const username = yup.string().min(2, USERNAME_TOO_SHORT);
 
-  const password = yup
-    .string()
-    .required(EMPTY_PASSWORD_FIELD)
-    .min(8, PASSWORD_TOO_SHORT)
-    .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, PASSWORD_HINT);
+  const password =
+    actionType === validationTypes.LOGIN
+      ? yup.string().required(EMPTY_PASSWORD_FIELD)
+      : yup
+          .string()
+          .required(EMPTY_PASSWORD_FIELD)
+          .min(8, PASSWORD_TOO_SHORT)
+          .matches(
+            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/,
+            PASSWORD_HINT
+          );
 
   const passwordConfirm = yup
     .string()

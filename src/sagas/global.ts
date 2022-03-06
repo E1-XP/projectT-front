@@ -112,6 +112,8 @@ export function* initAuth(action: PayloadAction<Fields>) {
       yield put(setIsLoading(true));
       yield put(setIsLoggedIn(true));
       yield put(getUserData(data.userId));
+    } else {
+      yield put(setFormMessage([data.message.concat("."), false]));
     }
   } catch (e) {
     yield put(networkError(e));

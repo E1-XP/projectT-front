@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styled from "styled-components";
 
 import { useStoreDispatch, useStoreSelector } from "../../hooks";
-import { initAuth, setIsFetching } from "../../actions/global";
+import { initAuth, setFormMessage, setIsFetching } from "../../actions/global";
 
 import { NavBar } from "../../components/navbar";
 import { Button_action } from "../../components/buttons";
@@ -61,7 +61,7 @@ export const Form = () => {
 
   const onSignUpPage = location.pathname.toLowerCase() === "/signup";
 
-  const { isFetching } = useStoreSelector((state) => state.global);
+  const { isFetching, formMessage } = useStoreSelector((state) => state.global);
   const [wasOnSignUpPage, setState] = useState(onSignUpPage);
 
   const { SIGN_UP, LOGIN } = validationTypes;
@@ -70,7 +70,7 @@ export const Form = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
   } = useForm({ resolver: yupResolver(getSchema(schemaType)!) });
 
@@ -83,17 +83,31 @@ export const Form = () => {
     dispatch(setIsFetching(false));
   }, []);
 
-  const errorMessage = Object.values(errors)
-    .map(({ message }, i) => {
-      const m = message.toLowerCase();
+  useEffect(() => {
+    !isSubmitting && formMessage[0] && dispatch(setFormMessage(["", true]));
+  }, [isSubmitting]);
 
-      return i ? m : m[0].toUpperCase() + m.split("").slice(1).join("");
-    })
-    .join(", ")
-    .concat(".");
+  const getErrorMessage = () => {
+    if (!formMessage[0] && !Object.values(errors).some((v) => !!v)) return "";
 
-  const onSubmit: SubmitHandler<Fields> = (fields) =>
+    return formMessage[0]
+      ? [formMessage[0][0].toUpperCase() + formMessage[0].slice(1)]
+      : Object.values(errors)
+          .map(({ message }, i) => {
+            const m = message.toLowerCase();
+
+            return i ? m : m[0].toUpperCase() + m.split("").slice(1).join("");
+          })
+          .join(", ")
+          .concat(".");
+  };
+
+  const clearFormMessage = () => dispatch(setFormMessage(["", true]));
+
+  const onSubmit: SubmitHandler<Fields> = (fields) => {
+    clearFormMessage();
     dispatch(initAuth(fields));
+  };
 
   const welcomeText = onSignUpPage
     ? `Sign Up to enter our App.`
@@ -110,7 +124,10 @@ export const Form = () => {
             id="email"
             placeholder="email"
             isValid={!errors.email?.message}
-            {...register("email")}
+            defaultValue=""
+            {...register("email", {
+              onChange: clearFormMessage,
+            })}
           />
           <HiddenLabel htmlFor="email">e-Mail</HiddenLabel>
           {onSignUpPage && (
@@ -120,7 +137,10 @@ export const Form = () => {
                 id="username"
                 placeholder="username"
                 isValid={!errors.username?.message}
-                {...register("username")}
+                defaultValue=""
+                {...register("username", {
+                  onChange: clearFormMessage,
+                })}
               />
               <HiddenLabel htmlFor="username">Username</HiddenLabel>
             </>
@@ -130,7 +150,10 @@ export const Form = () => {
             id="password"
             placeholder="password"
             isValid={!errors.password?.message}
-            {...register("password")}
+            defaultValue=""
+            {...register("password", {
+              onChange: clearFormMessage,
+            })}
           />
           <HiddenLabel htmlFor="password">Password</HiddenLabel>
           {onSignUpPage && (
@@ -140,7 +163,10 @@ export const Form = () => {
                 id="passwordConfirm"
                 placeholder="confirm password"
                 isValid={!errors.passwordConfirm?.message}
-                {...register("passwordConfirm")}
+                defaultValue=""
+                {...register("passwordConfirm", {
+                  onChange: clearFormMessage,
+                })}
               />
               <HiddenLabel htmlFor="passwordConfirm">
                 Confirm password
@@ -150,7 +176,7 @@ export const Form = () => {
           <Button_action style={{ marginTop: "2rem" }} isLoading={isFetching}>
             Send
           </Button_action>
-          <ErrorParagraph>{errorMessage}</ErrorParagraph>
+          <ErrorParagraph>{getErrorMessage()}</ErrorParagraph>
         </FormContainer>
       </Main>
     </>
