@@ -11,7 +11,12 @@ import { NavBar } from "../../components/navbar";
 import { Button_action } from "../../components/buttons";
 import { Input } from "../../components/inputs";
 
-import { getSchema, validationTypes } from "./validation";
+import {
+  CONFIRMATION_MISSING,
+  EMPTY_PASSWORD_FIELD,
+  getSchema,
+  validationTypes,
+} from "./validation";
 
 import { greyWhiteDarker, red } from "../../styles/variables";
 import { visuallyHidden } from "../../styles/helpers";
@@ -83,26 +88,40 @@ export const Form = () => {
     dispatch(setIsFetching(false));
   }, []);
 
+  const clearFormMessage = () => dispatch(setFormMessage(["", true]));
+
   useEffect(() => {
-    !isSubmitting && formMessage[0] && dispatch(setFormMessage(["", true]));
+    !isSubmitting && formMessage[0] && clearFormMessage();
   }, [isSubmitting]);
 
-  const getErrorMessage = () => {
+  const formatErrorMessage = () => {
     if (!formMessage[0] && !Object.values(errors).some((v) => !!v)) return "";
 
     return formMessage[0]
       ? [formMessage[0][0].toUpperCase() + formMessage[0].slice(1)]
-      : Object.values(errors)
-          .map(({ message }, i) => {
+      : Object.entries(errors)
+          .map(([key, { message }], i, errorsArr) => {
             const m = message.toLowerCase();
+            const keys = Object.keys(errors);
+
+            const wrongPasswordSoDontShowPassConfirmMsg =
+              (keys.includes("password") &&
+                keys.includes("passwordConfirm") &&
+                message === CONFIRMATION_MISSING) ||
+              (errorsArr.find(
+                ([k, e]: [string, { message: string }]) =>
+                  e.message === EMPTY_PASSWORD_FIELD
+              ) &&
+                message === CONFIRMATION_MISSING);
+
+            if (wrongPasswordSoDontShowPassConfirmMsg) return "";
 
             return i ? m : m[0].toUpperCase() + m.split("").slice(1).join("");
           })
+          .filter(Boolean)
           .join(", ")
           .concat(".");
   };
-
-  const clearFormMessage = () => dispatch(setFormMessage(["", true]));
 
   const onSubmit: SubmitHandler<Fields> = (fields) => {
     clearFormMessage();
@@ -176,7 +195,7 @@ export const Form = () => {
           <Button_action style={{ marginTop: "2rem" }} isLoading={isFetching}>
             Send
           </Button_action>
-          <ErrorParagraph>{getErrorMessage()}</ErrorParagraph>
+          <ErrorParagraph>{formatErrorMessage()}</ErrorParagraph>
         </FormContainer>
       </Main>
     </>
