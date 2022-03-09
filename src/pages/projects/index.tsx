@@ -93,13 +93,9 @@ export const Projects = () => {
         .map((p) => ({ ...p, isChecked: false }))
         .sort(sortFn(sortBy, sortOrder)),
     });
-  }, [projects]);
 
-  const onButtonRemove = useCallback(() => {
-    state.sortedProjects
-      .filter(({ isChecked }) => isChecked)
-      .forEach(({ name }) => dispatch(removeProject(name)));
-  }, [state.sortedProjects]);
+    if (isConfirmationModalOpen) setIsConfirmationModalOpen(false);
+  }, [projects]);
 
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
@@ -108,6 +104,12 @@ export const Projects = () => {
     () => setIsConfirmationModalOpen(true),
     []
   );
+
+  const onButtonRemove = useCallback(() => {
+    state.sortedProjects
+      .filter(({ isChecked }) => isChecked)
+      .forEach(({ name }) => dispatch(removeProject(name)));
+  }, [state.sortedProjects]);
 
   const periodDaysArr = Object.values(entriesByDays);
 
