@@ -143,8 +143,9 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
   const submitPasswordUpdate = useCallback(() => {
     cleanupValidationMessages();
     setIsFieldValid([true, true, true]);
+    console.log(currentPass, newPass);
 
-    if (isEqual(currentPass, newPass) && !formMessage.length) {
+    if (isEqual(currentPass, newPass) && !formMessage[0].length) {
       setErrorMessage(PASSWORD_NOT_CHANGED);
       setIsFieldValid([true, false, false]);
       return;

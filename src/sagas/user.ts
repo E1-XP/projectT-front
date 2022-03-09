@@ -184,7 +184,7 @@ export function* sendAvatar({ payload }: PayloadAction<any>) {
     if (response.status === 200) {
       const data: UserDataResponse = yield response.json();
 
-      const keys = ["settings", "entries", "projects"];
+      const keys = ["entries", "projects"];
       const userDataFiltered = pickBy((_, key) => !keys.includes(key))(
         data
       ) as UserData;
@@ -218,7 +218,7 @@ export function* deleteAvatar(action: Action) {
     if (response.status === 200) {
       const data: UserDataResponse = yield response.json();
 
-      const keys = ["settings", "entries", "projects"];
+      const keys = ["entries", "projects"];
       const userDataFiltered = pickBy((_, key) => !keys.includes(key))(
         data
       ) as UserData;
