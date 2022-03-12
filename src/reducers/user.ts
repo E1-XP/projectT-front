@@ -26,7 +26,7 @@ const initialState = {
 
 export const userReducer = createReducer(initialState, (builder) => {
   builder.addCase(setUserData, (state, action) => {
-    state.userData = action.payload;
+    state.userData = { ...state.userData, ...action.payload };
   });
   builder.addCase(setEntries, (state, action) => {
     state.entries = action.payload;
