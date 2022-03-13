@@ -14,6 +14,7 @@ const Timer = lazy(() => import("../pages/timer"));
 const Reports = lazy(() => import("../pages/reports"));
 const Projects = lazy(() => import("../pages/projects"));
 const Settings = lazy(() => import("../pages/settings"));
+const ErrorPage = lazy(() => import("./../pages/error"));
 
 import { initReAuth } from "../actions/global";
 
@@ -30,6 +31,7 @@ export const Routes = () => {
         <Route exact={true} path="/" render={() => <Redirect to="/timer" />} />
         <Route path="/login" component={Form} />
         <Route path="/signup" component={Form} />
+        <Route path="/500" component={ErrorPage} />
         <ProtectedRoute path="/" component={Sidebar} />
         <Switch>
           <ProtectedRoute path="/timer" component={Timer} />
