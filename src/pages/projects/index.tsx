@@ -18,7 +18,7 @@ import { SortBy, sortFn, SortOrder } from "./helpers";
 
 import { breakPoints } from "../../styles/variables";
 import { getBP } from "./../../styles/helpers";
-import { Heading as HeadingCSS } from "../../styles/typography";
+import { Heading as HeadingCSS, Paragraph } from "../../styles/typography";
 
 export interface State {
   sortedProjects: (Project & { isChecked: boolean })[];
@@ -54,6 +54,26 @@ const Header = styled.header`
 
 const Heading = styled.h2`
   ${HeadingCSS}
+`;
+
+const No_Projects_image = styled.img`
+  width: 50%;
+  margin: 4rem auto;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+
+  ${getBP(breakPoints.small)} {
+    width: 80%;
+  }
+`;
+
+const No_Entries = styled.p`
+  ${Paragraph}
+
+  display: block;
+  padding: 1rem;
+  text-align: center;
 `;
 
 const Footer = styled.section`
@@ -126,12 +146,23 @@ export const Projects = () => {
         <Heading>Projects</Heading>
         <Button_success onClick={openModal}>Create Project</Button_success>
       </Header>
-      <ProjectsTable
-        projects={projects}
-        periodProjectDurations={periodProjectDurations}
-        state={state}
-        setState={setState}
-      />
+      {projects.length ? (
+        <ProjectsTable
+          projects={projects}
+          periodProjectDurations={periodProjectDurations}
+          state={state}
+          setState={setState}
+        />
+      ) : (
+        <>
+          <No_Projects_image
+            src={require("./../../../public/assets/projects-page.svg").default}
+          />
+          <No_Entries>
+            No projects found. Press the 'Create Project' button to get started.
+          </No_Entries>
+        </>
+      )}
       <Footer>
         {!!projects.length && (
           <Button_danger

@@ -100,26 +100,6 @@ const TD = styled.td`
   }
 `;
 
-const No_Projects_image = styled.img`
-  width: 50%;
-  margin: 4rem auto;
-  display: block;
-  user-select: none;
-  -webkit-user-drag: none;
-
-  ${getBP(breakPoints.small)} {
-    width: 80%;
-  }
-`;
-
-const No_Entries = styled.td`
-  ${Paragraph}
-
-  display: block;
-  padding: 1rem;
-  text-align: center;
-`;
-
 const Icon_Link = styled.a`
   cursor: pointer;
 `;
@@ -251,47 +231,28 @@ export const ProjectsTable = ({
               <Sortable_Panel sortBy={"status"} stateFn={setSortState} />
             </TH>
           </Table_Row_Header>
-          {projects.length ? (
-            state.sortedProjects.map((item, i) => (
-              <Table_Row key={item.name}>
-                <TD>
-                  <CheckBox
-                    name={item.name}
-                    state={state}
-                    handleFn={checkBoxesHandler}
-                  />
-                </TD>
-                <TD>
-                  <Color_Indicator color={item.color} />
-                  {item.name}
-                </TD>
-                <TD>{item.client ? item.client : "(No Client)"}</TD>
-                <TD>
-                  {formatDuration(
-                    getProjectDuration(periodProjectDurations, item.name)
-                      .readable
-                  )}
-                </TD>
-              </Table_Row>
-            ))
-          ) : (
-            <>
-              <tr>
-                <No_Projects_image
-                  src={
-                    require("./../../../public/assets/projects-page.svg")
-                      .default
-                  }
+
+          {state.sortedProjects.map((item, i) => (
+            <Table_Row key={item.name}>
+              <TD>
+                <CheckBox
+                  name={item.name}
+                  state={state}
+                  handleFn={checkBoxesHandler}
                 />
-              </tr>
-              <tr>
-                <No_Entries>
-                  No projects found. Press the 'Create Project' button to get
-                  started.
-                </No_Entries>
-              </tr>
-            </>
-          )}
+              </TD>
+              <TD>
+                <Color_Indicator color={item.color} />
+                {item.name}
+              </TD>
+              <TD>{item.client ? item.client : "(No Client)"}</TD>
+              <TD>
+                {formatDuration(
+                  getProjectDuration(periodProjectDurations, item.name).readable
+                )}
+              </TD>
+            </Table_Row>
+          ))}
         </tbody>
       </Table>
     </Table_section>
