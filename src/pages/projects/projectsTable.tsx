@@ -116,8 +116,8 @@ const No_Entries = styled.td`
   ${Paragraph}
 
   display: block;
-  text-align: center;
   padding: 1rem;
+  text-align: center;
 `;
 
 const Icon_Link = styled.a`

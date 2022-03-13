@@ -12,4 +12,5 @@ export const Paragraph = css`
   font-family: "Open Sans", sans-serif;
   font-weight: 400;
   font-size: 1.3rem;
+  line-height: 1.6;
 `;

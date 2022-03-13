@@ -68,7 +68,7 @@ const No_Entries_image = styled.img`
 const Info_paragraph = styled.p`
   ${Paragraph}
 
-  text-align:center;
+  text-align: center;
 `;
 
 export const Timeline = () => {
