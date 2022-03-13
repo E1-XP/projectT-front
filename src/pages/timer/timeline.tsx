@@ -1,19 +1,24 @@
 import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
+
 import { fetchEntries } from "../../actions/user";
-import {
-  darkGrey,
-  greyWhite,
-  greyWhiteDarker,
-  red,
-  white,
-} from "../../styles/variables";
 
 import { useStoreDispatch, useStoreSelector } from "./../../hooks";
 import { groupEntriesByDays } from "./../../selectors/groupEntriesByDays";
 
 import { DayList } from "./dayList";
 import { Spinner } from "./../../components/loader";
+
+import { getBP } from "../../styles/helpers";
+import {
+  breakPoints,
+  darkGrey,
+  greyWhite,
+  greyWhiteDarker,
+  red,
+  white,
+} from "../../styles/variables";
+import { Paragraph } from "../../styles/typography";
 
 const Timeline_wrapper = styled.section``;
 
@@ -48,10 +53,29 @@ const Button_load = styled.button`
   align-items: center;
 `;
 
+const No_Entries_image = styled.img`
+  width: 50%;
+  margin: 4rem auto;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+
+  ${getBP(breakPoints.small)} {
+    width: 80%;
+  }
+`;
+
+const Info_paragraph = styled.p`
+  ${Paragraph}
+
+  text-align:center;
+`;
+
 export const Timeline = () => {
   const dispatch = useStoreDispatch();
   const isFetching = useStoreSelector((state) => state.global.isFetching);
   const entriesByDays = useStoreSelector(groupEntriesByDays);
+  const entriesByDaysAsArr = Object.values(entriesByDays);
   console.log(entriesByDays);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -67,17 +91,29 @@ export const Timeline = () => {
 
   return (
     <Timeline_wrapper>
-      <Timeline_list>
-        {Object.values(entriesByDays).map((day) => (
-          <Timeline_item key={day.start}>
-            <DayList data={day} />
-          </Timeline_item>
-        ))}
-      </Timeline_list>
+      {entriesByDaysAsArr.length ? (
+        <Timeline_list>
+          {entriesByDaysAsArr.map((day) => (
+            <Timeline_item key={day.start}>
+              <DayList data={day} />
+            </Timeline_item>
+          ))}
+        </Timeline_list>
+      ) : (
+        <No_Entries_image
+          src={require("./../../../public/assets/timer-page.svg").default}
+        />
+      )}
       <Loader_container>
-        <Button_load onClick={loadMoreData}>
-          {isLoading ? <Spinner fill={red} /> : "Load more"}
-        </Button_load>
+        {entriesByDaysAsArr.length ? (
+          <Button_load onClick={loadMoreData}>
+            {isLoading ? <Spinner fill={red} /> : "Load more"}
+          </Button_load>
+        ) : (
+          <Info_paragraph>
+            No entries found. Press timer button to begin time tracking.
+          </Info_paragraph>
+        )}
       </Loader_container>
     </Timeline_wrapper>
   );

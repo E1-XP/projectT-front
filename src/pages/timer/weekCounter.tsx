@@ -112,8 +112,8 @@ export const WeekCounter = ({}: Props) => {
     (val, key) => val.start >= weekStart
   )(entriesByDays) as Record<string, SingleDay>;
 
-  const weekProjectCount = Object.entries(weekEntriesByDays).reduce(
-    (acc, [key, data]) => {
+  const weekProjectCount = Object.values(weekEntriesByDays).reduce(
+    (acc, data) => {
       Object.entries(data.projects).forEach(([projectKey, data]) => {
         if (acc[projectKey] === undefined) acc[projectKey] = 0;
         acc[projectKey] += data.totalDuration;
@@ -148,32 +148,34 @@ export const WeekCounter = ({}: Props) => {
         {formatDuration(intervalToDuration({ start: 0, end: totalDuration }))}
       </Timer>
       <Week_bar>
-        {Object.entries(weekProjectCount).map(([key, sum]) => (
-          <Tooltip
-            key={key}
-            overlay={showInfoOnHover(
-              key,
-              sum,
-              totalDuration,
-              getProjectColor(key)
-            )}
-            placement="top"
-            overlayStyle={overlayStyle}
-            mouseLeaveDelay={0.2}
-          >
-            <Week_bar_part
+        {Object.entries(weekProjectCount)
+          .filter(([_, sum]) => sum !== 0)
+          .map(([key, sum]) => (
+            <Tooltip
               key={key}
-              width={getWidth(sum)}
-              color={getProjectColor(key)}
-            >
-              {getWidth(sum) > 3 && (
-                <Bar_text>
-                  {key === "no project" ? "(NO PROJECT)" : key.toUpperCase()}
-                </Bar_text>
+              overlay={showInfoOnHover(
+                key,
+                sum,
+                totalDuration,
+                getProjectColor(key)
               )}
-            </Week_bar_part>
-          </Tooltip>
-        ))}
+              placement="top"
+              overlayStyle={overlayStyle}
+              mouseLeaveDelay={0.2}
+            >
+              <Week_bar_part
+                key={key}
+                width={getWidth(sum)}
+                color={getProjectColor(key)}
+              >
+                {getWidth(sum) > 3 && (
+                  <Bar_text>
+                    {key === "no project" ? "(NO PROJECT)" : key.toUpperCase()}
+                  </Bar_text>
+                )}
+              </Week_bar_part>
+            </Tooltip>
+          ))}
       </Week_bar>
     </Week_counter>
   );

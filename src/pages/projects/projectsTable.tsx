@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import { Project } from "../../store/interfaces";
-
 import { useStoreSelector } from "../../hooks";
+
+import { State } from ".";
 
 import { PeriodProjectDurations } from "../../helpers";
 import { getProjectDuration, SortBy, sortFn, SortOrder } from "./helpers";
@@ -20,7 +21,7 @@ import {
   greyWhiteDarker,
 } from "../../styles/variables";
 import { getBP } from "./../../styles/helpers";
-import { State } from ".";
+import { Paragraph } from "../../styles/typography";
 
 interface Props {
   projects: Project[];
@@ -99,9 +100,22 @@ const TD = styled.td`
   }
 `;
 
-const No_Entries = styled.td`
+const No_Projects_image = styled.img`
+  width: 50%;
+  margin: 4rem auto;
   display: block;
-  width: 301%;
+  user-select: none;
+  -webkit-user-drag: none;
+
+  ${getBP(breakPoints.small)} {
+    width: 80%;
+  }
+`;
+
+const No_Entries = styled.td`
+  ${Paragraph}
+
+  display: block;
   text-align: center;
   padding: 1rem;
 `;
@@ -261,11 +275,22 @@ export const ProjectsTable = ({
               </Table_Row>
             ))
           ) : (
-            <tr>
-              <No_Entries>
-                Press the 'Create Project' button to get started.
-              </No_Entries>
-            </tr>
+            <>
+              <tr>
+                <No_Projects_image
+                  src={
+                    require("./../../../public/assets/projects-page.svg")
+                      .default
+                  }
+                />
+              </tr>
+              <tr>
+                <No_Entries>
+                  No projects found. Press the 'Create Project' button to get
+                  started.
+                </No_Entries>
+              </tr>
+            </>
           )}
         </tbody>
       </Table>
