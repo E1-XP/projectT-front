@@ -53,15 +53,28 @@ const Button_load = styled.button`
   align-items: center;
 `;
 
-const No_Entries_image = styled.img`
-  width: 50%;
-  margin: 4rem auto;
+const Decoration_image = styled.img`
   display: block;
   user-select: none;
   -webkit-user-drag: none;
 
   ${getBP(breakPoints.small)} {
     width: 80%;
+  }
+`;
+
+const Figure = styled.figure`
+  width: 50%;
+  margin: 4rem auto;
+
+  & img {
+    width: 100%;
+  }
+
+  & figcaption {
+    margin-top: 0.5rem;
+    text-align: center;
+    font-size: 0.8rem;
   }
 `;
 
@@ -100,9 +113,16 @@ export const Timeline = () => {
           ))}
         </Timeline_list>
       ) : (
-        <No_Entries_image
-          src={require("./../../../public/assets/timer-page.svg").default}
-        />
+        <Figure>
+          <Decoration_image
+            src={require("./../../../public/assets/timer-page.svg").default}
+          />
+          <figcaption>
+            <a href="https://www.freepik.com/vectors/illustration">
+              Illustration vector created by pikisuperstar - www.freepik.com
+            </a>
+          </figcaption>
+        </Figure>
       )}
       <Loader_container>
         {entriesByDaysAsArr.length ? (

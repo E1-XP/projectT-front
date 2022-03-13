@@ -56,15 +56,28 @@ const Heading = styled.h2`
   ${HeadingCSS}
 `;
 
-const No_Projects_image = styled.img`
-  width: 50%;
-  margin: 4rem auto;
+const Decoration_image = styled.img`
   display: block;
   user-select: none;
   -webkit-user-drag: none;
 
   ${getBP(breakPoints.small)} {
     width: 80%;
+  }
+`;
+
+const Figure = styled.figure`
+  width: 50%;
+  margin: 4rem auto;
+
+  & img {
+    width: 100%;
+  }
+
+  & figcaption {
+    margin-top: 0.5rem;
+    text-align: center;
+    font-size: 0.8rem;
   }
 `;
 
@@ -155,9 +168,18 @@ export const Projects = () => {
         />
       ) : (
         <>
-          <No_Projects_image
-            src={require("./../../../public/assets/projects-page.svg").default}
-          />
+          <Figure>
+            <Decoration_image
+              src={
+                require("./../../../public/assets/projects-page.svg").default
+              }
+            />
+            <figcaption>
+              <a href="https://www.freepik.com/vectors/business">
+                Business vector created by pikisuperstar - www.freepik.com
+              </a>
+            </figcaption>
+          </Figure>
           <No_Entries>
             No projects found. Press the 'Create Project' button to get started.
           </No_Entries>
