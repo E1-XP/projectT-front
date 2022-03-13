@@ -34,7 +34,7 @@ const Main_content = styled.section`
   }
 `;
 
-const Settings_section = styled.section`
+const Section = styled.section`
   flex: 1 1 50%;
 `;
 
@@ -78,7 +78,7 @@ export const ErrorPage = () => {
         <Heading>Error Page</Heading>
       </Header>
       <Main_content>
-        <Settings_section>
+        <Section>
           <Figure>
             <Decoration_image
               src={require("./../../../public/assets/error-page.svg").default}
@@ -89,12 +89,11 @@ export const ErrorPage = () => {
               </a>
             </figcaption>
           </Figure>
-
           <Info_paragraph>
             Something really bad happened and application crashed. We are
             already working to fix it. Please refresh page in a few minutes.
           </Info_paragraph>
-        </Settings_section>
+        </Section>
       </Main_content>
     </Wrapper>
   );
