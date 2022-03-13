@@ -33,4 +33,8 @@ export const setIsFetching = createAction<boolean>(
   types.GLOBAL_SET_IS_FETCHING
 );
 
+export const setHasErrored = createAction<boolean>(
+  types.GLOBAL_SET_HAS_ERRORED
+);
+
 export const requestError = createAction<any>(types.GLOBAL_REQUEST_ERROR);
