@@ -101,7 +101,7 @@ export const Projects = () => {
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchEntries(0));
+    projects.length && dispatch(fetchEntries(0));
   }, []);
 
   useEffect(() => {
