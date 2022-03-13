@@ -33,8 +33,8 @@ import {
   greyWhite,
   whiteGrey,
 } from "../../styles/variables";
-
 import { getBP } from "./../../styles/helpers";
+import { Heading as HeadingCSS } from "../../styles/typography";
 
 export interface State {
   readable: readable | string;
@@ -66,8 +66,7 @@ const Header = styled.header`
 `;
 
 const Heading = styled.h2`
-  font-size: 2.125rem;
-  font-weight: 500;
+  ${HeadingCSS}
 `;
 
 const Heading_section = styled.h3`

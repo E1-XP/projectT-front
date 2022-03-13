@@ -1,6 +1,10 @@
 import { css } from "styled-components";
 
-export const Heading = css``;
+export const Heading = css`
+  font-family: "Open Sans", sans-serif;
+  font-size: 2.125rem;
+  font-weight: 500;
+`;
 
 export const Heading2 = css``;
 

@@ -23,6 +23,7 @@ import {
   whiteGrey,
 } from "../../styles/variables";
 import { getBP } from "../../styles/helpers";
+import { Heading as HeadingCSS } from "./../../styles/typography";
 
 const Wrapper = styled.main`
   width: 100%;
@@ -41,8 +42,7 @@ const Header = styled.header`
 `;
 
 const Heading = styled.h2`
-  font-size: 2.125rem;
-  font-weight: 500;
+  ${HeadingCSS}
 `;
 
 const Main_content = styled.section`

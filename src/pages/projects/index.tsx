@@ -18,6 +18,7 @@ import { SortBy, sortFn, SortOrder } from "./helpers";
 
 import { breakPoints } from "../../styles/variables";
 import { getBP } from "./../../styles/helpers";
+import { Heading as HeadingCSS } from "../../styles/typography";
 
 export interface State {
   sortedProjects: (Project & { isChecked: boolean })[];
@@ -52,8 +53,7 @@ const Header = styled.header`
 `;
 
 const Heading = styled.h2`
-  font-size: 2.125rem;
-  font-weight: 500;
+  ${HeadingCSS}
 `;
 
 const Footer = styled.section`
