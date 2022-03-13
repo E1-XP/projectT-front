@@ -73,7 +73,7 @@ const Main_preloader = styled.div`
 
 interface ComponentLoaderProps {
   isVisible: boolean;
-  shouldShowSpinner: boolean;
+  shouldShowSpinner?: boolean;
   shouldShowMessage?: boolean;
   message?: string;
   fill?: string;
@@ -86,9 +86,12 @@ export const ComponentLoader = ({
   message,
   fill,
 }: ComponentLoaderProps) => {
+  const isSpinnerVisible =
+    shouldShowSpinner === undefined ? true : shouldShowSpinner;
+
   return (
     <Overlay isVisible={isVisible}>
-      {shouldShowSpinner ? (
+      {isSpinnerVisible ? (
         <Spinner fill={fill || greyWhite} showBigSpinner={true} />
       ) : shouldShowMessage ? (
         message || ""

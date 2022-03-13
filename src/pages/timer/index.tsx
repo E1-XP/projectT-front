@@ -1,9 +1,11 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import styled from "styled-components";
 
 import { TaskController } from "./taskController";
 import { WeekCounter } from "./weekCounter";
-import { Timeline } from "./timeline";
+const Timeline = lazy(() => import("./timeline"));
+
+import { ComponentLoader } from "../../components/loader";
 
 const Timer_wrapper = styled.main`
   width: 100%;
@@ -15,7 +17,9 @@ export const Timer = () => (
   <Timer_wrapper>
     <TaskController />
     <WeekCounter />
-    <Timeline />
+    <Suspense fallback={<ComponentLoader isVisible={true} />}>
+      <Timeline />
+    </Suspense>
   </Timer_wrapper>
 );
 

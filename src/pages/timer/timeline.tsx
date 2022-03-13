@@ -138,3 +138,5 @@ export const Timeline = () => {
     </Timeline_wrapper>
   );
 };
+
+export default Timeline;

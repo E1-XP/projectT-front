@@ -220,3 +220,5 @@ export const ProjectChart = ({ range }: Props) => {
     </Wrapper>
   );
 };
+
+export default ProjectChart;

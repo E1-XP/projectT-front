@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense, lazy } from "react";
+import React, { useEffect } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 
 import { useStoreDispatch } from "../hooks";
@@ -10,11 +10,11 @@ import { ProtectedRoute } from "./protected";
 import { Form } from "../pages/forms";
 import { Sidebar } from "../components/sidebar";
 
-const Timer = lazy(() => import("../pages/timer"));
-const Reports = lazy(() => import("../pages/reports"));
-const Projects = lazy(() => import("../pages/projects"));
-const Settings = lazy(() => import("../pages/settings"));
-const ErrorPage = lazy(() => import("./../pages/error"));
+import Timer from "../pages/timer";
+import Reports from "../pages/reports";
+import Projects from "../pages/projects";
+import Settings from "../pages/settings";
+import ErrorPage from "./../pages/error";
 
 import { initReAuth } from "../actions/global";
 
@@ -26,21 +26,19 @@ export const Routes = () => {
   }, []);
 
   return (
-    <Suspense fallback={<Loader />}>
-      <Loader>
-        <Route exact={true} path="/" render={() => <Redirect to="/timer" />} />
-        <Route path="/login" component={Form} />
-        <Route path="/signup" component={Form} />
-        <Route path="/500" component={ErrorPage} />
-        <ProtectedRoute path="/" component={Sidebar} />
-        <Switch>
-          <ProtectedRoute path="/timer" component={Timer} />
-          <ProtectedRoute path="/reports" component={Reports} />
-          <ProtectedRoute path="/projects" component={Projects} />
-          <ProtectedRoute path="/settings" component={Settings} />
-          <ProtectedRoute path="*" component={() => <Redirect to="/timer" />} />
-        </Switch>
-      </Loader>
-    </Suspense>
+    <Loader>
+      <Route exact={true} path="/" render={() => <Redirect to="/timer" />} />
+      <Route path="/login" component={Form} />
+      <Route path="/signup" component={Form} />
+      <Route path="/500" component={ErrorPage} />
+      <ProtectedRoute path="/" component={Sidebar} />
+      <Switch>
+        <ProtectedRoute path="/timer" component={Timer} />
+        <ProtectedRoute path="/reports" component={Reports} />
+        <ProtectedRoute path="/projects" component={Projects} />
+        <ProtectedRoute path="/settings" component={Settings} />
+        <ProtectedRoute path="*" component={() => <Redirect to="/timer" />} />
+      </Switch>
+    </Loader>
   );
 };

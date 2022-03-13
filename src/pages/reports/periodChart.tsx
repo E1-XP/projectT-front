@@ -237,3 +237,5 @@ export const PeriodChart = ({ periodState, range }: Props) => {
     </Wrapper>
   );
 };
+
+export default PeriodChart;

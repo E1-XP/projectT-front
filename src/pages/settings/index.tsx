@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, Suspense, lazy } from "react";
 import styled from "styled-components";
 import uniq from "lodash/fp/uniq";
 
 import { useStoreDispatch, useStoreSelector } from "../../hooks";
 
-import { Avatar } from "./avatar";
+const Avatar = lazy(() => import("./avatar"));
 import { PasswordModal } from "./passwordModal";
 import { Icon } from "../../components/icon";
 import { Button, Button_success } from "../../components/buttons";
@@ -236,13 +236,15 @@ export const Settings = () => {
       </Header>
       <Main_content>
         <Side>
-          <Avatar
-            userData={userData}
-            isUploading={isUploading}
-            uploadImage={uploadImage}
-            uploadCompleted={uploadCompleted}
-            onAvatarRemove={onAvatarRemove}
-          />
+          <Suspense fallback={<ComponentLoader isVisible={true} />}>
+            <Avatar
+              userData={userData}
+              isUploading={isUploading}
+              uploadImage={uploadImage}
+              uploadCompleted={uploadCompleted}
+              onAvatarRemove={onAvatarRemove}
+            />
+          </Suspense>
         </Side>
         <Settings_section>
           <ComponentLoader

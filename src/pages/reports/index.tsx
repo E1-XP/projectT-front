@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, Suspense, lazy } from "react";
 import styled from "styled-components";
 import startOfWeek from "date-fns/startOfWeek";
 import endOfWeek from "date-fns/endOfWeek";
@@ -9,9 +9,10 @@ import add from "date-fns/add";
 import sub from "date-fns/sub";
 
 import { Calendar } from "./calendar";
-import { PeriodChart } from "./periodChart";
-import { ProjectChart } from "./projectChart";
+const PeriodChart = lazy(() => import("./periodChart"));
+const ProjectChart = lazy(() => import("./projectChart"));
 import { Icon } from "../../components/icon";
+import { ComponentLoader } from "../../components/loader";
 
 import {
   formatCustomReadable,
@@ -237,16 +238,22 @@ export const Reports = () => {
             </Period_selection>
             {isCalendarOpen && <Screen_blocker onClick={closeCalendar} />}
             {isCalendarOpen && (
-              <Calendar
-                range={range}
-                syncRange={syncRange}
-                closeCalendar={closeCalendar}
-              />
+              <Suspense fallback={<ComponentLoader isVisible={true} />}>
+                <Calendar
+                  range={range}
+                  syncRange={syncRange}
+                  closeCalendar={closeCalendar}
+                />
+              </Suspense>
             )}
           </Heading_section>
         </Header>
-        <PeriodChart periodState={state} range={range} />
-        <ProjectChart periodState={state} range={range} />
+        <Suspense fallback={<ComponentLoader isVisible={true} />}>
+          <PeriodChart periodState={state} range={range} />
+        </Suspense>
+        <Suspense fallback={<ComponentLoader isVisible={true} />}>
+          <ProjectChart periodState={state} range={range} />
+        </Suspense>
       </Chart_section>
     </Wrapper>
   );

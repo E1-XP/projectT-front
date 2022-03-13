@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, lazy, Suspense } from "react";
 import styled from "styled-components";
 
 import { useStoreDispatch, useStoreSelector } from "../../hooks";
@@ -8,7 +8,7 @@ import { Project } from "../../store/interfaces";
 
 import { fetchEntries, removeProject } from "../../actions/user";
 
-import { ProjectsTable } from "./projectsTable";
+const ProjectsTable = lazy(() => import("./projectsTable"));
 import { CreationModal } from "./creationModal";
 import { ConfirmationModal } from "./confirmationModal";
 import { Button_success, Button_danger } from "../../components/buttons";
@@ -19,6 +19,7 @@ import { SortBy, sortFn, SortOrder } from "./helpers";
 import { breakPoints } from "../../styles/variables";
 import { getBP } from "./../../styles/helpers";
 import { Heading as HeadingCSS, Paragraph } from "../../styles/typography";
+import { ComponentLoader } from "../../components/loader";
 
 export interface State {
   sortedProjects: (Project & { isChecked: boolean })[];
@@ -160,12 +161,14 @@ export const Projects = () => {
         <Button_success onClick={openModal}>Create Project</Button_success>
       </Header>
       {projects.length ? (
-        <ProjectsTable
-          projects={projects}
-          periodProjectDurations={periodProjectDurations}
-          state={state}
-          setState={setState}
-        />
+        <Suspense fallback={<ComponentLoader isVisible={true} />}>
+          <ProjectsTable
+            projects={projects}
+            periodProjectDurations={periodProjectDurations}
+            state={state}
+            setState={setState}
+          />
+        </Suspense>
       ) : (
         <>
           <Figure>

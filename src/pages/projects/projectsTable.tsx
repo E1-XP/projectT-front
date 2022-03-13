@@ -258,3 +258,5 @@ export const ProjectsTable = ({
     </Table_section>
   );
 };
+
+export default ProjectsTable;
