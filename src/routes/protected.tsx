@@ -9,14 +9,22 @@ interface Props extends RouteProps {
 }
 
 export const ProtectedRoute = ({ path, component: Component }: Props) => {
-  const isUserLoggedIn = useStoreSelector(
-    (state) => state.global.isUserLoggedIn
+  const { isUserLoggedIn, hasErrored } = useStoreSelector(
+    (state) => state.global
   );
 
   return (
     <Route
       path={path}
-      render={() => (isUserLoggedIn ? <Component /> : <Redirect to="/login" />)}
+      render={() =>
+        hasErrored ? (
+          <Redirect to="/500" />
+        ) : isUserLoggedIn ? (
+          <Component />
+        ) : (
+          <Redirect to="/login" />
+        )
+      }
     />
   );
 };
