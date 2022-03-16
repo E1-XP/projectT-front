@@ -40,13 +40,13 @@ export const getPeriodProjectDurations = (
     totalDuration: getNoProjectDuration(daysArr, timerDuration, currentProject),
   };
 
-  return daysArr
+  const getFill = (name: string) =>
+    projects.find((project) => project.name === name)?.color || greyWhiteDarker;
+
+  const producedData = daysArr
     .reduce(
       (acc, day) => {
         Object.entries(day.projects).map(([name, value]) => {
-          const getFill = () =>
-            projects.find((project) => project.name === name)?.color ||
-            greyWhiteDarker;
           const foundProjectIdx = acc.findIndex(
             (project) => project.name === name
           );
@@ -57,7 +57,7 @@ export const getPeriodProjectDurations = (
             acc.push({
               ...value,
               name,
-              fill: getFill(),
+              fill: getFill(name),
               totalDuration: value.totalDuration,
             });
           }
@@ -72,6 +72,23 @@ export const getPeriodProjectDurations = (
 
       return project;
     });
+
+  if (
+    currentProject &&
+    timerDuration &&
+    !producedData.find((project) => project.name === currentProject)
+  ) {
+    producedData.push({
+      name: currentProject,
+      fill: getFill(currentProject),
+      totalDuration: timerDuration,
+      entries: [],
+      start: 0,
+      stop: 0,
+    });
+  }
+
+  return producedData;
 };
 
 export const getTotalPeriodDuration = (
