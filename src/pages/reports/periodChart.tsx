@@ -238,7 +238,7 @@ export const PeriodChart = ({ periodState, range }: Props) => {
             <LabelList
               dataKey="totalDuration"
               position="top"
-              content={getCustomLabel(hoveredBarStartDate, dataSrc)}
+              content={getCustomLabel(hoveredBarStartDate, type, dataSrc)}
             />
             {dataSrc.map((item, i) => (
               <Cell

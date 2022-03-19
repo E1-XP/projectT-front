@@ -84,66 +84,71 @@ export const getYAxisTick = (props: any) => {
 
 export const getCustomLabel: (
   hoveredBarStartDate: number,
+  periodType: periods,
   dataSrc: SingleDayExtract[]
-) => ContentType = (hoveredBarStartDate, dataSrc) => (props: any) => {
-  const { value, x, y, width, height, index } = props;
+) => ContentType =
+  (hoveredBarStartDate, periodType, dataSrc) => (props: any) => {
+    const { value, x, y, width, height, index } = props;
 
-  const rectWidth = 158;
-  const idx = dataSrc.findIndex((data) => data.start === hoveredBarStartDate);
-  const isHovered = idx === index;
+    const rectWidth = 158;
+    const idx = dataSrc.findIndex((data) => data.start === hoveredBarStartDate);
+    const isHovered = idx === index;
 
-  return isHovered ? (
-    <>
-      <rect
-        x={x + width / 2 - rectWidth / 2}
-        y={y - 70}
-        width={rectWidth}
-        height={60}
-        rx="5px"
-        ry="5px"
-        strokeLinejoin="round"
-        style={{ fill: white, stroke: greyWhite }}
-      />
-      <foreignObject x={x - 5 + width / 2} y={y - 11} width={10} height={10}>
-        <div
-          style={{
-            width: 0,
-            height: 0,
-            borderStyle: "solid",
-            borderWidth: "10px 5px 0 5px",
-            borderColor: `${greyWhite} transparent transparent transparent`,
-          }}
+    return isHovered ? (
+      <>
+        <rect
+          x={x + width / 2 - rectWidth / 2}
+          y={y - 70}
+          width={rectWidth}
+          height={60}
+          rx="5px"
+          ry="5px"
+          strokeLinejoin="round"
+          style={{ fill: white, stroke: greyWhite }}
         />
-      </foreignObject>
-      <foreignObject x={x - 5 + width / 2} y={y - 13} width={10} height={10}>
-        <div
-          style={{
-            width: 0,
-            height: 0,
-            borderStyle: "solid",
-            borderWidth: "10px 5px 0 5px",
-            borderColor: `${white} transparent transparent transparent`,
-          }}
-        />
-      </foreignObject>
-      <text
-        x={x + width / 2}
-        y={y - 48}
-        textAnchor="middle"
-        style={{ fontSize: "12px" }}
-        fill={black}
-      >
-        {format(dataSrc[idx].start, "EEEE, LLLL do")}
-      </text>
-      <text
-        x={x + width / 2}
-        y={y - 25}
-        textAnchor="middle"
-        style={{ fontSize: "12px" }}
-        fill={black}
-      >
-        {`Total: ${formatTotalDuration(value)}`}
-      </text>
-    </>
-  ) : null;
-};
+        <foreignObject x={x - 5 + width / 2} y={y - 11} width={10} height={10}>
+          <div
+            style={{
+              width: 0,
+              height: 0,
+              borderStyle: "solid",
+              borderWidth: "10px 5px 0 5px",
+              borderColor: `${greyWhite} transparent transparent transparent`,
+            }}
+          />
+        </foreignObject>
+        <foreignObject x={x - 5 + width / 2} y={y - 13} width={10} height={10}>
+          <div
+            style={{
+              width: 0,
+              height: 0,
+              borderStyle: "solid",
+              borderWidth: "10px 5px 0 5px",
+              borderColor: `${white} transparent transparent transparent`,
+            }}
+          />
+        </foreignObject>
+        <text
+          x={x + width / 2}
+          y={y - 48}
+          textAnchor="middle"
+          style={{ fontSize: "12px" }}
+          fill={black}
+        >
+          {format(
+            dataSrc[idx].start,
+            periodType === periods.YEAR ? "LLLL yyyy" : "EEEE, LLLL do"
+          )}
+        </text>
+        <text
+          x={x + width / 2}
+          y={y - 25}
+          textAnchor="middle"
+          style={{ fontSize: "12px" }}
+          fill={black}
+        >
+          {`Total: ${formatTotalDuration(value)}`}
+        </text>
+      </>
+    ) : null;
+  };
