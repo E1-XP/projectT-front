@@ -93,6 +93,8 @@ export const PeriodChart = ({ periodState, range }: Props) => {
   }, [startDate, endDate]);
 
   const { isLoading, isFetching } = useStoreSelector((state) => state.global);
+  const { duration: timerDuration } = useStoreSelector((state) => state.timer);
+
   const entriesByDays = useStoreSelector(groupEntriesByDays);
 
   const periodFilter = ({ start, stop }: SingleDay) =>
@@ -115,6 +117,19 @@ export const PeriodChart = ({ periodState, range }: Props) => {
       const day = foundItem || { ...item, start: theoreticalDay.getTime() };
       return day;
     });
+
+  const dataFromTodayIdx = periodInDays.findIndex((day) =>
+    isSameDay(Date.now(), day.start)
+  );
+
+  if (timerDuration && dataFromTodayIdx >= 0) {
+    const currData = periodInDays[dataFromTodayIdx];
+
+    periodInDays[dataFromTodayIdx] = {
+      ...currData,
+      totalDuration: currData.totalDuration + timerDuration,
+    };
+  }
 
   const getPeriodInMonths = () =>
     periodInDays.reduce((acc, day) => {

@@ -3,10 +3,7 @@ import { ContentType } from "recharts/types/component/Label";
 import { ContentType as CType } from "recharts/types/component/DefaultLegendContent";
 import intervalToDuration from "date-fns/intervalToDuration";
 import format from "date-fns/format";
-import isSameDay from "date-fns/isSameDay";
 import pipe from "lodash/fp/pipe";
-
-import { useStoreSelector } from "../../hooks";
 
 import { useWindowSize, State as WindowState } from "../../hooks/useWindowSize";
 import { periods } from "./helpers";
@@ -91,13 +88,9 @@ export const getCustomLabel: (
 ) => ContentType = (hoveredBarStartDate, dataSrc) => (props: any) => {
   const { value, x, y, width, height, index } = props;
 
-  const { duration: timerDuration } = useStoreSelector((store) => store.timer);
-
   const rectWidth = 158;
   const idx = dataSrc.findIndex((data) => data.start === hoveredBarStartDate);
   const isHovered = idx === index;
-  const isToday =
-    idx === -1 ? false : isSameDay(Date.now(), dataSrc[idx].start);
 
   return isHovered ? (
     <>
@@ -149,7 +142,7 @@ export const getCustomLabel: (
         style={{ fontSize: "12px" }}
         fill={black}
       >
-        {`Total: ${formatTotalDuration(value + (isToday ? timerDuration : 0))}`}
+        {`Total: ${formatTotalDuration(value)}`}
       </text>
     </>
   ) : null;
