@@ -50,8 +50,8 @@ export function* rootSaga() {
   yield takeEvery(types.ENTRY_UPDATE, updateEntry);
   yield takeEvery(types.ENTRY_INIT_DELETE, removeEntry);
   yield takeEvery(types.ENTRY_DELETE_CURRENT, removeRunningEntry);
-  yield takeLatest(types.TIMER_SET_IS_RUNNING, startTimerInterval);
-  yield takeLatest(types.TIMER_SET_TIMER, updateTitleBar);
-  yield takeLatest(types.TIMER_HANDLE_RUNNING_ENTRY, handleRunningEntry);
+  yield takeEvery(types.TIMER_SET_IS_RUNNING, startTimerInterval);
+  yield takeEvery(types.TIMER_SET_TIMER, updateTitleBar);
+  yield takeEvery(types.TIMER_HANDLE_RUNNING_ENTRY, handleRunningEntry);
   yield takeLatest(LOCATION_CHANGE, trimEntriesOnTimerRoute);
 }

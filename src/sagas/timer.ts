@@ -114,12 +114,12 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
 
         currentDay = addDays(currentDay, 1).getTime();
 
-        while (i > 0) {
+        while (i >= 0) {
           yield call(createEntrySaga, {
             type: createEntry.type,
             payload: {
               start: startOfDay(currentDay).getTime(),
-              stop: i === 1 ? stop : endOfDay(currentDay).getTime(),
+              stop: i === 0 ? stop : endOfDay(currentDay).getTime(),
               description,
               billable,
               project,
@@ -132,13 +132,14 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
         }
       }
 
-      if (currentRunningEntry)
+      if (currentRunningEntry) {
         yield call(updateEntrySaga, {
           type: updateEntry.type,
           payload: {
             stop,
           },
         });
+      }
 
       yield put(setTimer(`0:00:00`));
       yield put(setDuration(0));
