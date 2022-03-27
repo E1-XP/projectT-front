@@ -89,7 +89,6 @@ export const Timeline = () => {
   const isFetching = useStoreSelector((state) => state.global.isFetching);
   const entriesByDays = useStoreSelector(groupEntriesByDays);
   const entriesByDaysAsArr = Object.values(entriesByDays);
-  console.log(entriesByDays);
 
   const [isLoading, setIsLoading] = useState(false);
 
