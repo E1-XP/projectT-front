@@ -26,6 +26,14 @@ type NewEntryData = Pick<
   "description" | "billable" | "project" | "start"
 > & { stop?: number; _id?: string };
 
+type UpdatedEntryData = Pick<
+  Entry,
+  "description" | "billable" | "project" | "start" | "stop"
+> & { _id: string };
+
+type PartialEntryWithId = Partial<UpdatedEntryData> &
+  Pick<UpdatedEntryData, "_id">;
+
 const getQueryString = (
   dataObj: Record<string, any>,
   keysToOmit = [] as string[]
@@ -45,27 +53,34 @@ const postNewEntry = async (entryData: NewEntryData, userId: string) => {
 };
 
 const postEntryUpdate = async (
-  entryData: Partial<NewEntryData> | Partial<NewEntryData>[],
-  userId: string,
-  currentEntryId: string
+  entryData: Partial<UpdatedEntryData>[],
+  userId: string
 ) => {
-  const isSingleEntry = !Array.isArray(entryData);
+  const URL = `${config.API_URL}/users/${userId}/entries/`;
 
-  const queryString = getQueryString(isSingleEntry ? entryData : entryData[0], [
-    "_id",
-  ]);
-
-  const URL = `${config.API_URL}/users/${userId}/entries/${currentEntryId}?${queryString}`;
-
-  return await request(URL, { method: "PUT", credentials: "include" });
+  return await request(URL, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(entryData),
+  });
 };
 
 const postEntryRemove = async (userId: string, entryId: string | string[]) => {
-  const entriesId = Array.isArray(entryId) ? JSON.stringify(entryId) : entryId;
+  const entriesId = Array.isArray(entryId) ? entryId : [entryId];
 
-  const URL = `${config.API_URL}/users/${userId}/entries/${entriesId}/`;
+  const URL = `${config.API_URL}/users/${userId}/entries/`;
 
-  return await request(URL, { method: "DELETE", credentials: "include" });
+  return await request(URL, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(entriesId),
+  });
 };
 
 export function* createEntry(action: PayloadAction<NewEntryData>) {
@@ -92,34 +107,25 @@ export function* createEntry(action: PayloadAction<NewEntryData>) {
   }
 }
 
-export function* updateEntry(
-  action: PayloadAction<Partial<NewEntryData> | Partial<NewEntryData>[]>
-) {
+export function* updateEntry({
+  payload,
+}: PayloadAction<PartialEntryWithId | PartialEntryWithId[]>) {
   try {
     const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
       (state) => state.user.userData
     );
-    const currentEntryId: StoreSelector["timer"]["currentEntryId"] =
-      yield select((state) => state.timer.currentEntryId);
 
-    const entryId = Array.isArray(action.payload)
-      ? JSON.stringify(action.payload.map((entry) => entry._id))
-      : [currentEntryId, action.payload._id].find(Boolean);
-
-    if (!entryId) {
-      console.log("check this");
-      return;
-    }
+    const entryData = Array.isArray(payload) ? payload : [payload];
 
     const response: FetchResponse = yield call(
       postEntryUpdate,
-      action.payload,
-      userId,
-      entryId
+      entryData,
+      userId
     );
 
     if (response.status === 200) {
       const entryData: Entry | Entry[] = yield response.json();
+
       if (Array.isArray(entryData)) yield put(batchInsertEntry(entryData));
       else yield put(insertEntry(entryData));
     }

@@ -115,6 +115,7 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
           type: updateEntry.type,
           payload: {
             stop: endOfDay(currentRunningEntry.start).getTime(),
+            _id: currentRunningEntry._id,
           },
         });
 
@@ -143,6 +144,7 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
           type: updateEntry.type,
           payload: {
             stop,
+            _id: currentRunningEntry._id,
           },
         });
       }
