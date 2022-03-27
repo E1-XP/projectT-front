@@ -1,5 +1,12 @@
-export const getBP = (width: string, direction = "max") =>
-  `@media only screen and (${direction}-width: ${width})`;
+export const getBP = (width: string, direction = "max") => {
+  if (direction === "min") {
+    width = pxToEm(emToPx(width) + 1);
+  }
+
+  return `@media only screen and (${direction}-width: ${width})`;
+};
+
+export const pxToEm = (val: number) => `${val / 16}em`;
 
 export const emToPx = (val: string) =>
   Number(val.slice(undefined, val.length - 2)) * 16;
