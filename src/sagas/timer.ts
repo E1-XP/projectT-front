@@ -1,4 +1,4 @@
-import { delay, put, select, call } from "@redux-saga/core/effects";
+import { delay, put, select, call, take } from "@redux-saga/core/effects";
 import { Action, PayloadAction } from "@reduxjs/toolkit";
 import compose from "lodash/fp/compose";
 
@@ -21,13 +21,16 @@ import {
   setTimer,
 } from "./../actions/timer";
 import { createEntry, updateEntry } from "../actions/entry";
+import { types } from "../actions/types";
+
 import {
   createEntry as createEntrySaga,
   updateEntry as updateEntrySaga,
 } from "../sagas/entry";
 
-import { StoreSelector } from "./helpers";
+import { StoreSelector, waitFor } from "./helpers";
 import { requestError } from "../actions/global";
+import { RootState } from "../store";
 
 const SECOND = 1000;
 
@@ -63,7 +66,7 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
     if (isRunning) {
       const start = Date.now();
 
-      if (!runningEntryMode)
+      if (!runningEntryMode) {
         yield put(
           createEntry({
             start,
@@ -72,6 +75,9 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
             project,
           })
         );
+
+        yield take(types.ENTRY_INSERT);
+      }
 
       while (isYielding) {
         const duration: StoreSelector["timer"]["duration"] = yield select(
@@ -147,6 +153,19 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
       yield put(setProject(``));
       yield put(setBillable(false));
       yield put(setCurrentEntryId(undefined));
+
+      const entries: StoreSelector["user"]["entries"] = yield select(
+        (state) => state.user.entries
+      );
+
+      const stillRunningEntry = entries.find(
+        (entry) => entry.stop === undefined
+      );
+
+      if (stillRunningEntry) {
+        yield put(setCurrentEntryId(stillRunningEntry._id));
+        yield put(setIsTimerRunning(true));
+      }
     }
   } catch (e) {
     yield put(requestError(e));

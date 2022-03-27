@@ -12,7 +12,8 @@ import {
 } from "../actions/timer";
 
 import { Entry } from "../store/interfaces";
-import { FetchResponse, StoreSelector } from "./helpers";
+import { RootState } from "./../store";
+import { FetchResponse, StoreSelector, waitFor } from "./helpers";
 
 import { config } from "./../config";
 
@@ -195,6 +196,13 @@ export function* createEntryFromExisting(action: PayloadAction<Entry>) {
     if (description) yield put(setDescription(description));
     if (billable) yield put(setBillable(billable));
     if (project) yield put(setProject(project));
+
+    if (isRunning) {
+      yield call(
+        waitFor,
+        (state: RootState) => state.timer.isRunning === false
+      );
+    }
 
     yield put(setIsTimerRunning(true));
   } catch (e) {

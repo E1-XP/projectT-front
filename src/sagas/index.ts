@@ -1,4 +1,4 @@
-import { takeEvery, takeLatest } from "redux-saga/effects";
+import { takeEvery, takeLatest, all, fork } from "redux-saga/effects";
 import { LOCATION_CHANGE } from "connected-react-router";
 
 import { types } from "../actions/types";
@@ -32,6 +32,8 @@ import {
   sendUserData,
 } from "./user";
 
+import { watchTimerInterval } from "./watchers";
+
 export function* rootSaga() {
   yield takeLatest(types.GLOBAL_INIT_AUTH, initAuth);
   yield takeLatest(types.GLOBAL_INIT_RE_AUTH, initReAuth);
@@ -50,8 +52,9 @@ export function* rootSaga() {
   yield takeEvery(types.ENTRY_UPDATE, updateEntry);
   yield takeEvery(types.ENTRY_INIT_DELETE, removeEntry);
   yield takeEvery(types.ENTRY_DELETE_CURRENT, removeRunningEntry);
-  yield takeEvery(types.TIMER_SET_IS_RUNNING, startTimerInterval);
   yield takeEvery(types.TIMER_SET_TIMER, updateTitleBar);
   yield takeEvery(types.TIMER_HANDLE_RUNNING_ENTRY, handleRunningEntry);
   yield takeLatest(LOCATION_CHANGE, trimEntriesOnTimerRoute);
+
+  yield all([fork(watchTimerInterval)]);
 }
