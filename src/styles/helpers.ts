@@ -1,5 +1,5 @@
 export const getBP = (width: string, direction = "max") => {
-  if (direction === "min") {
+  if (direction === "min" && !width.endsWith("px")) {
     width = pxToEm(emToPx(width) + 1);
   }
 
