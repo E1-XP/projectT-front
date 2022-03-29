@@ -5,14 +5,21 @@ import { ConnectedRouter } from "connected-react-router";
 import { Head } from "./head";
 import { Routes } from "./routes";
 import { history } from "./routes/history";
-import { useStoreSelector } from "./hooks";
-import { store } from "./store";
+import { RootState, store } from "./store";
 import { GlobalStyle } from "./styles";
 
 export const App = () => {
-  const isUserLoggedIn = useStoreSelector(
-    (state) => state.global.isUserLoggedIn
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(
+    store.getState().global.isUserLoggedIn
   );
+
+  useEffect(() => {
+    const unsub = store.subscribe(() =>
+      setIsUserLoggedIn(store.getState().global.isUserLoggedIn)
+    );
+
+    return () => unsub();
+  }, []);
 
   return (
     <>
