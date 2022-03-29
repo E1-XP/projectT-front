@@ -22,11 +22,15 @@ export const GlobalStyle = createGlobalStyle`
         ${getBP(breakPoints.verySmall)} {
             font-size: 68.8%;
         }
+
+        ${getBP("370px", "min")} {
+            overflow:hidden;
+        }
   
         height: 100%;
     }
 
-    body {     
+    body {
         font-family: 'Open Sans', sans-serif;
         font-weight: 500;
         background-color: ${white};
