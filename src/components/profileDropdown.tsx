@@ -74,7 +74,7 @@ const Dropdown = styled.ul`
   border-radius: 7px;
 
   ${getBP(breakPoints.verySmall)} {
-    top: -6.938rem;
+    top: -7.938rem;
     right: 3rem;
     font-size: 1.2rem;
   }
@@ -84,6 +84,10 @@ const Dropdown_item = styled.li`
   color: ${black};
   padding: 0.6rem;
   text-align: left;
+
+  ${getBP(breakPoints.verySmall)} {
+    padding: 0.8rem;
+  }
 
   &:hover {
     background-color: ${greyWhite};
@@ -122,8 +126,15 @@ export const ProfileDropdown = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const setIsClosed = useCallback(() => setIsOpen(false), []);
+  const setIsOpened = useCallback(() => setIsOpen(true), []);
+  const stopEvtPropagation = (e: any) => e.stopPropagation();
 
-  const pushToSettings = useCallback(() => dispatch(push("/settings")), []);
+  const pushToSettings = (e: any) => {
+    stopEvtPropagation(e);
+
+    setIsClosed();
+    dispatch(push("/settings"));
+  };
 
   const { username, avatar } = useStoreSelector((state) => state.user.userData);
 
@@ -138,7 +149,7 @@ export const ProfileDropdown = () => {
 
   return (
     <>
-      <Profile_link onClick={() => setIsOpen(true)}>
+      <Profile_link onClick={setIsOpened}>
         <Link_label>
           {username.length > 12 ? username.substring(0, 10) + "..." : username}
         </Link_label>
