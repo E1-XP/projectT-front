@@ -5,7 +5,14 @@ import styled from "styled-components";
 import { ProfileDropdown } from "./profileDropdown";
 import { Icon } from "./../components/icon";
 import { getBP } from "../styles/helpers";
-import { breakPoints, darkGrey, greyWhite, white } from "../styles/variables";
+import {
+  breakPoints,
+  darkGrey,
+  greyWhite,
+  white,
+  red,
+} from "../styles/variables";
+import { useStoreSelector } from "../hooks";
 
 const Wrapper = styled.aside`
   color: ${white};
@@ -64,6 +71,7 @@ const Navigation_link = styled(NavLink)`
   padding: 0.3rem;
   border-radius: 7px;
   position: relative;
+  border: 1px solid transparent;
 
   ${getBP(breakPoints.medium, "min")} {
     justify-content: initial;
@@ -75,6 +83,9 @@ const Navigation_link = styled(NavLink)`
 
   &.active {
     background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid
+      ${({ $isFetching }: { $isFetching?: boolean }) =>
+        $isFetching ? red : "rgba(255, 255, 255, 0.2)"};
   }
 `;
 
@@ -123,47 +134,57 @@ const Navigation_list = styled.ul`
 
 const Navigation_item = styled.li`
   margin: 0.1rem;
-
-  &:first-of-type ${Navigation_link} {
-    border-style: solid;
-    border-width: 1px;
-    border-color: ${darkGrey};
-  }
 `;
 
-export const Sidebar = () => (
-  <Wrapper>
-    <Sidebar_header>
-      <Header>
-        <Header_link to="/timer">
-          <Link_label>Project</Link_label>T
-        </Header_link>
-      </Header>
-    </Sidebar_header>
-    <Sidebar_navigation>
-      <Navigation_list>
-        <Navigation_item>
-          <Navigation_link to="/timer">
-            <Icon name="access_time" />
-            <Link_label>Timer</Link_label>
-          </Navigation_link>
-        </Navigation_item>
-        <Navigation_item>
-          <Navigation_link to="/reports" activeClassName="active">
-            <Icon name="bar_chart" />
-            <Link_label>Reports</Link_label>
-          </Navigation_link>
-        </Navigation_item>
-        <Navigation_item>
-          <Navigation_link to="/projects" activeClassName="active">
-            <Icon name="folder" />
-            <Link_label>Projects</Link_label>
-          </Navigation_link>
-        </Navigation_item>
-      </Navigation_list>
-    </Sidebar_navigation>
-    <Sidebar_profile>
-      <ProfileDropdown />
-    </Sidebar_profile>
-  </Wrapper>
-);
+export const Sidebar = () => {
+  const isFetching = useStoreSelector((store) => store.global.isFetching);
+
+  return (
+    <Wrapper>
+      <Sidebar_header>
+        <Header>
+          <Header_link to="/timer">
+            <Link_label>Project</Link_label>T
+          </Header_link>
+        </Header>
+      </Sidebar_header>
+      <Sidebar_navigation>
+        <Navigation_list>
+          <Navigation_item>
+            <Navigation_link
+              to="/timer"
+              $isFetching={isFetching}
+              activeClassName="active"
+            >
+              <Icon name="access_time" />
+              <Link_label>Timer</Link_label>
+            </Navigation_link>
+          </Navigation_item>
+          <Navigation_item>
+            <Navigation_link
+              to="/reports"
+              $isFetching={isFetching}
+              activeClassName="active"
+            >
+              <Icon name="bar_chart" />
+              <Link_label>Reports</Link_label>
+            </Navigation_link>
+          </Navigation_item>
+          <Navigation_item>
+            <Navigation_link
+              to="/projects"
+              $isFetching={isFetching}
+              activeClassName="active"
+            >
+              <Icon name="folder" />
+              <Link_label>Projects</Link_label>
+            </Navigation_link>
+          </Navigation_item>
+        </Navigation_list>
+      </Sidebar_navigation>
+      <Sidebar_profile>
+        <ProfileDropdown />
+      </Sidebar_profile>
+    </Wrapper>
+  );
+};
