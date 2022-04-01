@@ -90,6 +90,13 @@ const Item_project = styled.span`
 const Input = styled.input`
   margin-left: 0.5rem;
   border: none;
+
+  &:focus {
+    outline-style: dashed;
+    outline-color: lightgrey;
+    border-radius: 5px;
+    outline-width: 2px;
+  }
 `;
 
 const Searchbar = styled.div`
