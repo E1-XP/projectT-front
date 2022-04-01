@@ -57,6 +57,7 @@ const Description_side = styled.section`
     isHeader ? "1.5rem" : "4rem"};
   white-space: nowrap;
   display: flex;
+  align-items: center;
 `;
 
 const Timing_side = styled.section`
@@ -83,6 +84,14 @@ const Task_Input = styled.input`
   white-space: nowrap;
   overflow: hidden;
   margin-right: 3px;
+  height: 2rem;
+
+  &:focus {
+    outline-style: dashed;
+    outline-color: lightgrey;
+    border-radius: 5px;
+    outline-width: 2px;
+  }
 `;
 
 const Item_link = styled.a`
@@ -173,7 +182,7 @@ export const Entry = (props: Props) => {
   );
 
   const startNewEntryFromExisting = useCallback(
-    debounce(200)(() => {
+    debounce(50)(() => {
       const entryData = isRegularEntry ? props.data : props.data.entries[0];
       dispatch(createEntryFromExisting(entryData));
     }),

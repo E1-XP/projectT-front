@@ -56,8 +56,17 @@ const Task_timing_inner = styled.div`
 const Task_description = styled.input`
   flex: 1 1 25%;
   padding: 0.3rem;
+  margin-right: 1rem;
   border: none;
   font-size: 1.125rem;
+  height: 2rem;
+
+  &:focus {
+    outline-style: dashed;
+    outline-color: lightgrey;
+    border-radius: 5px;
+    outline-width: 2px;
+  }
 `;
 
 const Task_timer = styled.span`
@@ -110,7 +119,7 @@ export const TaskController = () => {
   const projects = useStoreSelector((store) => store.user.projects);
 
   const handleStartStopBtn = useCallback(
-    debounce(200)(() => dispatch(setIsTimerRunning(!isRunning))),
+    debounce(50)(() => dispatch(setIsTimerRunning(!isRunning))),
     [isRunning]
   );
 
