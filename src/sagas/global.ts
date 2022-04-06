@@ -32,6 +32,7 @@ import { UserData, Entry, Project } from "./../store/interfaces";
 import { FetchResponse, StoreSelector } from "./helpers";
 import { request } from "../helpers/request";
 import { groupEntriesByDays, SingleDay } from "../selectors/groupEntriesByDays";
+import { selectUserData } from "../selectors";
 
 import {
   FORM_MESSAGE_ERROR,
@@ -185,9 +186,7 @@ export function* initReAuth(action: Action) {
 
 export function* changePassword({ payload }: PayloadAction<PasswordData>) {
   try {
-    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
-    );
+    const { _id: userId } = yield select(selectUserData);
 
     const response: FetchResponse = yield call(
       passwordChangeRequest,
@@ -220,7 +219,7 @@ export function* initLogOut(action: Action) {
     yield put(setIsLoading(false));
 
     const userData: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
+      selectUserData
     );
 
     const cleanedUserData: any = mapValues(() => "")(userData);

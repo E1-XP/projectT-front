@@ -16,6 +16,7 @@ import { batchInsertEntry } from "../actions/entry";
 import { setProjects, setUserData } from "../actions/user";
 
 import { groupEntriesByDays, SingleDay } from "../selectors/groupEntriesByDays";
+import { selectUserData } from "../selectors";
 
 interface UserDataResponse extends UserData {
   projects: Project[];
@@ -92,9 +93,7 @@ const requestSendUserData = async (data: Partial<UserData>, userId: string) => {
 
 export function* fetchEntries(action: PayloadAction<number | undefined>) {
   try {
-    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
-    );
+    const { _id: userId } = yield select(selectUserData);
     const entriesByDays: Record<string, SingleDay> = yield select(
       groupEntriesByDays
     );
@@ -127,9 +126,7 @@ export function* fetchEntries(action: PayloadAction<number | undefined>) {
 
 export function* createProject(action: PayloadAction<Omit<Project, "_id">>) {
   try {
-    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
-    );
+    const { _id: userId } = yield select(selectUserData);
 
     const response: FetchResponse = yield call(
       projectCreationRequest,
@@ -171,9 +168,7 @@ export function* removeProject(action: PayloadAction<string>) {
 
 export function* sendAvatar({ payload }: PayloadAction<any>) {
   try {
-    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
-    );
+    const { _id: userId } = yield select(selectUserData);
 
     const response: FetchResponse = yield call(
       sendAvatarRequest,
@@ -198,12 +193,7 @@ export function* sendAvatar({ payload }: PayloadAction<any>) {
 
 export function* deleteAvatar(action: Action) {
   try {
-    const {
-      _id: userId,
-      avatar: avatarURL,
-    }: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
-    );
+    const { _id: userId, avatar: avatarURL } = yield select(selectUserData);
 
     const avatarFileURL = avatarURL.split(config.API_URL)[1];
 
@@ -234,9 +224,7 @@ export function* sendUserData(action: PayloadAction<Partial<UserData>>) {
   try {
     console.log(action.payload);
 
-    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
-    );
+    const { _id: userId } = yield select(selectUserData);
 
     const response: FetchResponse = yield call(
       requestSendUserData,

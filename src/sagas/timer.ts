@@ -31,6 +31,7 @@ import {
 import { StoreSelector, waitFor } from "./helpers";
 import { requestError } from "../actions/global";
 import { RootState } from "../store";
+import { selectEntries, selectTimer, selectUserData } from "../selectors";
 
 const SECOND = 1000;
 
@@ -42,7 +43,7 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
       isBillable: billable,
       project,
       currentEntryId,
-    }: StoreSelector["timer"] = yield select((state) => state.timer);
+    } = yield select(selectTimer);
 
     const runningEntryMode = !!currentEntryId;
 
@@ -50,7 +51,7 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
 
     if (runningEntryMode) {
       const entries: StoreSelector["user"]["entries"] = yield select(
-        (state) => state.user.entries
+        selectEntries
       );
 
       currentRunningEntry = entries.find(
@@ -79,9 +80,7 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
       }
 
       while (isYielding) {
-        const duration: StoreSelector["timer"]["duration"] = yield select(
-          (state) => state.timer.duration
-        );
+        const { duration } = yield select(selectTimer);
 
         const displayValue = compose(
           formatDuration,
@@ -104,7 +103,8 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
 
         yield put(setDuration(handleInactiveTabFreeze));
 
-        isYielding = yield select((state) => state.timer.isRunning);
+        const { isRunning } = yield select(selectTimer);
+        isYielding = isRunning;
       }
     } else {
       const stop = Date.now();
@@ -165,7 +165,7 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
       yield put(setCurrentEntryId(undefined));
 
       const entries: StoreSelector["user"]["entries"] = yield select(
-        (state) => state.user.entries
+        selectEntries
       );
 
       const stillRunningEntry = entries.find(
@@ -185,7 +185,7 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
 export function* handleRunningEntry(action: Action) {
   try {
     const entries: StoreSelector["user"]["entries"] = yield select(
-      (state) => state.user.entries
+      selectEntries
     );
 
     const runningEntry = entries.find((entry) => !entry.stop);
@@ -208,10 +208,8 @@ export function* updateTitleBar(action: Action) {
   const STANDARD_TITLE = "Project-T";
 
   try {
-    const settings: StoreSelector["user"]["userData"]["settings"] =
-      yield select((state) => state.user.userData.settings);
-    const { timer, duration, isRunning, project }: StoreSelector["timer"] =
-      yield select((state) => state.timer);
+    const { settings } = yield select(selectUserData);
+    const { timer, duration, isRunning, project } = yield select(selectTimer);
 
     if (settings.shouldShowTimerOnTitle && isRunning) {
       const readable = formatDurationReadable(

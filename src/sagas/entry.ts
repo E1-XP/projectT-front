@@ -21,6 +21,8 @@ import { request } from "../helpers/request";
 import { types } from "../actions/types";
 import { requestError } from "../actions/global";
 
+import { selectTimer, selectUserData } from "../selectors";
+
 type NewEntryData = Pick<
   Entry,
   "description" | "billable" | "project" | "start"
@@ -85,9 +87,7 @@ const postEntryRemove = async (userId: string, entryId: string | string[]) => {
 
 export function* createEntry(action: PayloadAction<NewEntryData>) {
   try {
-    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
-    );
+    const { _id: userId } = yield select(selectUserData);
 
     const response: FetchResponse = yield call(
       postNewEntry,
@@ -111,9 +111,7 @@ export function* updateEntry({
   payload,
 }: PayloadAction<PartialEntryWithId | PartialEntryWithId[]>) {
   try {
-    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
-    );
+    const { _id: userId } = yield select(selectUserData);
 
     const entryData = Array.isArray(payload) ? payload : [payload];
 
@@ -138,9 +136,7 @@ export function* removeEntry(action: PayloadAction<string | string[]>) {
   try {
     const entryId = action.payload;
 
-    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
-    );
+    const { _id: userId } = yield select(selectUserData);
 
     const response: FetchResponse = yield call(
       postEntryRemove,
@@ -162,13 +158,9 @@ export function* removeEntry(action: PayloadAction<string | string[]>) {
 
 export function* removeRunningEntry(action: PayloadAction<string | string[]>) {
   try {
-    const { _id: userId }: StoreSelector["user"]["userData"] = yield select(
-      (state) => state.user.userData
-    );
+    const { _id: userId } = yield select((state) => state.user.userData);
 
-    const { currentEntryId }: StoreSelector["timer"] = yield select(
-      (state) => state.timer
-    );
+    const { currentEntryId } = yield select(selectTimer);
 
     if (!currentEntryId) return;
 
@@ -190,9 +182,7 @@ export function* removeRunningEntry(action: PayloadAction<string | string[]>) {
 export function* createEntryFromExisting(action: PayloadAction<Entry>) {
   try {
     const { description, billable, project } = action.payload;
-    const { isRunning }: StoreSelector["timer"] = yield select(
-      (state) => state.timer
-    );
+    const { isRunning } = yield select(selectTimer);
 
     if (isRunning) {
       yield put(setIsTimerRunning(false));
