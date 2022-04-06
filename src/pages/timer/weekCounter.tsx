@@ -95,9 +95,22 @@ const showInfoOnHover = (
   );
 };
 
-export const WeekCounter = ({}: Props) => {
-  const weekStart = startOfWeek(Date.now(), { weekStartsOn: 1 }).getTime();
+const weekStart = startOfWeek(Date.now(), { weekStartsOn: 1 }).getTime();
 
+export const getThisWeekEntries = pickBy<SingleDay>(
+  (val, key) => val.start >= weekStart
+);
+
+export const calcTotalDuration = (
+  weekEntriesByDays: Record<string, SingleDay>,
+  timerDuration: number
+) =>
+  Object.values(weekEntriesByDays).reduce(
+    (acc, { totalDuration }) => acc + totalDuration,
+    0
+  ) + timerDuration;
+
+export const WeekCounter = ({}: Props) => {
   const { duration: timerDuration, project } = useStoreSelector(
     (store) => store.timer
   );
@@ -108,9 +121,7 @@ export const WeekCounter = ({}: Props) => {
   };
 
   const entriesByDays = useStoreSelector(groupEntriesByDays);
-  const weekEntriesByDays = pickBy<SingleDay>(
-    (val, key) => val.start >= weekStart
-  )(entriesByDays) as Record<string, SingleDay>;
+  const weekEntriesByDays = getThisWeekEntries(entriesByDays);
 
   const weekProjectCount = Object.values(weekEntriesByDays).reduce(
     (acc, data) => {
@@ -132,11 +143,7 @@ export const WeekCounter = ({}: Props) => {
     } as Record<string, number>
   );
 
-  const totalDuration =
-    Object.values(weekEntriesByDays).reduce(
-      (acc, { totalDuration }) => acc + totalDuration,
-      0
-    ) + timerDuration;
+  const totalDuration = calcTotalDuration(weekEntriesByDays, timerDuration);
 
   const getWidth = (projectSum: number) =>
     totalDuration ? (projectSum / totalDuration) * 100 : 100;

@@ -1,0 +1,101 @@
+{
+  "router": {
+    "location": {
+      "pathname": "/timer",
+      "search": "",
+      "hash": "",
+      "query": {}
+    },
+    "action": "POP"
+  },
+  "global": {
+    "isUserLoggedIn": true,
+    "isLoading": false,
+    "isFetching": false,
+    "formMessage": ["", true],
+    "hasErrored": false
+  },
+  "user": {
+    "userData": {
+      "avatar": "https://project-t.gtxcodeworks.site/uploads/5bf917c98dc6b519d0b23025/IMG_20171022_203802-min.jpg",
+      "email": "admin@admin.com",
+      "username": "Admin",
+      "_id": "5bf917c98dc6b519d0b23025",
+      "settings": {
+        "shouldShowTimerOnTitle": true
+      },
+      "__v": 3416
+    },
+    "entries": [],
+    "projects": [
+      {
+        "name": "work",
+        "color": "#3498db",
+        "client": "me",
+        "_id": "5bf917fd8dc6b519d0b23026"
+      },
+      {
+        "name": "read book",
+        "color": "#e74c3c",
+        "client": "me",
+        "_id": "5bf918218dc6b519d0b23027"
+      },
+      {
+        "name": "check emails",
+        "color": "#1abc9c",
+        "client": "me",
+        "_id": "5bf9182e8dc6b519d0b23028"
+      },
+      {
+        "name": "go outside",
+        "color": "#34495e",
+        "client": "",
+        "_id": "5bf918a48dc6b519d0b2302e"
+      },
+      {
+        "name": "read news",
+        "color": "#f1c40f",
+        "client": "",
+        "_id": "5bf93cbd8dad4925e09dbf26"
+      },
+      {
+        "name": "project-t",
+        "color": "#e74c3c",
+        "client": "me",
+        "_id": "61fc4d6e529dbd21dfebf5b4"
+      },
+      {
+        "name": "workout",
+        "color": "#1abc9c",
+        "client": "me",
+        "_id": "62379e7463853b91c0b49f05"
+      },
+      {
+        "name": "GTxMotorsports",
+        "color": "#1abc9c",
+        "client": "me",
+        "_id": "624756f5622c0eb348b86382"
+      },
+      {
+        "name": "Project-S",
+        "color": "#8e44ad",
+        "client": "me",
+        "_id": "62475709622c0eb348b86383"
+      },
+      {
+        "name": "Project-F",
+        "color": "#95a5a6",
+        "client": "me",
+        "_id": "62475721622c0eb348b86384"
+      }
+    ]
+  },
+  "timer": {
+    "isRunning": false,
+    "timer": "0:00:00",
+    "duration": 0,
+    "description": "",
+    "isBillable": false,
+    "project": ""
+  }
+}
