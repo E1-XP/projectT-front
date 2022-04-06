@@ -37,7 +37,6 @@ const SECOND = 1000;
 export function* startTimerInterval(action: PayloadAction<boolean>) {
   try {
     const {
-      duration,
       isRunning,
       description,
       isBillable: billable,
@@ -94,7 +93,16 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
 
         yield put(setTimer(displayValue));
         yield delay(SECOND);
-        yield put(setDuration(duration + SECOND));
+
+        const realElapsedTime = Date.now() - start;
+        console.log(duration + SECOND < realElapsedTime - SECOND * 3);
+
+        const handleInactiveTabFreeze =
+          duration + SECOND < realElapsedTime - SECOND * 3
+            ? realElapsedTime
+            : duration + SECOND;
+
+        yield put(setDuration(handleInactiveTabFreeze));
 
         isYielding = yield select((state) => state.timer.isRunning);
       }
