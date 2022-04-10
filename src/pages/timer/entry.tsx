@@ -218,6 +218,7 @@ export const Entry = (props: Props) => {
         )}
         <Task_Input
           value={description}
+          title={description}
           onChange={setEntryDescription}
           placeholder="Add description"
         />
