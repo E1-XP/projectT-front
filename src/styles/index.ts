@@ -6,11 +6,7 @@ import { getBP } from "./helpers";
 import { breakPoints, white } from "./variables";
 import { libraryStyles } from "./library";
 
-interface Props {
-  isSidebarVisible: boolean;
-}
-
-export const GlobalStyle = createGlobalStyle<Props>`
+export const GlobalStyle = createGlobalStyle`
     ${styledNormalize}
     ${reset}
 
@@ -54,30 +50,6 @@ export const GlobalStyle = createGlobalStyle<Props>`
         ${getBP(breakPoints.verySmall)} {
             height: calc(100% - 54px);
          }
-
-        & main {
-           padding-left: ${({ isSidebarVisible }) =>
-             isSidebarVisible ? "9.326rem" : "unset"};
-
-            ${getBP(breakPoints.medium)} {
-                  padding-left: ${({ isSidebarVisible }) =>
-                    isSidebarVisible ? "4.25rem" : "unset"};
-             
-            }
-
-            ${getBP(breakPoints.verySmall)} {
-                padding-left: ${({ isSidebarVisible }) =>
-                  isSidebarVisible ? "1rem" : "unset"};
-                padding-bottom: ${({ isSidebarVisible }) =>
-                  isSidebarVisible ? "5.4rem" : "unset"};
-              
-            }
-
-            ${getBP("370px")} {
-                overflow-y: initial;
-                height: initial;
-            }
-        }
     }
 
     ${libraryStyles}

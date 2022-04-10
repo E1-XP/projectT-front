@@ -13,6 +13,7 @@ import {
   red,
 } from "../styles/variables";
 import { useStoreSelector } from "../hooks";
+import { selectGlobal } from "../selectors";
 
 const Wrapper = styled.aside`
   color: ${white};
@@ -42,6 +43,24 @@ const Wrapper = styled.aside`
     bottom: 0;
     top: initial;
     padding-top: 1rem;
+  }
+
+  & ~ main {
+    padding-left: 9.326rem;
+
+    ${getBP(breakPoints.medium)} {
+      padding-left: 4.25rem;
+    }
+
+    ${getBP(breakPoints.verySmall)} {
+      padding-left: 1rem;
+      padding-bottom: 5.4rem;
+    }
+
+    ${getBP("370px")} {
+      overflow-y: initial;
+      height: initial;
+    }
   }
 `;
 
@@ -137,7 +156,7 @@ const Navigation_item = styled.li`
 `;
 
 export const Sidebar = () => {
-  const isFetching = useStoreSelector((store) => store.global.isFetching);
+  const { isFetching } = useStoreSelector(selectGlobal);
 
   return (
     <Wrapper>
