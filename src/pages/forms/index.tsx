@@ -18,8 +18,6 @@ import {
   validationTypes,
 } from "./validation";
 
-import detectIncognito from "../../scripts/detectIncognito";
-
 import { greyWhiteDarker, red } from "../../styles/variables";
 import { visuallyHidden } from "../../styles/helpers";
 
@@ -62,11 +60,6 @@ const ErrorParagraph = styled.p`
   text-align: center;
 `;
 
-const InfoParagraph = styled.p`
-  padding: 2rem;
-  text-align: center;
-`;
-
 export const Form = () => {
   const dispatch = useStoreDispatch();
   const location = useLocation();
@@ -75,7 +68,6 @@ export const Form = () => {
 
   const { isFetching, formMessage } = useStoreSelector((state) => state.global);
   const [wasOnSignUpPage, setState] = useState(onSignUpPage);
-  const [isIncognito, setIsIncognito] = useState(false);
 
   const { SIGN_UP, LOGIN } = validationTypes;
   const schemaType = onSignUpPage ? SIGN_UP : LOGIN;
@@ -94,7 +86,6 @@ export const Form = () => {
 
   useEffect(() => {
     dispatch(setIsFetching(false));
-    detectIncognito((obj: any) => setIsIncognito(obj.isPrivate));
   }, []);
 
   const clearFormMessage = () => dispatch(setFormMessage(["", true]));
@@ -205,12 +196,6 @@ export const Form = () => {
             Send
           </Button_action>
           <ErrorParagraph>{formatErrorMessage()}</ErrorParagraph>
-          {isIncognito && (
-            <InfoParagraph>
-              Please leave incognito mode or allow third party cookies to auth
-              without errors
-            </InfoParagraph>
-          )}
         </FormContainer>
       </Main>
     </>
