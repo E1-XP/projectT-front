@@ -23,7 +23,7 @@ export const GlobalStyle = createGlobalStyle`
             font-size: 68.8%;
         }
 
-        ${getBP("370px", "min")} {
+        ${getBP("370px", "min")} and (orientation:portrait) {
             overflow:hidden;
         }
   
