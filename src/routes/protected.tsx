@@ -13,18 +13,8 @@ export const ProtectedRoute = ({ path, component: Component }: Props) => {
     (state) => state.global
   );
 
-  return (
-    <Route
-      path={path}
-      render={() =>
-        hasErrored ? (
-          <Redirect to="/500" />
-        ) : isUserLoggedIn ? (
-          <Component />
-        ) : (
-          <Redirect to="/login" />
-        )
-      }
-    />
-  );
+  if (hasErrored) return <Redirect to="/500" />;
+  if (!isUserLoggedIn) return <Redirect to="/login" />;
+
+  return <Route path={path} component={Component} />;
 };
