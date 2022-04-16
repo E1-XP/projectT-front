@@ -70,14 +70,14 @@ const Heading = styled.h2`
   ${HeadingCSS}
 `;
 
-const Heading_section = styled.h3`
+const Heading_Section = styled.h3`
   font-size: 1.5rem;
   font-weight: 700;
   display: flex;
   position: relative;
 `;
 
-const Chart_section = styled.section`
+const Chart_Section = styled.section`
   flex-basis: 72%;
   min-width: 36.875rem;
   margin-right: 1rem;
@@ -95,14 +95,14 @@ const Chart_section = styled.section`
   }
 `;
 
-const Item_link = styled.a`
+const Item_Link = styled.a`
   color: ${darkGrey};
   cursor: pointer;
   display: flex;
   align-items: center;
 `;
 
-const Item_link_border = styled(Item_link)`
+const Item_Link_Border = styled(Item_Link)`
   border-right: 1px solid ${whiteGrey};
 
   & span {
@@ -116,7 +116,7 @@ const Item_link_border = styled(Item_link)`
   }
 `;
 
-const Item_link_hover = styled(Item_link)`
+const Item_Link_Hover = styled(Item_Link)`
   color: ${greyWhite};
 
   &:hover {
@@ -124,11 +124,11 @@ const Item_link_hover = styled(Item_link)`
   }
 `;
 
-const Period_selection = styled.div`
+const Period_Selection = styled.div`
   display: flex;
 `;
 
-const Screen_blocker = styled.div`
+const Screen_Blocker = styled.div`
   display: block;
   position: fixed;
   top: 0;
@@ -216,27 +216,27 @@ export const Reports = () => {
 
   return (
     <Wrapper>
-      <Chart_section>
+      <Chart_Section>
         <Header>
           <Heading>Reports</Heading>
-          <Heading_section>
-            <Item_link_border onClick={toggleCalendar}>
+          <Heading_Section>
+            <Item_Link_Border onClick={toggleCalendar}>
               {state.readable}
               <Icon
                 name={isCalendarOpen ? "close" : "arrow_drop_down"}
                 fill={isCalendarOpen ? darkGrey : greyWhite}
                 size={isCalendarOpen ? "18px" : "24px"}
               />
-            </Item_link_border>
-            <Period_selection>
-              <Item_link_hover onClick={goToPreviousPeriod}>
+            </Item_Link_Border>
+            <Period_Selection>
+              <Item_Link_Hover onClick={goToPreviousPeriod}>
                 <Icon name="keyboard_arrow_left" />
-              </Item_link_hover>
-              <Item_link_hover onClick={goToNextPeriod}>
+              </Item_Link_Hover>
+              <Item_Link_Hover onClick={goToNextPeriod}>
                 <Icon name="keyboard_arrow_right" />
-              </Item_link_hover>
-            </Period_selection>
-            {isCalendarOpen && <Screen_blocker onClick={closeCalendar} />}
+              </Item_Link_Hover>
+            </Period_Selection>
+            {isCalendarOpen && <Screen_Blocker onClick={closeCalendar} />}
             {isCalendarOpen && (
               <Suspense fallback={<ComponentLoader isVisible={true} />}>
                 <Calendar
@@ -246,7 +246,7 @@ export const Reports = () => {
                 />
               </Suspense>
             )}
-          </Heading_section>
+          </Heading_Section>
         </Header>
         <Suspense fallback={<ComponentLoader isVisible={true} />}>
           <PeriodChart periodState={state} range={range} />
@@ -254,7 +254,7 @@ export const Reports = () => {
         <Suspense fallback={<ComponentLoader isVisible={true} />}>
           <ProjectChart periodState={state} range={range} />
         </Suspense>
-      </Chart_section>
+      </Chart_Section>
     </Wrapper>
   );
 };

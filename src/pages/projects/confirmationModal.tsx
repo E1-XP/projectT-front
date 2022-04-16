@@ -3,11 +3,11 @@ import styled from "styled-components";
 import Modal from "react-modal";
 
 import { Icon } from "../../components/icon";
-import { Button_success, Button_danger } from "../../components/buttons";
+import { Button_Success, Button_Danger } from "../../components/buttons";
 
 import { whiteGrey } from "../../styles/variables";
 
-const Section_heading = styled.h3`
+const Section_Heading = styled.h3`
   display: flex;
   align-items: center;
 `;
@@ -67,14 +67,14 @@ export const ConfirmationModal = ({
       style={styles}
     >
       <Modal_Header>
-        <Section_heading>Are your sure?</Section_heading>
+        <Section_Heading>Are your sure?</Section_Heading>
         <Icon_Link onClick={closeModal}>
           <Icon name="close" />
         </Icon_Link>
       </Modal_Header>
       <Modal_Section>
-        <Button_success onClick={handleRemove}>Yes</Button_success>
-        <Button_danger onClick={closeModal}>No</Button_danger>
+        <Button_Success onClick={handleRemove}>Yes</Button_Success>
+        <Button_Danger onClick={closeModal}>No</Button_Danger>
       </Modal_Section>
     </Modal>
   );

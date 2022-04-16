@@ -7,20 +7,20 @@ const Timeline = lazy(() => import("./timeline"));
 
 import { ComponentLoader } from "../../components/loader";
 
-const Timer_wrapper = styled.main`
+const Timer_Wrapper = styled.main`
   width: 100%;
   height: 100vh;
   overflow-y: scroll;
 `;
 
 export const Timer = () => (
-  <Timer_wrapper>
+  <Timer_Wrapper>
     <TaskController />
     <WeekCounter />
     <Suspense fallback={<ComponentLoader isVisible={true} />}>
       <Timeline />
     </Suspense>
-  </Timer_wrapper>
+  </Timer_Wrapper>
 );
 
 export default Timer;

@@ -7,7 +7,7 @@ import { useStoreDispatch, useStoreSelector } from "../../hooks";
 const Avatar = lazy(() => import("./avatar"));
 import { PasswordModal } from "./passwordModal";
 import { Icon } from "../../components/icon";
-import { Button, Button_success } from "../../components/buttons";
+import { Button, Button_Success } from "../../components/buttons";
 import { Input } from "../../components/inputs";
 import { ComponentLoader } from "../../components/loader";
 
@@ -44,7 +44,7 @@ const Heading = styled.h2`
   ${HeadingCSS}
 `;
 
-const Main_content = styled.section`
+const Main_Content = styled.section`
   display: flex;
   margin-top: 4rem;
 
@@ -53,11 +53,11 @@ const Main_content = styled.section`
   }
 `;
 
-const Button_bar = styled.div`
+const Button_Bar = styled.div`
   display: flex;
 `;
 
-const Button_password = styled(Button)`
+const Button_Password = styled(Button)`
   background-color: ${darkGrey};
   margin-right: 0.7rem;
 
@@ -72,11 +72,11 @@ const Side = styled.div`
   align-items: center;
 `;
 
-const Settings_section = styled.section`
+const Settings_Section = styled.section`
   flex: 1 1 50%;
 `;
 
-const Form_wrapper = styled.div`
+const Form_Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   max-width: 35rem;
@@ -91,27 +91,27 @@ const Label = styled.label`
   font-weight: 500;
 `;
 
-const Input_label = styled(Input)`
+const Input_Label = styled(Input)`
   margin-bottom: 1rem;
 `;
 
-const Input_group = styled.div`
+const Input_Group = styled.div`
   display: flex;
   padding: 0.3rem;
   padding-top: 6rem;
 `;
 
-const Label_check = styled.label`
+const Label_Check = styled.label`
   float: left;
   margin-left: 1rem;
 `;
 
-const Form_message = styled.p`
+const Form_Message = styled.p`
   color: ${red};
   text-align: center;
 `;
 
-const Icon_button = (props: { name: string }) => (
+const Icon_Button = (props: { name: string }) => (
   <Icon fill={whiteGrey} size="1rem" {...props} />
 );
 
@@ -217,11 +217,11 @@ export const Settings = () => {
     <Wrapper>
       <Header>
         <Heading>My Profile</Heading>
-        <Button_bar>
-          <Button_password onClick={openModal}>
-            <Icon_button name="settings" /> Change password
-          </Button_password>
-          <Button_success
+        <Button_Bar>
+          <Button_Password onClick={openModal}>
+            <Icon_Button name="settings" /> Change password
+          </Button_Password>
+          <Button_Success
             disabled={
               username.trim() === userData.username &&
               email.trim() === userData.email &&
@@ -230,11 +230,11 @@ export const Settings = () => {
             }
             onClick={saveUserData}
           >
-            <Icon_button name="done" /> Save
-          </Button_success>
-        </Button_bar>
+            <Icon_Button name="done" /> Save
+          </Button_Success>
+        </Button_Bar>
       </Header>
-      <Main_content>
+      <Main_Content>
         <Side>
           <Suspense fallback={<ComponentLoader isVisible={true} />}>
             <Avatar
@@ -246,28 +246,28 @@ export const Settings = () => {
             />
           </Suspense>
         </Side>
-        <Settings_section>
+        <Settings_Section>
           <ComponentLoader
             isVisible={isFetching}
             shouldShowSpinner={isFetching}
           />
-          <Form_wrapper>
+          <Form_Wrapper>
             <Label htmlFor="username">Your name</Label>
-            <Input_label
+            <Input_Label
               isValid={isFieldValid[0]}
               name="username"
               value={username}
               onChange={(e: any) => setUsername(e.target.value)}
             />
             <Label htmlFor="email">Email</Label>
-            <Input_label
+            <Input_Label
               isValid={isFieldValid[1]}
               name="email"
               value={email}
               onChange={(e: any) => setEmail(e.target.value)}
             />
-            <Form_message>{formMessage}</Form_message>
-            <Input_group>
+            <Form_Message>{formMessage}</Form_Message>
+            <Input_Group>
               <Input
                 isValid={true}
                 type="checkbox"
@@ -277,13 +277,13 @@ export const Settings = () => {
                   setShouldShowTimerOnTitle(!shouldShowTimerOnTitle)
                 }
               />
-              <Label_check htmlFor="showtitletimer">
+              <Label_Check htmlFor="showtitletimer">
                 <span></span>Show running time on the title bar
-              </Label_check>
-            </Input_group>
-          </Form_wrapper>
-        </Settings_section>
-      </Main_content>
+              </Label_Check>
+            </Input_Group>
+          </Form_Wrapper>
+        </Settings_Section>
+      </Main_Content>
       <PasswordModal isOpen={isModalOpen} closeModal={closeModal} />
     </Wrapper>
   );

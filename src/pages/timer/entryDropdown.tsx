@@ -15,14 +15,14 @@ import {
 } from "../../styles/variables";
 
 import { Icon } from "./../../components/icon";
-import { Screen_blocker } from "./styles";
+import { Screen_Blocker } from "./styles";
 
 interface Props {
   isHovered: boolean;
   onDelete: () => any;
 }
 
-const Relative_container = styled.div`
+const Relative_Container = styled.div`
   position: relative;
 `;
 
@@ -38,7 +38,7 @@ const Dropdown = styled.ul`
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
 `;
 
-const Dropdown_item = styled.li`
+const Dropdown_Item = styled.li`
   padding: 0.7rem;
   color: ${darkGrey};
   line-height: 170%;
@@ -54,7 +54,7 @@ interface IItemLink {
   isActive?: boolean;
 }
 
-const Item_link = styled.a`
+const Item_Link = styled.a`
   cursor: pointer;
   display: block;
   opacity: ${({ isActive }: IItemLink) =>
@@ -77,24 +77,24 @@ export const EntryDropdown = ({ isHovered, onDelete }: Props) => {
 
   return (
     <>
-      <Relative_container>
-        <Item_link isActive={isHovered} onClick={openMenu}>
+      <Relative_Container>
+        <Item_Link isActive={isHovered} onClick={openMenu}>
           <Icon name="more_vert" fill={isOpen ? green : undefined} />
-        </Item_link>
+        </Item_Link>
         {isOpen && (
           <Dropdown>
-            <Dropdown_item>
-              <Item_link fill={darkGrey} onClick={pushToProjects}>
+            <Dropdown_Item>
+              <Item_Link fill={darkGrey} onClick={pushToProjects}>
                 Go to Projects
-              </Item_link>
-            </Dropdown_item>
-            <Dropdown_item onClick={onDelete}>
-              <Item_link fill={red}>Delete</Item_link>
-            </Dropdown_item>
+              </Item_Link>
+            </Dropdown_Item>
+            <Dropdown_Item onClick={onDelete}>
+              <Item_Link fill={red}>Delete</Item_Link>
+            </Dropdown_Item>
           </Dropdown>
         )}
-      </Relative_container>
-      {isOpen && <Screen_blocker onClick={closeMenu} />}
+      </Relative_Container>
+      {isOpen && <Screen_Blocker onClick={closeMenu} />}
     </>
   );
 };

@@ -20,11 +20,11 @@ import {
 } from "../../styles/variables";
 import { Paragraph } from "../../styles/typography";
 
-const Timeline_wrapper = styled.section``;
+const Timeline_Wrapper = styled.section``;
 
-const Timeline_list = styled.ul``;
+const Timeline_List = styled.ul``;
 
-const Timeline_item = styled.li`
+const Timeline_Item = styled.li`
   background-color: ${white};
   border-bottom: 1px solid ${greyWhiteDarker};
   border-top: 1px solid ${greyWhite};
@@ -32,13 +32,13 @@ const Timeline_item = styled.li`
   color: ${darkGrey};
 `;
 
-const Loader_container = styled.div`
+const Loader_Container = styled.div`
   margin: 1rem auto;
   display: flex;
   justify-content: center;
 `;
 
-const Button_load = styled.button`
+const Button_Load = styled.button`
   background-color: ${white};
   font-weight: 500;
   border: none;
@@ -53,7 +53,7 @@ const Button_load = styled.button`
   align-items: center;
 `;
 
-const Decoration_image = styled.img`
+const Decoration_Image = styled.img`
   display: block;
   user-select: none;
   -webkit-user-drag: none;
@@ -78,7 +78,7 @@ const Figure = styled.figure`
   }
 `;
 
-const Info_paragraph = styled.p`
+const Info_Paragraph = styled.p`
   ${Paragraph}
 
   text-align: center;
@@ -102,18 +102,18 @@ export const Timeline = () => {
   }, []);
 
   return (
-    <Timeline_wrapper>
+    <Timeline_Wrapper>
       {entriesByDaysAsArr.length ? (
-        <Timeline_list>
+        <Timeline_List>
           {entriesByDaysAsArr.map((day) => (
-            <Timeline_item key={day.start}>
+            <Timeline_Item key={day.start}>
               <DayList data={day} />
-            </Timeline_item>
+            </Timeline_Item>
           ))}
-        </Timeline_list>
+        </Timeline_List>
       ) : (
         <Figure>
-          <Decoration_image
+          <Decoration_Image
             src={require("./../../../public/assets/timer-page.svg").default}
           />
           <figcaption>
@@ -123,18 +123,18 @@ export const Timeline = () => {
           </figcaption>
         </Figure>
       )}
-      <Loader_container>
+      <Loader_Container>
         {entriesByDaysAsArr.length ? (
-          <Button_load onClick={loadMoreData}>
+          <Button_Load onClick={loadMoreData}>
             {isLoading ? <Spinner fill={red} /> : "Load more"}
-          </Button_load>
+          </Button_Load>
         ) : (
-          <Info_paragraph>
+          <Info_Paragraph>
             No entries found. Press timer button to begin time tracking.
-          </Info_paragraph>
+          </Info_Paragraph>
         )}
-      </Loader_container>
-    </Timeline_wrapper>
+      </Loader_Container>
+    </Timeline_Wrapper>
   );
 };
 

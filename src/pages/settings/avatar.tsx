@@ -15,7 +15,7 @@ import {
   whiteGrey,
 } from "../../styles/variables";
 
-const Avatar_settings = styled.label`
+const Avatar_Settings = styled.label`
   cursor: pointer;
   background-color: ${whiteGrey};
   width: 3.438rem;
@@ -43,18 +43,18 @@ const rotateAnim = keyframes`
     }
 `;
 
-const Avatar_section = styled.figure`
+const Avatar_Section = styled.figure`
   position: relative;
 `;
 
-const Avatar_img = styled.img`
+const Avatar_Img = styled.img`
   max-width: 11.25rem;
   padding: 0px;
   border: 1px solid ${whiteGrey};
   position: relative;
 `;
 
-const Avatar_inProgress = styled.div`
+const Avatar_InProgress = styled.div`
   position: absolute;
   top: 0;
   left: 0;
@@ -91,7 +91,7 @@ const Avatar_inProgress = styled.div`
   }
 `;
 
-const Avatar_remove = styled.a`
+const Avatar_Remove = styled.a`
   cursor: pointer;
   transition: all 0.2s ease-in;
 
@@ -116,18 +116,18 @@ export const Avatar = ({
   onAvatarRemove,
 }: Props) => (
   <>
-    <Avatar_section>
-      <Avatar_img
+    <Avatar_Section>
+      <Avatar_Img
         id="avatar"
         onLoad={uploadCompleted}
         src={userData.avatar || placeholderAvatar}
       />
       {isUploading && (
-        <Avatar_inProgress>
+        <Avatar_InProgress>
           <span></span>
-        </Avatar_inProgress>
+        </Avatar_InProgress>
       )}
-      <Avatar_settings>
+      <Avatar_Settings>
         <Icon name="settings" />
         <form encType="multipart/form-data" name="formAv" id="formAvatar">
           <input
@@ -138,12 +138,12 @@ export const Avatar = ({
             id="avInput"
           />
         </form>
-      </Avatar_settings>
-    </Avatar_section>
+      </Avatar_Settings>
+    </Avatar_Section>
     {userData.avatar && (
-      <Avatar_remove onClick={onAvatarRemove}>
+      <Avatar_Remove onClick={onAvatarRemove}>
         <Icon name="close" />
-      </Avatar_remove>
+      </Avatar_Remove>
     )}
   </>
 );

@@ -64,25 +64,25 @@ const Wrapper = styled.aside`
   }
 `;
 
-const Sidebar_profile = styled.section`
+const Sidebar_Profile = styled.section`
   ${getBP(breakPoints.verySmall, "min")} {
     margin-top: auto;
   }
 `;
 
-const Sidebar_header = styled.header`
+const Sidebar_Header = styled.header`
   ${getBP(breakPoints.verySmall)} {
     font-size: 1.4rem;
   }
 `;
 
-const Sidebar_navigation = styled.nav`
+const Sidebar_Navigation = styled.nav`
   ${getBP(breakPoints.verySmall, "min")} {
     margin-top: 1rem;
   }
 `;
 
-const Navigation_link = styled(NavLink)`
+const Navigation_Link = styled(NavLink)`
   color: ${greyWhite};
   display: flex;
   align-items: center;
@@ -113,7 +113,7 @@ const Header = styled.h1`
   font-family: "Open Sans", sans-serif;
 `;
 
-const Header_link = styled(Link)`
+const Header_Link = styled(Link)`
   color: ${greyWhite};
   display: flex;
   align-items: center;
@@ -123,7 +123,7 @@ const Header_link = styled(Link)`
   }
 `;
 
-const Link_label = styled.span`
+const Link_Label = styled.span`
   display: none;
 
   ${getBP(breakPoints.verySmall)} {
@@ -145,13 +145,13 @@ const Link_label = styled.span`
   }
 `;
 
-const Navigation_list = styled.ul`
+const Navigation_List = styled.ul`
   ${getBP(breakPoints.verySmall)} {
     display: flex;
   }
 `;
 
-const Navigation_item = styled.li`
+const Navigation_Item = styled.li`
   margin: 0.1rem;
 `;
 
@@ -160,50 +160,50 @@ export const Sidebar = () => {
 
   return (
     <Wrapper>
-      <Sidebar_header>
+      <Sidebar_Header>
         <Header>
-          <Header_link to="/timer">
-            <Link_label>Project</Link_label>T
-          </Header_link>
+          <Header_Link to="/timer">
+            <Link_Label>Project</Link_Label>T
+          </Header_Link>
         </Header>
-      </Sidebar_header>
-      <Sidebar_navigation>
-        <Navigation_list>
-          <Navigation_item>
-            <Navigation_link
+      </Sidebar_Header>
+      <Sidebar_Navigation>
+        <Navigation_List>
+          <Navigation_Item>
+            <Navigation_Link
               to="/timer"
               $isFetching={isFetching}
               activeClassName="active"
             >
               <Icon name="access_time" />
-              <Link_label>Timer</Link_label>
-            </Navigation_link>
-          </Navigation_item>
-          <Navigation_item>
-            <Navigation_link
+              <Link_Label>Timer</Link_Label>
+            </Navigation_Link>
+          </Navigation_Item>
+          <Navigation_Item>
+            <Navigation_Link
               to="/reports"
               $isFetching={isFetching}
               activeClassName="active"
             >
               <Icon name="bar_chart" />
-              <Link_label>Reports</Link_label>
-            </Navigation_link>
-          </Navigation_item>
-          <Navigation_item>
-            <Navigation_link
+              <Link_Label>Reports</Link_Label>
+            </Navigation_Link>
+          </Navigation_Item>
+          <Navigation_Item>
+            <Navigation_Link
               to="/projects"
               $isFetching={isFetching}
               activeClassName="active"
             >
               <Icon name="folder" />
-              <Link_label>Projects</Link_label>
-            </Navigation_link>
-          </Navigation_item>
-        </Navigation_list>
-      </Sidebar_navigation>
-      <Sidebar_profile>
+              <Link_Label>Projects</Link_Label>
+            </Navigation_Link>
+          </Navigation_Item>
+        </Navigation_List>
+      </Sidebar_Navigation>
+      <Sidebar_Profile>
         <ProfileDropdown />
-      </Sidebar_profile>
+      </Sidebar_Profile>
     </Wrapper>
   );
 };

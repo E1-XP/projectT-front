@@ -14,7 +14,7 @@ import {
 import { useStoreDispatch, useStoreSelector } from "./../hooks";
 import { initLogOut } from "../actions/global";
 
-const Profile_link = styled.a`
+const Profile_Link = styled.a`
   cursor: pointer;
   position: relative;
   color: ${greyWhiteDarker};
@@ -33,7 +33,7 @@ interface IconProfileProps {
   url: string | null;
 }
 
-const Icon_profile = styled.span`
+const Icon_Profile = styled.span`
   display: flex;
   background-color: ${red};
   background-image: url(${(props: IconProfileProps) => props.url || "none"});
@@ -53,7 +53,7 @@ const Icon_profile = styled.span`
   }
 `;
 
-const Link_label = styled.span`
+const Link_Label = styled.span`
   display: none;
 
   ${getBP(breakPoints.medium, "min")} {
@@ -80,7 +80,7 @@ const Dropdown = styled.ul`
   }
 `;
 
-const Dropdown_item = styled.li`
+const Dropdown_Item = styled.li`
   color: ${black};
   padding: 0.6rem;
   text-align: left;
@@ -98,7 +98,7 @@ const Dropdown_item = styled.li`
   }
 `;
 
-const Screen_blocker = styled.div`
+const Screen_Blocker = styled.div`
   display: block;
   position: fixed;
   top: 0;
@@ -108,11 +108,11 @@ const Screen_blocker = styled.div`
   height: 100%;
 `;
 
-const Dropdown_item_border = styled(Dropdown_item)`
+const Dropdown_Item_Border = styled(Dropdown_Item)`
   border-top: 1px solid ${greyWhiteDarker};
 `;
 
-const Dropdown_item_noclick = styled(Dropdown_item)`
+const Dropdown_Item_Noclick = styled(Dropdown_Item)`
   cursor: default;
 
   &:hover {
@@ -149,28 +149,28 @@ export const ProfileDropdown = () => {
 
   return (
     <>
-      <Profile_link onClick={setIsOpened}>
-        <Link_label>
+      <Profile_Link onClick={setIsOpened}>
+        <Link_Label>
           {username.length > 12 ? username.substring(0, 10) + "..." : username}
-        </Link_label>
-        <Icon_profile url={avatar || null}>
+        </Link_Label>
+        <Icon_Profile url={avatar || null}>
           {!avatar && getShortUserName(username)}
-        </Icon_profile>
+        </Icon_Profile>
         {isOpen && (
           <Dropdown>
-            <Dropdown_item_noclick>
+            <Dropdown_Item_Noclick>
               {`${username}'s workspace`}
-            </Dropdown_item_noclick>
-            <Dropdown_item onClick={pushToSettings}>
+            </Dropdown_Item_Noclick>
+            <Dropdown_Item onClick={pushToSettings}>
               Profile settings
-            </Dropdown_item>
-            <Dropdown_item_border onClick={logOut}>
+            </Dropdown_Item>
+            <Dropdown_Item_Border onClick={logOut}>
               Log out
-            </Dropdown_item_border>
+            </Dropdown_Item_Border>
           </Dropdown>
         )}
-      </Profile_link>
-      {isOpen && <Screen_blocker onClick={setIsClosed} />}
+      </Profile_Link>
+      {isOpen && <Screen_Blocker onClick={setIsClosed} />}
     </>
   );
 };

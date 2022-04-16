@@ -52,7 +52,7 @@ interface IDescriptionSide {
   isHeader: boolean;
 }
 
-const Description_side = styled.section`
+const Description_Side = styled.section`
   margin-left: ${({ isHeader }: IDescriptionSide) =>
     isHeader ? "1.5rem" : "4rem"};
   white-space: nowrap;
@@ -60,12 +60,12 @@ const Description_side = styled.section`
   align-items: center;
 `;
 
-const Timing_side = styled.section`
+const Timing_Side = styled.section`
   display: flex;
   align-items: center;
 `;
 
-const EntriesCount = styled.span`
+const Entries_Count = styled.span`
   cursor: pointer;
   margin-right: 0.5rem;
   border: 1px solid ${whiteGrey};
@@ -94,30 +94,27 @@ const Task_Input = styled.input`
   }
 `;
 
-const Item_link = styled.a`
+const Item_Link = styled.a`
   color: ${greyWhite};
   cursor: pointer;
 `;
 
-const Timing_side_inner = styled.div`
+const Timing_Side_Inner = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
 `;
 
-interface IItem_link_toggle {
+interface IItem_Link_Toggle {
   isActive: boolean;
 }
 
-const Item_link_toggle = styled(Item_link)`
-  opacity: ${(props: IItem_link_toggle) => (props.isActive ? "1" : "0")};
-  pointer-events: ${(props: IItem_link_toggle) =>
-    props.isActive ? "all" : "none"};
-  color: ${(props: IItem_link_toggle) =>
-    props.isActive ? greyWhiteDarker : whiteGrey};
-  background-color: ${(props: IItem_link_toggle) =>
-    props.isActive ? whiteGrey : "transparent"};
+const Item_Link_Toggle = styled(Item_Link)<IItem_Link_Toggle>`
+  opacity: ${(props) => (props.isActive ? "1" : "0")};
+  pointer-events: ${(props) => (props.isActive ? "all" : "none")};
+  color: ${(props) => (props.isActive ? greyWhiteDarker : whiteGrey)};
+  background-color: ${(props) => (props.isActive ? whiteGrey : "transparent")};
   padding: 0.2rem 0.4rem;
   border-radius: 5px;
 
@@ -126,7 +123,7 @@ const Item_link_toggle = styled(Item_link)`
   }
 `;
 
-const Icon_hover = styled(Icon)`
+const Icon_Hover = styled(Icon)`
   &:hover {
     color: ${darkGrey};
   }
@@ -207,14 +204,14 @@ export const Entry = (props: Props) => {
 
   return (
     <Wrapper onMouseOver={onMouseOver} onMouseLeave={onMouseLeave}>
-      <Description_side isHeader={isEntryHeader}>
+      <Description_Side isHeader={isEntryHeader}>
         {isEntryHeader && (
-          <EntriesCount
+          <Entries_Count
             color={props.isOpen ? green : undefined}
             onClick={() => props.setIsOpen(!props.isOpen)}
           >
             {props.size}
-          </EntriesCount>
+          </Entries_Count>
         )}
         <Task_Input
           value={description}
@@ -234,9 +231,9 @@ export const Entry = (props: Props) => {
                 )
           }
         />
-      </Description_side>
-      <Timing_side>
-        <Item_link_toggle
+      </Description_Side>
+      <Timing_Side>
+        <Item_Link_Toggle
           isActive={isMouseOver}
           onClick={() =>
             isRegularEntry
@@ -261,8 +258,8 @@ export const Entry = (props: Props) => {
             size="1.25rem"
             fill={isBillable ? green : greyWhiteDarker}
           />
-        </Item_link_toggle>
-        <Timing_side_inner>
+        </Item_Link_Toggle>
+        <Timing_Side_Inner>
           <span>
             {`${format(props.data?.start, "H:mm aa")} - ${format(
               props.data?.stop,
@@ -281,13 +278,13 @@ export const Entry = (props: Props) => {
               )
             )}
           </span>
-        </Timing_side_inner>
-        <Item_link_toggle
+        </Timing_Side_Inner>
+        <Item_Link_Toggle
           isActive={isMouseOver}
           onClick={startNewEntryFromExisting}
         >
-          <Icon_hover name="play_arrow" size="2rem" />
-        </Item_link_toggle>
+          <Icon_Hover name="play_arrow" size="2rem" />
+        </Item_Link_Toggle>
         <EntryDropdown
           onDelete={() =>
             dispatch(
@@ -300,7 +297,7 @@ export const Entry = (props: Props) => {
           }
           isHovered={isMouseOver}
         ></EntryDropdown>
-      </Timing_side>
+      </Timing_Side>
     </Wrapper>
   );
 };

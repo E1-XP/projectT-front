@@ -8,7 +8,7 @@ import { useStoreDispatch, useStoreSelector } from "../../hooks";
 import { initAuth, setFormMessage, setIsFetching } from "../../actions/global";
 
 import { NavBar } from "../../components/navbar";
-import { Button_action } from "../../components/buttons";
+import { Button_Action } from "../../components/buttons";
 import { Input } from "../../components/inputs";
 
 import {
@@ -192,9 +192,9 @@ export const Form = () => {
               </HiddenLabel>
             </>
           )}
-          <Button_action style={{ marginTop: "2rem" }} isLoading={isFetching}>
+          <Button_Action style={{ marginTop: "2rem" }} isLoading={isFetching}>
             Send
-          </Button_action>
+          </Button_Action>
           <ErrorParagraph>{formatErrorMessage()}</ErrorParagraph>
         </FormContainer>
       </Main>

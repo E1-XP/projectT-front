@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Screen_blocker = styled.div`
+export const Screen_Blocker = styled.div`
   display: block;
   position: absolute;
   top: 0;

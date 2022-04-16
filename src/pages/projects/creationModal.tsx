@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Modal from "react-modal";
 
 import { Icon } from "../../components/icon";
-import { Button_success } from "./../../components/buttons";
+import { Button_Success } from "./../../components/buttons";
 import { ColorPickerDropdown } from "./colorPickerDropdown";
 
 import { whiteGrey } from "../../styles/variables";
@@ -11,7 +11,7 @@ import { useStoreDispatch } from "../../hooks";
 
 import { createProject } from "../../actions/user";
 
-const Section_heading = styled.h3`
+const Section_Heading = styled.h3`
   display: flex;
   align-items: center;
 `;
@@ -35,7 +35,7 @@ const Modal_Footer = styled.footer`
   justify-content: flex-end;
 `;
 
-const Relative_container = styled.div`
+const Relative_Container = styled.div`
   position: relative;
 `;
 
@@ -136,13 +136,13 @@ export const CreationModal = ({ isOpen, closeModal }: Props) => {
       onAfterClose={cleanUpState}
     >
       <Modal_Header>
-        <Section_heading>Create Project</Section_heading>
+        <Section_Heading>Create Project</Section_Heading>
         <Icon_Link onClick={closeModal}>
           <Icon name="close" />
         </Icon_Link>
       </Modal_Header>
       <Modal_Section>
-        <Relative_container>
+        <Relative_Container>
           <Icon_Link_Modal onClick={openColorPicker}>
             <Color_Indicator color={selectedColor} />
             <Icon name="arrow_drop_down" />
@@ -154,7 +154,7 @@ export const CreationModal = ({ isOpen, closeModal }: Props) => {
             selectedColor={selectedColor}
             setSelectedColor={setSelectedColor}
           />
-        </Relative_container>
+        </Relative_Container>
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -167,12 +167,12 @@ export const CreationModal = ({ isOpen, closeModal }: Props) => {
         />
       </Modal_Section>
       <Modal_Footer>
-        <Button_success
+        <Button_Success
           disabled={!name.trim().length || !selectedColor}
           onClick={onButtonCreateClick}
         >
           Create Project
-        </Button_success>
+        </Button_Success>
       </Modal_Footer>
     </Modal>
   );

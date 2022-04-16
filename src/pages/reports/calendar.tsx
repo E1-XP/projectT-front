@@ -43,7 +43,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const Period_selector = styled.nav`
+const Period_Selector = styled.nav`
   width: 100%;
   display: flex;
   flex-wrap: wrap;
@@ -56,7 +56,7 @@ const Period_selector = styled.nav`
   }
 `;
 
-const Period_item = styled.a`
+const Period_Item = styled.a`
   flex: 1 1 25%;
   cursor: pointer;
   text-align: center;
@@ -117,16 +117,16 @@ export const Calendar = ({ range, syncRange, closeCalendar }: Props) => {
         rangeColors={[green]}
         onChange={onChange}
       />
-      <Period_selector>
-        <Period_item onClick={setToday}>Today</Period_item>
-        <Period_item onClick={setThisWeek}>This Week</Period_item>
-        <Period_item onClick={setThisMonth}>This Month</Period_item>
-        <Period_item onClick={setThisYear}>This Year</Period_item>
-        <Period_item onClick={setYesterday}>Yesterday</Period_item>
-        <Period_item onClick={setLastWeek}>Last Week</Period_item>
-        <Period_item onClick={setLastMonth}>Last Month</Period_item>
-        <Period_item onClick={setLastYear}>Last Year</Period_item>
-      </Period_selector>
+      <Period_Selector>
+        <Period_Item onClick={setToday}>Today</Period_Item>
+        <Period_Item onClick={setThisWeek}>This Week</Period_Item>
+        <Period_Item onClick={setThisMonth}>This Month</Period_Item>
+        <Period_Item onClick={setThisYear}>This Year</Period_Item>
+        <Period_Item onClick={setYesterday}>Yesterday</Period_Item>
+        <Period_Item onClick={setLastWeek}>Last Week</Period_Item>
+        <Period_Item onClick={setLastMonth}>Last Month</Period_Item>
+        <Period_Item onClick={setLastYear}>Last Year</Period_Item>
+      </Period_Selector>
     </Wrapper>
   );
 };

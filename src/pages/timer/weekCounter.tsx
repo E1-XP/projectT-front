@@ -18,7 +18,7 @@ import Tooltip from "rc-tooltip";
 
 interface Props {}
 
-const Week_counter = styled.div`
+const Week_Counter = styled.div`
   text-transform: uppercase;
   font-size: 0.813rem;
   padding: 1.8rem;
@@ -26,7 +26,7 @@ const Week_counter = styled.div`
   font-weight: 500;
 `;
 
-const Week_bar = styled.div`
+const Week_Bar = styled.div`
   background-color: ${greyWhiteDarker};
   width: 100%;
   height: 3px;
@@ -39,7 +39,7 @@ interface IWeekBarPart {
   width: number;
 }
 
-const Week_bar_part = styled.div`
+const Week_Bar_Part = styled.div`
   background-color: ${(props: IWeekBarPart) => props.color};
   width: ${(props: IWeekBarPart) => props.width + "%"};
   height: 100%;
@@ -54,7 +54,7 @@ const Week_bar_part = styled.div`
   }
 `;
 
-const Bar_text = styled.span`
+const Bar_Text = styled.span`
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -65,7 +65,7 @@ const Timer = styled.span`
   color: ${black};
 `;
 
-const Tooltip_container = styled.div`
+const Tooltip_Container = styled.div`
   > span:not(:last-of-type) {
     margin-right: 0.5rem;
   }
@@ -85,13 +85,13 @@ const showInfoOnHover = (
   const percent = `${~~((duration / weekTotal) * 100)}%`;
 
   return (
-    <Tooltip_container>
+    <Tooltip_Container>
       <span style={{ color }}>
         {projectName === "no project" ? "(No Project)" : projectName}
       </span>
       <span>{readable}</span>
       <span>{percent}</span>
-    </Tooltip_container>
+    </Tooltip_Container>
   );
 };
 
@@ -149,12 +149,12 @@ export const WeekCounter = ({}: Props) => {
     totalDuration ? (projectSum / totalDuration) * 100 : 100;
 
   return (
-    <Week_counter>
+    <Week_Counter>
       This week:
       <Timer>
         {formatDuration(intervalToDuration({ start: 0, end: totalDuration }))}
       </Timer>
-      <Week_bar>
+      <Week_Bar>
         {Object.entries(weekProjectCount)
           .filter(([_, sum]) => sum !== 0)
           .map(([key, sum]) => (
@@ -170,20 +170,20 @@ export const WeekCounter = ({}: Props) => {
               overlayStyle={overlayStyle}
               mouseLeaveDelay={0.2}
             >
-              <Week_bar_part
+              <Week_Bar_Part
                 key={key}
                 width={getWidth(sum)}
                 color={getProjectColor(key)}
               >
                 {getWidth(sum) > 3 && (
-                  <Bar_text>
+                  <Bar_Text>
                     {key === "no project" ? "(NO PROJECT)" : key.toUpperCase()}
-                  </Bar_text>
+                  </Bar_Text>
                 )}
-              </Week_bar_part>
+              </Week_Bar_Part>
             </Tooltip>
           ))}
-      </Week_bar>
-    </Week_counter>
+      </Week_Bar>
+    </Week_Counter>
   );
 };

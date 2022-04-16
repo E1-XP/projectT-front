@@ -25,7 +25,7 @@ const Heading = styled.h2`
   ${HeadingCSS}
 `;
 
-const Main_content = styled.section`
+const Main_Content = styled.section`
   display: flex;
   margin-top: 4rem;
 
@@ -38,7 +38,7 @@ const Section = styled.section`
   flex: 1 1 50%;
 `;
 
-const Decoration_image = styled.img`
+const Decoration_Image = styled.img`
   display: block;
   user-select: none;
   -webkit-user-drag: none;
@@ -63,7 +63,7 @@ const Figure = styled.figure`
   }
 `;
 
-const Info_paragraph = styled.p`
+const Info_Paragraph = styled.p`
   ${Paragraph}
 
   text-align: justify;
@@ -77,10 +77,10 @@ export const ErrorPage = () => {
       <Header>
         <Heading>Error Page</Heading>
       </Header>
-      <Main_content>
+      <Main_Content>
         <Section>
           <Figure>
-            <Decoration_image
+            <Decoration_Image
               src={require("./../../../public/assets/error-page.svg").default}
             />
             <figcaption>
@@ -89,12 +89,12 @@ export const ErrorPage = () => {
               </a>
             </figcaption>
           </Figure>
-          <Info_paragraph>
+          <Info_Paragraph>
             Something really bad happened and application crashed. We are
             already working to fix it. Please refresh page in a few minutes.
-          </Info_paragraph>
+          </Info_Paragraph>
         </Section>
-      </Main_content>
+      </Main_Content>
     </Wrapper>
   );
 };

@@ -55,7 +55,7 @@ export const Spinner = styled.div`
   animation: ${rotateAnim} 0.5s linear infinite;
 `;
 
-const Main_preloader = styled.div`
+const Main_Preloader = styled.div`
   background-color: ${darkGrey};
   color: ${white};
   width: 100%;
@@ -106,10 +106,10 @@ export const Loader = (props: PropsWithChildren<{}>) => {
   const isLoading = useStoreSelector((state) => state.global.isLoading);
 
   return isLoading ? (
-    <Main_preloader>
+    <Main_Preloader>
       <h1>ProjectT</h1>
       <Spinner fill={red} />
-    </Main_preloader>
+    </Main_Preloader>
   ) : (
     <> {props.children}</>
   );

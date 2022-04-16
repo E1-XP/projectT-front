@@ -11,7 +11,7 @@ import { fetchEntries, removeProject } from "../../actions/user";
 const ProjectsTable = lazy(() => import("./projectsTable"));
 import { CreationModal } from "./creationModal";
 import { ConfirmationModal } from "./confirmationModal";
-import { Button_success, Button_danger } from "../../components/buttons";
+import { Button_Success, Button_Danger } from "../../components/buttons";
 
 import { getPeriodProjectDurations } from "../../helpers";
 import { SortBy, sortFn, SortOrder } from "./helpers";
@@ -57,7 +57,7 @@ const Heading = styled.h2`
   ${HeadingCSS}
 `;
 
-const Decoration_image = styled.img`
+const Decoration_Image = styled.img`
   display: block;
   user-select: none;
   -webkit-user-drag: none;
@@ -158,7 +158,7 @@ export const Projects = () => {
     <Wrapper>
       <Header>
         <Heading>Projects</Heading>
-        <Button_success onClick={openModal}>Create Project</Button_success>
+        <Button_Success onClick={openModal}>Create Project</Button_Success>
       </Header>
       {projects.length ? (
         <Suspense fallback={<ComponentLoader isVisible={true} />}>
@@ -172,7 +172,7 @@ export const Projects = () => {
       ) : (
         <>
           <Figure>
-            <Decoration_image
+            <Decoration_Image
               src={
                 require("./../../../public/assets/projects-page.svg").default
               }
@@ -190,12 +190,12 @@ export const Projects = () => {
       )}
       <Footer>
         {!!projects.length && (
-          <Button_danger
+          <Button_Danger
             onClick={openConfirmationModal}
             disabled={!state.sortedProjects.some(({ isChecked }) => isChecked)}
           >
             Remove Selected
-          </Button_danger>
+          </Button_Danger>
         )}
       </Footer>
       <CreationModal isOpen={isModalOpen} closeModal={closeModal} />

@@ -38,7 +38,7 @@ interface ICheckbox {
 
 const SmallMobileBP = "25em";
 
-const Table_section = styled.section`
+const Table_Section = styled.section`
   position: relative;
 `;
 
@@ -200,7 +200,7 @@ export const ProjectsTable = ({
     readable.startsWith("0") ? "(Not started)" : readable;
 
   return (
-    <Table_section>
+    <Table_Section>
       <ComponentLoader
         isVisible={isLoading || isFetching}
         shouldShowSpinner={isLoading || isFetching}
@@ -255,7 +255,7 @@ export const ProjectsTable = ({
           ))}
         </tbody>
       </Table>
-    </Table_section>
+    </Table_Section>
   );
 };
 

@@ -2,7 +2,7 @@ import React, { useCallback, useState, ChangeEvent } from "react";
 import styled from "styled-components";
 
 import { Icon } from "../../components/icon";
-import { Screen_blocker } from "./styles";
+import { Screen_Blocker } from "./styles";
 
 import { Project } from "../../store/interfaces";
 
@@ -25,22 +25,19 @@ interface Props {
   onProjectSelect: (project: string) => any;
 }
 
-const Item_link = styled.a`
+const Item_Link = styled.a`
   cursor: pointer;
 `;
 
-interface IItem_link_toggle {
+interface IItem_Link_Toggle {
   isActive: boolean;
 }
 
-const Item_link_toggle = styled(Item_link)`
-  opacity: ${(props: IItem_link_toggle) => (props.isActive ? "1" : "0")};
-  pointer-events: ${(props: IItem_link_toggle) =>
-    props.isActive ? "all" : "none"};
-  color: ${(props: IItem_link_toggle) =>
-    props.isActive ? greyWhiteDarker : whiteGrey};
-  background-color: ${(props: IItem_link_toggle) =>
-    props.isActive ? whiteGrey : "transparent"};
+const Item_Link_Toggle = styled(Item_Link)<IItem_Link_Toggle>`
+  opacity: ${(props) => (props.isActive ? "1" : "0")};
+  pointer-events: ${(props) => (props.isActive ? "all" : "none")};
+  color: ${(props) => (props.isActive ? greyWhiteDarker : whiteGrey)};
+  background-color: ${(props) => (props.isActive ? whiteGrey : "transparent")};
   padding: 0.2rem 0.4rem;
   border-radius: 5px;
 
@@ -70,7 +67,7 @@ const List = styled.ul`
   overflow-y: auto;
 `;
 
-const Color_indicator = styled.span`
+const Color_Indicator = styled.span`
   display: inline-block;
   width: 0.6rem;
   height: 0.6rem;
@@ -79,7 +76,7 @@ const Color_indicator = styled.span`
   margin-right: 0.5rem;
 `;
 
-const Item_project = styled.span`
+const Item_Project = styled.span`
   color: ${({ color }) => color};
 
   ${getBP(breakPoints.small)} {
@@ -99,7 +96,7 @@ const Input = styled.input`
   }
 `;
 
-const Searchbar = styled.div`
+const Search_Bar = styled.div`
   display: flex;
   justify-content: center;
   border-radius: 5px;
@@ -125,7 +122,7 @@ const Wrapper = styled.div`
   top: 2rem;
 `;
 
-const Relative_container = styled.div`
+const Relative_Container = styled.div`
   position: relative;
 `;
 
@@ -149,29 +146,29 @@ export const ProjectDropdown = ({
   return (
     <>
       {currentProject && (
-        <Item_link onClick={openMenu}>
-          <Color_indicator color={currentProject?.color} />
-          <Item_project color={currentProject?.color}>
+        <Item_Link onClick={openMenu}>
+          <Color_Indicator color={currentProject?.color} />
+          <Item_Project color={currentProject?.color}>
             {currentProject.name}
-          </Item_project>
-        </Item_link>
+          </Item_Project>
+        </Item_Link>
       )}
       {!currentProject && (
-        <Item_link_toggle onClick={openMenu} isActive={isHovered}>
+        <Item_Link_Toggle onClick={openMenu} isActive={isHovered}>
           <Icon name="folder" size="1.25rem" />
-        </Item_link_toggle>
+        </Item_Link_Toggle>
       )}
       {isOpen && (
-        <Relative_container>
+        <Relative_Container>
           <Wrapper style={wrapperStyle} currentProject={currentProject}>
-            <Searchbar>
+            <Search_Bar>
               <Icon name="search" fill={greyWhite} size="1.25rem" />
               <Input
                 placeholder="Find project..."
                 value={inputValue}
                 onChange={onInputChange}
               />
-            </Searchbar>
+            </Search_Bar>
 
             <List>
               {projects
@@ -185,10 +182,10 @@ export const ProjectDropdown = ({
                       closeMenu();
                     }}
                   >
-                    <Item_link>
-                      <Color_indicator color={project?.color} />
+                    <Item_Link>
+                      <Color_Indicator color={project?.color} />
                       {project.name}
-                    </Item_link>
+                    </Item_Link>
                   </Item>
                 ))}
               {
@@ -200,23 +197,23 @@ export const ProjectDropdown = ({
                     closeMenu();
                   }}
                 >
-                  <Item_link>
-                    <Color_indicator color={greyWhite} />
+                  <Item_Link>
+                    <Color_Indicator color={greyWhite} />
                     {"no project"}
-                  </Item_link>
+                  </Item_Link>
                 </Item>
               }
               {!projects.filter(({ name }) => name.includes(inputValue))
                 .length && (
                 <Item key="nothing to show">
-                  <Item_link>No projects found</Item_link>
+                  <Item_Link>No projects found</Item_Link>
                 </Item>
               )}
             </List>
           </Wrapper>
-        </Relative_container>
+        </Relative_Container>
       )}
-      {isOpen && <Screen_blocker onClick={closeMenu} />}
+      {isOpen && <Screen_Blocker onClick={closeMenu} />}
     </>
   );
 };

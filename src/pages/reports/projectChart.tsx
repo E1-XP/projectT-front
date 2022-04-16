@@ -47,7 +47,7 @@ const Color_Indicator = styled.span`
   margin-right: 0.5rem;
 `;
 
-const List_item = styled.li`
+const List_Item = styled.li`
   width: 15rem;
   display: flex;
   justify-content: space-between;
@@ -147,7 +147,7 @@ export const ProjectChart = ({ range }: Props) => {
       {periodProjectDurations
         .filter((item) => item.totalDuration)
         .map((item, i) => (
-          <List_item
+          <List_Item
             isCurrentItem={hoveredProject === item.name}
             value={item.name}
             key={`${i}-${item.name}`}
@@ -164,7 +164,7 @@ export const ProjectChart = ({ range }: Props) => {
                 })
               )}
             </span>
-          </List_item>
+          </List_Item>
         ))}
     </ul>
   );

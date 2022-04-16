@@ -25,15 +25,15 @@ const Header = styled.header`
   margin-right: 3.3rem;
 `;
 
-const Header_date = styled.span`
+const Header_Date = styled.span`
   font-weight: 700;
 `;
 
-const Header_dayCount = styled.span`
+const Header_DayCount = styled.span`
   font-weight: 700;
 `;
 
-const Project_list = styled.ul``;
+const Project_List = styled.ul``;
 
 type GroupedEntriesSorted = GroupedEntries & {
   entriesByDescription: IEntry[][];
@@ -107,21 +107,21 @@ export const DayList = ({ data }: Props) => {
   return (
     <>
       <Header>
-        <Header_date>{format(data.start, "eee, d MMM")}</Header_date>
-        <Header_dayCount>
+        <Header_Date>{format(data.start, "eee, d MMM")}</Header_Date>
+        <Header_DayCount>
           {formatDuration(
             intervalToDuration({ start: 0, end: data.totalDuration })
           )}
-        </Header_dayCount>
+        </Header_DayCount>
       </Header>
-      <Project_list>
+      <Project_List>
         {Object.values(projectEntriesHeaderData).map((groupedArr) =>
           groupedArr.map((data) => <EntryGroup key={data.start} data={data} />)
         )}
         {Object.values(entriesWithoutProjectHeaderData).map((data) => (
           <EntryGroup key={data.start} data={data} />
         ))}
-      </Project_list>
+      </Project_List>
     </>
   );
 };

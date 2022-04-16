@@ -38,13 +38,13 @@ const Task = styled.section`
   position: sticky;
 `;
 
-const Task_timing = styled.div`
+const Task_Timing = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
 `;
 
-const Task_timing_inner = styled.div`
+const Task_Timing_Inner = styled.div`
   display: flex;
   align-items: center;
   width: 11rem;
@@ -53,7 +53,7 @@ const Task_timing_inner = styled.div`
   justify-content: space-between;
 `;
 
-const Task_description = styled.input`
+const Task_Description = styled.input`
   flex: 1 1 25%;
   padding: 0.3rem;
   margin-right: 1rem;
@@ -69,13 +69,13 @@ const Task_description = styled.input`
   }
 `;
 
-const Task_timer = styled.span`
+const Task_Timer = styled.span`
   color: ${darkGrey};
   font-weight: 500;
   font-size: 1.125rem;
 `;
 
-const Task_options = styled.div`
+const Task_Options = styled.div`
   width: 1.125rem;
   margin-left: -0.5rem;
 `;
@@ -84,7 +84,7 @@ interface TaskButtonProps {
   isRunning: boolean;
 }
 
-const Task_button = styled.a`
+const Task_Button = styled.a`
   cursor: pointer;
   color: ${white};
   background-color: ${(props: TaskButtonProps) =>
@@ -96,7 +96,7 @@ const Task_button = styled.a`
   align-items: center;
 `;
 
-const Item_link = styled.a`
+const Item_Link = styled.a`
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -160,12 +160,12 @@ export const TaskController = () => {
 
   return (
     <Task>
-      <Task_description
+      <Task_Description
         placeholder="What are you working on?"
         value={description}
         onChange={setEntryDescription}
       />
-      <Task_timing>
+      <Task_Timing>
         <ProjectDropdown
           projects={projects}
           currentProject={currentProjectMatch}
@@ -174,27 +174,27 @@ export const TaskController = () => {
           wrapperStyle={wrapperStyle}
         />
 
-        <Task_timing_inner>
-          <Item_link onClick={setIsBillable}>
+        <Task_Timing_Inner>
+          <Item_Link onClick={setIsBillable}>
             <Icon
               name="attach_money"
               size="1.25rem"
               fill={isBillable ? green : greyWhiteDarker}
             />
-          </Item_link>
-          <Task_timer>{timer}</Task_timer>
-          <Task_button isRunning={isRunning} onClick={handleStartStopBtn}>
+          </Item_Link>
+          <Task_Timer>{timer}</Task_Timer>
+          <Task_Button isRunning={isRunning} onClick={handleStartStopBtn}>
             <Icon name={isRunning ? "stop" : "play_arrow"} />
-          </Task_button>
-          <Task_options>
+          </Task_Button>
+          <Task_Options>
             {isRunning && (
-              <Item_link onClick={deleteEntry}>
+              <Item_Link onClick={deleteEntry}>
                 <Icon name="delete" fill={greyWhiteDarker} size="1rem" />
-              </Item_link>
+              </Item_Link>
             )}
-          </Task_options>
-        </Task_timing_inner>
-      </Task_timing>
+          </Task_Options>
+        </Task_Timing_Inner>
+      </Task_Timing>
     </Task>
   );
 };

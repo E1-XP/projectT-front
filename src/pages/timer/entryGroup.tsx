@@ -10,7 +10,7 @@ interface Props {
   data: GroupedEntries;
 }
 
-const Project_item = styled.li`
+const Project_Item = styled.li`
   display: flex;
   justify-content: space-between;
   padding: 1rem 0;
@@ -22,7 +22,7 @@ const Project_item = styled.li`
   }
 `;
 
-const Entry_list = styled.ul`
+const Entry_List = styled.ul`
   width: 100%;
 `;
 
@@ -32,8 +32,8 @@ export const EntryGroup = ({ data }: Props) => {
   const setIsOpenCB = useCallback(() => setIsOpen(!isOpen), [isOpen]);
 
   return (
-    <Project_item>
-      <Entry_list>
+    <Project_Item>
+      <Entry_List>
         {data.entries.length > 1 && (
           <Entry
             key={data.entries.length}
@@ -46,7 +46,7 @@ export const EntryGroup = ({ data }: Props) => {
         )}
         {(isOpen || data.entries.length === 1) &&
           data.entries.map((entry) => <Entry key={entry._id} data={entry} />)}
-      </Entry_list>
-    </Project_item>
+      </Entry_List>
+    </Project_Item>
   );
 };

@@ -39,7 +39,7 @@ export const Button = styled.button`
   }
 `;
 
-export const Button_success = styled(Button)`
+export const Button_Success = styled(Button)`
   background-color: ${green};
 
   &:hover {
@@ -47,7 +47,7 @@ export const Button_success = styled(Button)`
   }
 `;
 
-export const Button_danger = styled(Button)`
+export const Button_Danger = styled(Button)`
   background-color: ${red};
 
   &:hover {
@@ -60,7 +60,7 @@ interface ButtonActionProps {
   style?: CSSProperties;
 }
 
-const Btn_action = styled.button`
+const Btn_Action = styled.button`
   padding: 0.8rem 0.5rem;
   background-color: ${red};
   cursor: pointer;
@@ -78,12 +78,12 @@ const Btn_action = styled.button`
   }
 `;
 
-export const Button_action = ({
+export const Button_Action = ({
   isLoading = false,
   style,
   children,
 }: PropsWithChildren<ButtonActionProps>) => (
-  <Btn_action style={style}>
+  <Btn_Action style={style}>
     {isLoading ? <Spinner fill={white} /> : children}
-  </Btn_action>
+  </Btn_Action>
 );

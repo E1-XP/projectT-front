@@ -19,8 +19,8 @@ import { changePassword, setFormMessage } from "../../actions/global";
 import { ComponentLoader } from "../../components/loader";
 import {
   Button,
-  Button_danger,
-  Button_success,
+  Button_Danger,
+  Button_Success,
 } from "../../components/buttons";
 import { Input } from "../../components/inputs";
 import { Icon } from "../../components/icon";
@@ -44,7 +44,7 @@ const Icon_Link = styled.a`
   padding: 0.3rem;
 `;
 
-const Modal_header = styled.header`
+const Modal_Header = styled.header`
   padding: 1.5rem;
   padding-left: 2rem;
   display: flex;
@@ -53,7 +53,7 @@ const Modal_header = styled.header`
   border-bottom: 1px solid ${whiteGrey};
 `;
 
-const Modal_content = styled.section`
+const Modal_Content = styled.section`
   display: flex;
   flex-direction: column;
   padding: 1rem;
@@ -68,7 +68,7 @@ interface IModalError {
   type: CAPTION_STATES;
 }
 
-const Modal_caption = styled.div`
+const Modal_Caption = styled.div`
   padding: 1rem;
   background-color: ${({ isVisible, type }: IModalError) =>
     isVisible ? (type === CAPTION_STATES.ERROR ? red : green) : white};
@@ -78,7 +78,7 @@ const Modal_caption = styled.div`
   transition: all 200ms ease-in-out;
 `;
 
-const Button_container = styled.div`
+const Button_Container = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 1rem 0rem;
@@ -238,13 +238,13 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
         shouldShowMessage={false}
         message=""
       />
-      <Modal_header>
+      <Modal_Header>
         <Section_Heading>Change Password</Section_Heading>
         <Icon_Link onClick={cancelPasswordUpdate}>
           <Icon name="close" />
         </Icon_Link>
-      </Modal_header>
-      <Modal_caption
+      </Modal_Header>
+      <Modal_Caption
         type={
           errorMessage.length || !formMessage[1]
             ? CAPTION_STATES.ERROR
@@ -253,8 +253,8 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
         isVisible={[errorMessage, formMessage[0]].some((s) => s.length)}
       >
         {formMessage[0] || errorMessage}
-      </Modal_caption>
-      <Modal_content>
+      </Modal_Caption>
+      <Modal_Content>
         <Input
           id="0"
           isValid={isFieldValid[0]}
@@ -279,18 +279,18 @@ export const PasswordModal = ({ isOpen, closeModal }: Props) => {
           type="password"
           onChange={onInputChange}
         />
-        <Button_container>
-          <Button_danger onClick={cancelPasswordUpdate}> Cancel </Button_danger>
-          <Button_success
+        <Button_Container>
+          <Button_Danger onClick={cancelPasswordUpdate}> Cancel </Button_Danger>
+          <Button_Success
             disabled={[currentPass, newPass, confirmNewPass].some(
               (s) => !s.length
             )}
             onClick={submitPasswordUpdate}
           >
             Save
-          </Button_success>
-        </Button_container>
-      </Modal_content>
+          </Button_Success>
+        </Button_Container>
+      </Modal_Content>
     </Modal>
   );
 };
