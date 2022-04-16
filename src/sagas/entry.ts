@@ -98,8 +98,9 @@ export function* createEntry(action: PayloadAction<NewEntryData>) {
     if (response.status === 200) {
       const entryData: Entry = yield response.json();
 
-      yield put(setCurrentEntryId(entryData._id));
-      console.log(entryData);
+      if (action.payload.stop === undefined) {
+        yield put(setCurrentEntryId(entryData._id));
+      }
       yield put(insertEntry(entryData));
     }
   } catch (e) {

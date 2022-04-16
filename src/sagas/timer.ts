@@ -94,7 +94,6 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
         yield delay(SECOND);
 
         const realElapsedTime = Date.now() - start;
-        console.log(duration + SECOND < realElapsedTime - SECOND * 3);
 
         const handleInactiveTabFreeze =
           duration + SECOND < realElapsedTime - SECOND * 3
@@ -129,12 +128,12 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
 
         currentDay = addDays(currentDay, 1).getTime();
 
-        while (i >= 0) {
+        while (i > 0) {
           yield call(createEntrySaga, {
             type: createEntry.type,
             payload: {
               start: startOfDay(currentDay).getTime(),
-              stop: i === 0 ? stop : endOfDay(currentDay).getTime(),
+              stop: i === 1 ? stop : endOfDay(currentDay).getTime(),
               description,
               billable,
               project,
@@ -145,6 +144,8 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
 
           currentDay = addDays(currentDay, 1).getTime();
         }
+
+        currentRunningEntry = undefined;
       }
 
       if (currentRunningEntry) {
