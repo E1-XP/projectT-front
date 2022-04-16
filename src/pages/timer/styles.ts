@@ -1,5 +1,11 @@
 import styled from "styled-components";
 
+export const Timer_Wrapper = styled.main`
+  width: 100%;
+  height: 100vh;
+  overflow-y: scroll;
+`;
+
 export const Screen_Blocker = styled.div`
   display: block;
   position: absolute;

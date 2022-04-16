@@ -27,7 +27,7 @@ describe("test Timeline component", () => {
       </Provider>
     );
 
-    const classNameOpening = "timeline__Timeline_Item";
+    const classNameOpening = "style__Timeline_Item";
 
     expect(
       container.querySelectorAll(`[class^="${classNameOpening}"]`).length

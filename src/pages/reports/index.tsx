@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState, Suspense, lazy } from "react";
-import styled from "styled-components";
 import startOfWeek from "date-fns/startOfWeek";
 import endOfWeek from "date-fns/endOfWeek";
 import startOfMonth from "date-fns/startOfMonth";
@@ -28,116 +27,23 @@ import { useQuerySync } from "./hooks";
 import { useStoreDispatch } from "../../hooks";
 import { fetchEntries } from "../../actions/user";
 
+import { darkGrey, greyWhite } from "../../styles/variables";
 import {
-  breakPoints,
-  darkGrey,
-  greyWhite,
-  whiteGrey,
-} from "../../styles/variables";
-import { getBP } from "./../../styles/helpers";
-import { Heading as HeadingCSS } from "../../styles/typography";
+  Wrapper,
+  Chart_Section,
+  Header,
+  Heading,
+  Heading_Section,
+  Item_Link_Border,
+  Period_Selection,
+  Item_Link_Hover,
+  Screen_Blocker,
+} from "./style";
 
 export interface State {
   readable: readable | string;
   type: periods;
 }
-
-const Wrapper = styled.main`
-  width: 100%;
-  max-width: ${breakPoints.large};
-  margin: 1rem auto;
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  padding-top: 0;
-
-  ${getBP(breakPoints.verySmall)} {
-    display: block;
-    width: 100%;
-    height: 100vh;
-    overflow-y: scroll;
-    margin: initial;
-    padding-top: 1rem;
-  }
-`;
-
-const Header = styled.header`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const Heading = styled.h2`
-  ${HeadingCSS}
-`;
-
-const Heading_Section = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 700;
-  display: flex;
-  position: relative;
-`;
-
-const Chart_Section = styled.section`
-  flex-basis: 72%;
-  min-width: 36.875rem;
-  margin-right: 1rem;
-
-  ${getBP("56.25rem")} {
-    flex-basis: 100%;
-  }
-
-  ${getBP(breakPoints.small)} {
-    margin-right: initial;
-  }
-
-  ${getBP(breakPoints.verySmall)} {
-    min-width: initial;
-  }
-`;
-
-const Item_Link = styled.a`
-  color: ${darkGrey};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-`;
-
-const Item_Link_Border = styled(Item_Link)`
-  border-right: 1px solid ${whiteGrey};
-
-  & span {
-    width: 1.5rem;
-    color: ${greyWhite};
-    margin-left: 0.3rem;
-  }
-
-  &:hover span {
-    color: ${darkGrey} !important;
-  }
-`;
-
-const Item_Link_Hover = styled(Item_Link)`
-  color: ${greyWhite};
-
-  &:hover {
-    color: ${darkGrey};
-  }
-`;
-
-const Period_Selection = styled.div`
-  display: flex;
-`;
-
-const Screen_Blocker = styled.div`
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: transparent;
-  width: 100%;
-  height: 100%;
-  z-index: 50;
-`;
 
 export type PeriodTimes = Record<string, Date[]>;
 

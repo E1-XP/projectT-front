@@ -1,115 +1,36 @@
 import React, { useCallback, useEffect, useState, Suspense, lazy } from "react";
-import styled from "styled-components";
 import uniq from "lodash/fp/uniq";
 
 import { useStoreDispatch, useStoreSelector } from "../../hooks";
 
 const Avatar = lazy(() => import("./avatar"));
 import { PasswordModal } from "./passwordModal";
+
 import { Icon } from "../../components/icon";
 import { Button, Button_Success } from "../../components/buttons";
-import { Input } from "../../components/inputs";
 import { ComponentLoader } from "../../components/loader";
+import { Input } from "../../components/inputs";
 
 import { uploadAvatar, removeAvatar, sendUserData } from "../../actions/user";
 import { getSchema, validationTypes } from "../forms/validation";
 
+import { whiteGrey } from "../../styles/variables";
 import {
-  breakPoints,
-  darkGrey,
-  red,
-  white,
-  whiteGrey,
-} from "../../styles/variables";
-import { getBP } from "../../styles/helpers";
-import { Heading as HeadingCSS } from "./../../styles/typography";
-
-const Wrapper = styled.main`
-  width: 100%;
-  max-width: ${breakPoints.large};
-  margin: 1rem auto;
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  padding-top: 0;
-  flex-direction: column;
-`;
-
-const Header = styled.header`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const Heading = styled.h2`
-  ${HeadingCSS}
-`;
-
-const Main_Content = styled.section`
-  display: flex;
-  margin-top: 4rem;
-
-  ${getBP(breakPoints.medium)} {
-    flex-direction: column;
-  }
-`;
-
-const Button_Bar = styled.div`
-  display: flex;
-`;
-
-const Button_Password = styled(Button)`
-  background-color: ${darkGrey};
-  margin-right: 0.7rem;
-
-  &:hover {
-    background-color: #2a2a2a;
-  }
-`;
-
-const Side = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Settings_Section = styled.section`
-  flex: 1 1 50%;
-`;
-
-const Form_Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  max-width: 35rem;
-  margin: 0 auto;
-
-  ${getBP(breakPoints.medium)} {
-    margin-top: 4rem;
-  }
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-`;
-
-const Input_Label = styled(Input)`
-  margin-bottom: 1rem;
-`;
-
-const Input_Group = styled.div`
-  display: flex;
-  padding: 0.3rem;
-  padding-top: 6rem;
-`;
-
-const Label_Check = styled.label`
-  float: left;
-  margin-left: 1rem;
-`;
-
-const Form_Message = styled.p`
-  color: ${red};
-  text-align: center;
-`;
+  Wrapper,
+  Header,
+  Heading,
+  Button_Bar,
+  Button_Password,
+  Main_Content,
+  Side,
+  Settings_Section,
+  Form_Wrapper,
+  Input_Label,
+  Form_Message,
+  Input_Group,
+  Label,
+  Label_Check,
+} from "./style";
 
 const Icon_Button = (props: { name: string }) => (
   <Icon fill={whiteGrey} size="1rem" {...props} />

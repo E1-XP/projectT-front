@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import styled from "styled-components";
 
 import { useStoreDispatch, useStoreSelector } from "../../hooks";
 import { initAuth, setFormMessage, setIsFetching } from "../../actions/global";
@@ -18,8 +17,13 @@ import {
   validationTypes,
 } from "./validation";
 
-import { greyWhiteDarker, red } from "../../styles/variables";
-import { visuallyHidden } from "../../styles/helpers";
+import {
+  Main,
+  Heading,
+  FormContainer,
+  HiddenLabel,
+  ErrorParagraph,
+} from "./style";
 
 export interface Fields {
   email: string;
@@ -27,38 +31,6 @@ export interface Fields {
   password: string;
   passwordConfirm: string;
 }
-
-const Heading = styled.h2`
-  padding: 2rem 0.2rem;
-  text-align: center;
-  font-size: 1.7rem;
-  font-weight: 500; ;
-`;
-
-const HiddenLabel = styled.label`
-  ${visuallyHidden}
-`;
-
-const Main = styled.main`
-  width: 31rem;
-  margin: 0 auto;
-  margin-top: 6rem;
-`;
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-
-  & > input {
-    width: 100%;
-  }
-`;
-
-const ErrorParagraph = styled.p`
-  color: ${red};
-  padding: 2rem;
-  text-align: center;
-`;
 
 export const Form = () => {
   const dispatch = useStoreDispatch();

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState, lazy, Suspense } from "react";
-import styled from "styled-components";
 
 import { useStoreDispatch, useStoreSelector } from "../../hooks";
 import { groupEntriesByDays } from "../../selectors/groupEntriesByDays";
@@ -12,14 +11,20 @@ const ProjectsTable = lazy(() => import("./projectsTable"));
 import { CreationModal } from "./creationModal";
 import { ConfirmationModal } from "./confirmationModal";
 import { Button_Success, Button_Danger } from "../../components/buttons";
+import { ComponentLoader } from "../../components/loader";
 
 import { getPeriodProjectDurations } from "../../helpers";
 import { SortBy, sortFn, SortOrder } from "./helpers";
 
-import { breakPoints } from "../../styles/variables";
-import { getBP } from "./../../styles/helpers";
-import { Heading as HeadingCSS, Paragraph } from "../../styles/typography";
-import { ComponentLoader } from "../../components/loader";
+import {
+  Wrapper,
+  Header,
+  Heading,
+  Figure,
+  Decoration_Image,
+  No_Entries,
+  Footer,
+} from "./style";
 
 export interface State {
   sortedProjects: (Project & { isChecked: boolean })[];
@@ -27,72 +32,6 @@ export interface State {
   sortOrder: SortOrder;
   sortBy: SortBy;
 }
-
-const Wrapper = styled.main`
-  width: 100%;
-  max-width: ${breakPoints.large};
-  margin: 1rem auto;
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  padding-top: 0;
-  flex-direction: column;
-
-  ${getBP(breakPoints.verySmall)} {
-    display: block;
-    width: 100%;
-    height: 100vh;
-    overflow-y: scroll;
-    margin: initial;
-    padding-top: 1rem;
-  }
-`;
-
-const Header = styled.header`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const Heading = styled.h2`
-  ${HeadingCSS}
-`;
-
-const Decoration_Image = styled.img`
-  display: block;
-  user-select: none;
-  -webkit-user-drag: none;
-
-  ${getBP(breakPoints.small)} {
-    width: 80%;
-  }
-`;
-
-const Figure = styled.figure`
-  width: 50%;
-  margin: 4rem auto;
-
-  & img {
-    width: 100%;
-  }
-
-  & figcaption {
-    margin-top: 0.5rem;
-    text-align: center;
-    font-size: 0.8rem;
-  }
-`;
-
-const No_Entries = styled.p`
-  ${Paragraph}
-
-  display: block;
-  padding: 1rem;
-  text-align: center;
-`;
-
-const Footer = styled.section`
-  display: flex;
-`;
 
 export const Projects = () => {
   const dispatch = useStoreDispatch();
