@@ -13,7 +13,7 @@ import {
   red,
 } from "../styles/variables";
 import { useStoreSelector } from "../hooks";
-import { selectGlobal } from "../selectors";
+import { selectGlobal, selectTimer } from "../selectors";
 
 const Wrapper = styled.aside`
   color: ${white};
@@ -157,6 +157,7 @@ const Navigation_Item = styled.li`
 
 export const Sidebar = () => {
   const { isFetching } = useStoreSelector(selectGlobal);
+  const { isRunning, timer } = useStoreSelector(selectTimer);
 
   return (
     <Wrapper>
@@ -176,7 +177,7 @@ export const Sidebar = () => {
               activeClassName="active"
             >
               <Icon name="access_time" />
-              <Link_Label>Timer</Link_Label>
+              <Link_Label>{isRunning ? timer : "Timer"}</Link_Label>
             </Navigation_Link>
           </Navigation_Item>
           <Navigation_Item>
