@@ -54,7 +54,7 @@ const Color_Indicator_Inner = styled.span`
   }
 `;
 
-const Screen_blocker = styled.div`
+const Screen_Blocker = styled.div`
   display: block;
   position: fixed;
   top: 0;
@@ -84,7 +84,7 @@ export const ColorPickerDropdown = ({
 
   return (
     <>
-      {isOpen && <Screen_blocker onClick={closeDropdown} />}
+      {isOpen && <Screen_Blocker onClick={closeDropdown} />}
       {isOpen && (
         <Color_Container>
           {colors.map((color) => (
