@@ -18,7 +18,7 @@ import {
   requestError as networkError,
   PasswordData,
   setFormMessage,
-  setHasErrored,
+  setErrorFlag,
 } from "./../actions/global";
 import {
   getUserData,
@@ -254,6 +254,6 @@ export function* trimEntriesOnTimerRoute(action: LocationChangeAction) {
 export function* requestError(action: PayloadAction<any>) {
   console.log("request error", action.payload);
 
-  yield put(setHasErrored(true));
+  yield put(setErrorFlag(true));
   yield put(push("/500"));
 }

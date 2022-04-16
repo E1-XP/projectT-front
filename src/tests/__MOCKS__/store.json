@@ -13,7 +13,7 @@
     "isLoading": false,
     "isFetching": false,
     "formMessage": ["", true],
-    "hasErrored": false
+    "errorFlag": false
   },
   "user": {
     "userData": {
