@@ -222,8 +222,6 @@ export function* deleteAvatar(action: Action) {
 
 export function* sendUserData(action: PayloadAction<Partial<UserData>>) {
   try {
-    console.log(action.payload);
-
     const { _id: userId } = yield select(selectUserData);
 
     const response: FetchResponse = yield call(

@@ -103,12 +103,9 @@ const passwordChangeRequest = async (
 
 export function* initAuth(action: PayloadAction<Fields>) {
   try {
-    console.log(action.payload);
-
     const response: FetchResponse = yield call(authRequest, action.payload);
 
     const data: AuthData = yield response.json();
-    console.log(data);
 
     if (response.status === 200) {
       yield put(setIsLoading(true));
@@ -130,7 +127,6 @@ export function* requestUserData(action: PayloadAction<string>) {
     );
 
     const userData: UserDataResponse = yield userReqResponse.json();
-    console.log(userData);
 
     if (userReqResponse.status === 200) {
       localStorage.setItem("isAuth", "true");
@@ -247,7 +243,7 @@ export function* trimEntriesOnTimerRoute(action: LocationChangeAction) {
 
     const tenDaysOfEntriesAsArr = entriesByDaysArr
       .slice(0, DAYS_TO_SHOW)
-      .reduce((acc, day) => acc.concat(day.entries), [] as Entry[]);
+      .reduce<Entry[]>((acc, day) => acc.concat(day.entries), []);
 
     yield put(setEntries(tenDaysOfEntriesAsArr));
   } catch (e) {
