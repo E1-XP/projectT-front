@@ -26,13 +26,13 @@ interface Props {
   projects: Project[];
   periodProjectDurations: PeriodProjectDurations;
   state: State;
-  setState: any;
+  setState: React.Dispatch<React.SetStateAction<State>>;
 }
 
 interface ICheckbox {
   name: string;
   state: State;
-  handleFn: (e: any, name: string) => any;
+  handleFn: (e: React.ChangeEvent<HTMLInputElement>, name: string) => void;
 }
 
 const MAIN_CHECKBOX = "mainCheckbox";
@@ -60,8 +60,8 @@ const CheckBox = ({ name, state, handleFn }: ICheckbox) => {
 };
 
 interface ISortable {
-  stateFn: any;
-  sortBy: string;
+  stateFn: (orderBy: SortOrder, sortBy: SortBy) => void;
+  sortBy: SortBy;
 }
 
 const Sortable_Panel = ({ stateFn, sortBy }: ISortable) => (
@@ -93,7 +93,10 @@ export const ProjectsTable = ({
     setState(newState);
   };
 
-  const checkBoxesHandler = (e: any, name: string) => {
+  const checkBoxesHandler = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
     const { checked } = e.target;
 
     const checkboxProjectIdx = state.sortedProjects.findIndex(
