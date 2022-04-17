@@ -61,8 +61,6 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
         yield put(setDuration(Date.now() - currentRunningEntry.start));
     }
 
-    let isYielding = isRunning;
-
     if (isRunning) {
       const start = Date.now();
 
@@ -75,12 +73,11 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
             project,
           })
         );
-
-        yield take(types.ENTRY_INSERT);
       }
 
-      while (isYielding) {
-        const { duration } = yield select(selectTimer);
+      while (true) {
+        const { duration, isRunning } = yield select(selectTimer);
+        if (!isRunning) break;
 
         const displayValue = compose(
           formatDuration,
@@ -101,9 +98,6 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
             : duration + SECOND;
 
         yield put(setDuration(handleInactiveTabFreeze));
-
-        const { isRunning } = yield select(selectTimer);
-        isYielding = isRunning;
       }
     } else {
       const stop = Date.now();
