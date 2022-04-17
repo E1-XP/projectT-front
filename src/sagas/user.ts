@@ -195,7 +195,7 @@ export function* deleteAvatar(action: Action) {
   try {
     const { _id: userId, avatar: avatarURL } = yield select(selectUserData);
 
-    const avatarFileURL = avatarURL.split(config.API_URL)[1];
+    const avatarFileURL = avatarURL.split(config.API_URL_ORIGIN)[1];
 
     if (!avatarURL || !avatarFileURL) return;
 

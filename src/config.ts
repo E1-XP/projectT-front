@@ -3,4 +3,5 @@ export const config = {
     process.env.NODE_ENV === "production"
       ? `${window.location.origin}/api`
       : "https://project-t.gtxcodeworks.site",
+  API_URL_ORIGIN: "https://project-t.gtxcodeworks.site",
 };
