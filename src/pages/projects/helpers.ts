@@ -2,6 +2,7 @@ import intervalToDuration from "date-fns/intervalToDuration";
 import { PeriodProjectDurations, formatDurationReadable } from "../../helpers";
 
 import { GroupedEntries } from "../../selectors/groupEntriesByDays";
+import { Project } from "../../store/interfaces";
 
 export type ProjectDurations = (GroupedEntries & {
   name: string;
@@ -12,29 +13,28 @@ export type SortOrder = "asc" | "desc";
 
 export const sortFn =
   (sortBy: SortBy, sortOrder: SortOrder, projectData?: ProjectDurations) =>
-  (a: any, b: any) => {
-    if (sortBy === "name") {
-      a = a.name.toLowerCase();
-      b = b.name.toLowerCase();
-    } else if (sortBy === "client") {
-      a = a.client.toLowerCase();
-      b = b.client.toLowerCase();
-    } else if (sortBy === "status" && projectData) {
-      a = projectData.find((p) => p.name === a.name)?.totalDuration || 0;
-      b = projectData.find((p) => p.name === b.name)?.totalDuration || 0;
-    }
+  (first: Project, second: Project) => {
+    const getValue = (v: Project, sortBy: "name" | "client") =>
+      v[sortBy].toLowerCase();
 
-    let boolArg;
+    type Value = string | number;
+    let a: Value, b: Value;
+
+    if (sortBy !== "status") {
+      a = getValue(first, sortBy);
+      b = getValue(second, sortBy);
+    } else if (sortBy === "status" && projectData) {
+      a = projectData.find((p) => p.name === first.name)?.totalDuration || 0;
+      b = projectData.find((p) => p.name === second.name)?.totalDuration || 0;
+    } else return 0;
+
     switch (sortOrder) {
       case "desc":
-        boolArg = a > b;
-        break;
-      case "asc":
-        boolArg = b > a;
-        break;
-    }
+        return a > b ? -1 : 1;
 
-    return boolArg ? -1 : !boolArg ? 1 : 0;
+      case "asc":
+        return b > a ? -1 : 1;
+    }
   };
 
 export const getProjectDuration = (
