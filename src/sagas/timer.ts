@@ -54,9 +54,8 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
         selectEntries
       );
 
-      currentRunningEntry = entries.find(
-        (entry) => entry._id === currentEntryId
-      );
+      currentRunningEntry = entries.find(({ _id }) => _id === currentEntryId);
+
       if (currentRunningEntry)
         yield put(setDuration(Date.now() - currentRunningEntry.start));
     }
@@ -140,14 +139,12 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
         }
 
         currentRunningEntry = undefined;
-      }
-
-      if (currentRunningEntry) {
+      } else {
         yield call(updateEntrySaga, {
           type: updateEntry.type,
           payload: {
             stop,
-            _id: currentRunningEntry._id,
+            _id: currentEntryId,
           },
         });
       }
