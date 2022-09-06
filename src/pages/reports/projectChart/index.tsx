@@ -100,6 +100,11 @@ export const ProjectChart = ({ range }: Props) => {
   const isSmallPhone = size.width && size.width < emToPx(breakPoints.verySmall);
 
   const legendStyle = { top: 0, transform: "translateY(100%)" };
+  const wrapperStyle = {
+    maxHeight: "86%",
+    overflow: "scroll",
+    marginTop: "1rem",
+  };
 
   const customLegend = () => (
     <ul>
@@ -170,6 +175,7 @@ export const ProjectChart = ({ range }: Props) => {
       </ResponsiveContainer>
       <Legend
         style={legendStyle}
+        wrapperStyle={wrapperStyle}
         content={customLegend}
         layout="vertical"
         align="left"

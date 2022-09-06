@@ -21,6 +21,7 @@ export const List_Item = styled.li`
 
   ${getBP(breakPoints.small)} {
     width: 13rem;
+    font-size: 0.95rem;
   }
 `;
 
