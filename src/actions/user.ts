@@ -13,7 +13,12 @@ export const sendUserData = createAction<Partial<UserData>>(
 
 export const setEntries = createAction<Entry[]>(types.USER_SET_ENTRIES);
 
-export const fetchEntries = createAction<number | undefined>(
+export interface FetchEntriesPayload {
+  end?: number;
+  days?: number;
+}
+
+export const fetchEntries = createAction<FetchEntriesPayload>(
   types.USER_FETCH_ENTRIES
 );
 

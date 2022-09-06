@@ -69,7 +69,7 @@ export const Reports = () => {
 
   useEffect(() => {
     setState(getState());
-    dispatch(fetchEntries(range.startDate.getTime()));
+    dispatch(fetchEntries({ end: range.startDate.getTime() }));
   }, [range]);
 
   const toggleCalendar = useCallback(

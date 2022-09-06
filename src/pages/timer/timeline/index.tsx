@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import isSameDay from "date-fns/isSameDay";
 
 import { fetchEntries } from "../../../actions/user";
 
@@ -23,8 +24,26 @@ import {
 export const Timeline = () => {
   const dispatch = useStoreDispatch();
   const isFetching = useStoreSelector((state) => state.global.isFetching);
+  const currentEntryId = useStoreSelector(
+    (state) => state.timer.currentEntryId
+  );
   const entriesByDays = useStoreSelector(groupEntriesByDays);
-  const entriesByDaysAsArr = Object.values(entriesByDays);
+  const entriesByDaysAsArr = Object.values(entriesByDays)
+    .slice()
+    .sort((a, b) => b.start - a.start);
+
+  useEffect(() => {
+    const oneDayHasSingleEntryThatStillRuns =
+      entriesByDaysAsArr.length === 9 &&
+      currentEntryId &&
+      !entriesByDaysAsArr.some((day) =>
+        isSameDay(day.start, Number(currentEntryId))
+      );
+
+    if (oneDayHasSingleEntryThatStillRuns) {
+      dispatch(fetchEntries({ days: 1 }));
+    }
+  }, []);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,7 +53,7 @@ export const Timeline = () => {
 
   const loadMoreData = useCallback(() => {
     setIsLoading(true);
-    dispatch(fetchEntries());
+    dispatch(fetchEntries({}));
   }, []);
 
   return (

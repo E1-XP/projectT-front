@@ -13,7 +13,7 @@ import { Entry, Project, UserData } from "../store/interfaces";
 
 import { requestError } from "../actions/global";
 import { batchInsertEntry } from "../actions/entry";
-import { setProjects, setUserData } from "../actions/user";
+import { FetchEntriesPayload, setProjects, setUserData } from "../actions/user";
 
 import { groupEntriesByDays, SingleDay } from "../selectors/groupEntriesByDays";
 import { selectUserData } from "../selectors";
@@ -25,11 +25,13 @@ interface UserDataResponse extends UserData {
 const entriesRequest = async (
   userId: string,
   beginAt: number,
-  endAt?: number
+  endAt?: number,
+  days?: number
 ) => {
-  const queryStr = `?begin=${beginAt}`.concat(
-    endAt !== undefined ? `&end=${endAt}` : ``
-  );
+  const queryStr = `?begin=${beginAt}`
+    .concat(endAt !== undefined ? `&end=${endAt}` : ``)
+    .concat(days !== undefined ? `&days=${days}` : ``);
+
   const URL = `${config.API_URL}/users/${userId}/entries${queryStr}`;
 
   return await request(URL, {
@@ -91,8 +93,9 @@ const requestSendUserData = async (data: Partial<UserData>, userId: string) => {
   });
 };
 
-export function* fetchEntries(action: PayloadAction<number | undefined>) {
+export function* fetchEntries(action: PayloadAction<FetchEntriesPayload>) {
   try {
+    const { end, days } = action.payload;
     const { _id: userId } = yield select(selectUserData);
     const entriesByDays: Record<string, SingleDay> = yield select(
       groupEntriesByDays
@@ -111,7 +114,8 @@ export function* fetchEntries(action: PayloadAction<number | undefined>) {
       entriesRequest,
       userId,
       startOfPreviousDay,
-      action.payload
+      end,
+      days
     );
 
     if (response.status === 200) {
