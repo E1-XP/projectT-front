@@ -11,10 +11,9 @@ export const GlobalStyle = createGlobalStyle`
     ${reset}
 
     html {
-        ${getBP(breakPoints.veryLarge)} {
-            font-size: 87.5%;
-        }
-
+        font-size: 87.5%;
+        height: 100%;
+    
         ${getBP(breakPoints.large)} {
             font-size: 75%;
         }
@@ -26,8 +25,6 @@ export const GlobalStyle = createGlobalStyle`
         ${getBP("370px", "min")} and (orientation:portrait) {
             overflow:hidden;
         }
-  
-        height: 100%;
     }
 
     body {
