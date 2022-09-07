@@ -68,7 +68,8 @@ export const ProjectChart = ({ range }: Props) => {
     periodDaysArr,
     projects,
     timerDuration,
-    project
+    project,
+    range
   );
 
   const totalPeriodDuration = getTotalPeriodDuration(periodProjectDurations);

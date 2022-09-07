@@ -1,6 +1,9 @@
+import isWithinInterval from "date-fns/isWithinInterval";
+
 import { GroupedEntries, SingleDay } from "../selectors/groupEntriesByDays";
 import { Project } from "../store/interfaces";
 import { greyWhiteDarker } from "../styles/variables";
+import { Range } from "../pages/reports//hooks";
 
 export const normalize = (str: number | undefined) =>
   `${str}`.length > 1 ? str : `0${str}`;
@@ -32,7 +35,8 @@ export const getPeriodProjectDurations = (
   daysArr: SingleDay[],
   projects: Project[],
   timerDuration: number,
-  currentProject: string
+  currentProject: string,
+  range?: Range
 ) => {
   const noProjectDuration = {
     name: NO_PROJECT_PLACEHOLDER,
@@ -42,6 +46,15 @@ export const getPeriodProjectDurations = (
 
   const getFill = (name: string) =>
     projects.find((project) => project.name === name)?.color || greyWhiteDarker;
+
+  const isDataWithinRange = (date: number) => {
+    return range === undefined
+      ? true
+      : isWithinInterval(date, {
+          start: range.startDate,
+          end: range.endDate,
+        });
+  };
 
   const producedData = daysArr
     .reduce(
@@ -67,8 +80,9 @@ export const getPeriodProjectDurations = (
       [noProjectDuration] as PeriodProjectDurations
     )
     .map((project) => {
-      if (project.name === currentProject)
+      if (project.name === currentProject && isDataWithinRange(Date.now())) {
         project.totalDuration += timerDuration;
+      }
 
       return project;
     });
@@ -76,7 +90,8 @@ export const getPeriodProjectDurations = (
   if (
     currentProject &&
     timerDuration &&
-    !producedData.find((project) => project.name === currentProject)
+    !producedData.find((project) => project.name === currentProject) &&
+    isDataWithinRange(Date.now())
   ) {
     producedData.push({
       name: currentProject,
