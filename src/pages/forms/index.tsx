@@ -23,6 +23,7 @@ import {
   FormContainer,
   HiddenLabel,
   ErrorParagraph,
+  InfoParagraph,
 } from "./style";
 
 export interface Fields {
@@ -36,13 +37,13 @@ export const Form = () => {
   const dispatch = useStoreDispatch();
   const location = useLocation();
 
-  const onSignUpPage = location.pathname.toLowerCase() === "/signup";
+  const isOnSignUpPage = location.pathname.toLowerCase() === "/signup";
 
   const { isFetching, formMessage } = useStoreSelector((state) => state.global);
-  const [wasOnSignUpPage, setState] = useState(onSignUpPage);
+  const [wasOnSignUpPage, setState] = useState(isOnSignUpPage);
 
   const { SIGN_UP, LOGIN } = validationTypes;
-  const schemaType = onSignUpPage ? SIGN_UP : LOGIN;
+  const schemaType = isOnSignUpPage ? SIGN_UP : LOGIN;
 
   const {
     register,
@@ -51,9 +52,9 @@ export const Form = () => {
     reset,
   } = useForm({ resolver: yupResolver(getSchema(schemaType)!) });
 
-  if (wasOnSignUpPage !== onSignUpPage) {
+  if (wasOnSignUpPage !== isOnSignUpPage) {
     reset();
-    setState(onSignUpPage);
+    setState(isOnSignUpPage);
   }
 
   useEffect(() => {
@@ -100,7 +101,7 @@ export const Form = () => {
     dispatch(initAuth(fields));
   };
 
-  const welcomeText = onSignUpPage
+  const welcomeText = isOnSignUpPage
     ? `Sign Up to enter our App.`
     : `Log in to get access to your account.`;
 
@@ -121,7 +122,7 @@ export const Form = () => {
             })}
           />
           <HiddenLabel htmlFor="email">e-Mail</HiddenLabel>
-          {onSignUpPage && (
+          {isOnSignUpPage && (
             <>
               <Input
                 type="text"
@@ -147,7 +148,7 @@ export const Form = () => {
             })}
           />
           <HiddenLabel htmlFor="password">Password</HiddenLabel>
-          {onSignUpPage && (
+          {isOnSignUpPage && (
             <>
               <Input
                 type="password"
@@ -168,6 +169,12 @@ export const Form = () => {
             Send
           </Button_Action>
           <ErrorParagraph>{formatErrorMessage()}</ErrorParagraph>
+          {!isOnSignUpPage && (
+            <InfoParagraph>
+              Test account credentials, login: admin@admin.com, password:
+              Admin123
+            </InfoParagraph>
+          )}
         </FormContainer>
       </Main>
     </>

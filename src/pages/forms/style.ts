@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { greyWhiteDarker, red } from "../../styles/variables";
+import { green, greyWhiteDarker, red } from "../../styles/variables";
 import { visuallyHidden } from "../../styles/helpers";
 
 export const Heading = styled.h2`
@@ -31,6 +31,16 @@ export const FormContainer = styled.form`
 
 export const ErrorParagraph = styled.p`
   color: ${red};
+  padding: 2rem;
+  text-align: center;
+  min-height: 5.15rem;
+`;
+
+export const InfoParagraph = styled.p`
+  background: blanchedalmond;
+  border: 1px solid darkkhaki;
+  border-radius: 5px;
+  color: darkgoldenrod;
   padding: 2rem;
   text-align: center;
 `;
