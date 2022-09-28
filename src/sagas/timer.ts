@@ -4,7 +4,7 @@ import compose from "lodash/fp/compose";
 
 import isSameDay from "date-fns/isSameDay";
 import intervalToDuration from "date-fns/intervalToDuration";
-import differenceInDays from "date-fns/differenceInDays";
+import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import startOfDay from "date-fns/startOfDay";
 import endOfDay from "date-fns/endOfDay";
 import addDays from "date-fns/addDays";
@@ -107,7 +107,10 @@ export function* startTimerInterval(action: PayloadAction<boolean>) {
         currentRunningEntry &&
         !isSameDay(currentRunningEntry.start, stop)
       ) {
-        const dayCount = differenceInDays(stop, currentRunningEntry.start);
+        const dayCount = differenceInCalendarDays(
+          stop,
+          currentRunningEntry.start
+        );
         let currentDay = currentRunningEntry.start;
         let i = dayCount;
 
