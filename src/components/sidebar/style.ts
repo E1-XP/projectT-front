@@ -49,7 +49,6 @@ export const Wrapper = styled.aside`
 
     ${getBP(breakPoints.verySmall)} {
       padding-left: 1rem;
-      padding-bottom: 5.4rem;
     }
 
     ${getBP("370px")} {
