@@ -97,8 +97,13 @@ export const Form = () => {
   };
 
   const onSubmit: SubmitHandler<Fields> = (fields) => {
+    const trimmedFields = Object.entries(fields).reduce((acc, [key, val]) => {
+      acc[key as keyof Fields] = val.trim();
+      return acc;
+    }, {} as Fields);
+
     clearFormMessage();
-    dispatch(initAuth(fields));
+    dispatch(initAuth(trimmedFields));
   };
 
   const welcomeText = isOnSignUpPage
