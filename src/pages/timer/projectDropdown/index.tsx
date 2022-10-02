@@ -73,7 +73,9 @@ export const ProjectDropdown = ({
 
             <List>
               {projects
-                .filter(({ name }) => name.includes(inputValue))
+                .filter(({ name }) =>
+                  name.toLowerCase().includes(inputValue.toLowerCase())
+                )
                 .map((project) => (
                   <Item
                     key={project.name}
@@ -104,8 +106,9 @@ export const ProjectDropdown = ({
                   </Item_Link>
                 </Item>
               }
-              {!projects.filter(({ name }) => name.includes(inputValue))
-                .length && (
+              {!projects.filter(({ name }) =>
+                name.toLowerCase().includes(inputValue.toLowerCase())
+              ).length && (
                 <Item key="nothing to show">
                   <Item_Link>No projects found</Item_Link>
                 </Item>
