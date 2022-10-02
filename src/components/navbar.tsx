@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
+import { useStoreSelector } from "../hooks";
 
 const Header = styled.header`
   display: flex;
@@ -21,10 +22,12 @@ const Navigation = styled.nav`
 const Logo = styled.h1``;
 
 export const NavBar = () => {
+  const { isUserLoggedIn } = useStoreSelector((state) => state.global);
+
   return (
     <Header>
       <Logo>
-        <NavLink to="/">ProjectT</NavLink>
+        <NavLink to={isUserLoggedIn ? "/" : "/login"}>ProjectT</NavLink>
       </Logo>
       <Navigation>
         <NavLink to="/login">Log In</NavLink>
