@@ -70,7 +70,7 @@ export const Entry = (props: Props) => {
   );
 
   const postEntry = useCallback(
-    debounce(500)((description) => {
+    debounce(1000)((description) => {
       isRegularEntry
         ? dispatch(updateEntry({ description, _id: props.data._id }))
         : dispatch(
