@@ -1,5 +1,8 @@
 import React from "react";
 import format from "date-fns/format";
+import isToday from "date-fns/isToday";
+import isYesterday from "date-fns/isYesterday";
+
 import intervalToDuration from "date-fns/intervalToDuration";
 
 import {
@@ -61,6 +64,13 @@ const getHeaderData = (entriesArr: IEntry[][]) =>
     return acc;
   }, [] as GroupedEntries[]);
 
+const getReadableDate = (date: number) => {
+  if (isToday(date)) return "Today";
+  if (isYesterday(date)) return "Yesterday";
+
+  return format(date, "eee, d MMM");
+};
+
 export const DayList = ({ data }: Props) => {
   const entriesWithoutProject = getEntriesSortedByDescription(
     data.entries.filter((entry) => !entry.project)
@@ -89,7 +99,7 @@ export const DayList = ({ data }: Props) => {
   return (
     <>
       <Header>
-        <Header_Date>{format(data.start, "eee, d MMM")}</Header_Date>
+        <Header_Date>{getReadableDate(data.start)}</Header_Date>
         <Header_DayCount>
           {formatDuration(
             intervalToDuration({ start: 0, end: data.totalDuration })
